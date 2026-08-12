@@ -13,34 +13,40 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("dark");
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") as Theme | null;
     const initialTheme = savedTheme || "dark";
     setTheme(initialTheme);
+
+    const root = document.documentElement;
     if (initialTheme === "dark") {
-      document.documentElement.classList.add("dark");
+      root.classList.add("dark");
+      root.classList.remove("light");
     } else {
-      document.documentElement.classList.remove("dark");
+      root.classList.remove("dark");
+      root.classList.add("light");
     }
-    setMounted(true);
   }, []);
 
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
+
+    const root = document.documentElement;
     if (newTheme === "dark") {
-      document.documentElement.classList.add("dark");
+      root.classList.add("dark");
+      root.classList.remove("light");
     } else {
-      document.documentElement.classList.remove("dark");
+      root.classList.remove("dark");
+      root.classList.add("light");
     }
   };
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <div className={mounted ? theme : "dark"}>{children}</div>
+      {children}
     </ThemeContext.Provider>
   );
 }
