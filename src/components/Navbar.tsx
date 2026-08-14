@@ -20,7 +20,7 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-40 w-full transition-colors duration-300 font-sans shadow-md">
       {/* Top Announcement Bar & Quick Contact Header */}
-      <div className="w-full bg-gradient-to-r from-amber-950 via-[#C65A20] to-amber-950 dark:from-[#1a1614] dark:via-neutral-900 dark:to-[#1a1614] text-amber-100 text-xs py-2 px-4 border-b border-amber-800/40 dark:border-white/10 transition-colors">
+      <div className="w-full bg-gradient-to-r from-amber-950 via-[#C65A20] to-amber-950 dark:from-[#1a1614] dark:via-neutral-950 dark:to-[#1a1614] text-amber-100 text-xs py-2 px-4 border-b border-amber-800/40 dark:border-white/10 transition-colors">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2 text-center sm:text-left">
           {/* Left Side: Certification Badge + Tagline */}
           <div className="flex items-center gap-3">

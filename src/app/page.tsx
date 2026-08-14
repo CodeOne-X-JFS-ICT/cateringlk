@@ -84,7 +84,7 @@ export default function Home() {
                 </span>
               </div>
               <h3 className="font-serif text-2xl font-bold text-slate-900 dark:text-white group-hover:text-amber-500 transition-colors">
-                Restaurant Portal
+                Restaurant
               </h3>
               <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                 Reserve private dining slots, takeaway order options, and express
