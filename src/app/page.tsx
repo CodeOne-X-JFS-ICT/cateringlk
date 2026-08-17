@@ -15,11 +15,9 @@ export default function Home() {
             className="w-full h-full object-cover object-center animate-hero-kenburns opacity-50 dark:opacity-30 filter contrast-105"
           />
 
-          {/* Gradient Overlay matching Light/Dark Theme */}
-          <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-white/10 to-white/5 dark:from-[#0f0d0c]/10 dark:via-[#0f0d0c]/5 dark:to-[#0f0d0c]/5 transition-colors duration-300"></div>
-
+          
           {/* Ambient Particle Grid Overlay */}
-          <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#E36727_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none"></div>
+          <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#E36727_1.5px,transparent_1.5px)] [background-size:24px_24px] pointer-events-none"></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-6">
@@ -237,7 +235,7 @@ export default function Home() {
               Ordering Advice & Guides
             </span>
             <h2 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white mt-3">
-              Portal Navigation & Service Matrix
+              Our Service Matrix
             </h2>
             <p className="mt-3 text-slate-600 dark:text-slate-400 text-sm sm:text-base">
               Select an option below to jump directly to the relevant service
@@ -248,37 +246,22 @@ export default function Home() {
           {/* Service Matrix Table Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Column 1: Restaurant Portal Links */}
-            <div className="bg-[#FFFBF8] dark:bg-[#1a1614] border border-amber-500/30 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+            <div className="bg-[#FFFBF8] dark:bg-[#1a1614] border border-amber-500/40 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
               <div className="flex items-center gap-3 pb-4 border-b border-slate-200 dark:border-white/10">
                 <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-lg">
                   <i className="fa-solid fa-utensils"></i>
                 </div>
                 <div>
                   <h3 className="font-serif text-2xl font-bold text-slate-900 dark:text-white">
-                    Restaurant Portal
+                    Restaurant
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Daily Dining, Takeaway & 6km Radius Delivery
+                    Takeaway & 6km Radius Delivery
                   </p>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <Link
-                  href="/restaurant"
-                  className="p-4 rounded-2xl bg-[#FBEAD9]/70 dark:bg-[#26201d] border border-slate-200 dark:border-white/10 hover:border-amber-500 cursor-pointer transition-all flex items-center justify-between group block shadow-xs"
-                >
-                  <div>
-                    <div className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-amber-500">
-                      Dining / Private Dining
-                    </div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                      Reserve open time slots for Breakfast, Lunch & Dinner
-                    </div>
-                  </div>
-                  <i className="fa-solid fa-chevron-right text-slate-400 group-hover:translate-x-1 transition-transform"></i>
-                </Link>
-
                 <Link
                   href="/restaurant"
                   className="p-4 rounded-2xl bg-[#FBEAD9]/70 dark:bg-[#26201d] border border-slate-200 dark:border-white/10 hover:border-amber-500 cursor-pointer transition-all flex items-center justify-between group block shadow-xs"
@@ -303,7 +286,7 @@ export default function Home() {
                       Delivery Service (6km Radius)
                     </div>
                     <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                      Interactive map pin drop, city search & live meal dispatch
+                      Interactive map, city search & live meal dispatch
                     </div>
                   </div>
                   <i className="fa-solid fa-chevron-right text-slate-400 group-hover:translate-x-1 transition-transform"></i>
@@ -312,14 +295,14 @@ export default function Home() {
             </div>
 
             {/* Column 2: Catering Service Portal Links */}
-            <div className="bg-[#FFFBF8] dark:bg-[#1a1614] border border-[#E36727]/30 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+            <div className="bg-[#FFFBF8] dark:bg-[#1a1614] border border-[#E36727]/40 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
               <div className="flex items-center gap-3 pb-4 border-b border-slate-200 dark:border-white/10">
                 <div className="w-10 h-10 rounded-xl bg-[#E36727]/20 text-[#E36727] flex items-center justify-center font-bold text-lg">
                   <i className="fa-solid fa-bell-concierge"></i>
                 </div>
                 <div>
                   <h3 className="font-serif text-2xl font-bold text-slate-900 dark:text-white">
-                    Catering Service Portal
+                    Catering Service
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
                     Events, Custom Menus & Budget Estimator
@@ -354,21 +337,6 @@ export default function Home() {
                     <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                       Interactive Catering Cost Estimator with live LKR quote
                       summary
-                    </div>
-                  </div>
-                  <i className="fa-solid fa-chevron-right text-slate-400 group-hover:translate-x-1 transition-transform"></i>
-                </Link>
-
-                <Link
-                  href="/catering"
-                  className="p-4 rounded-2xl bg-[#FBEAD9]/70 dark:bg-[#26201d] border border-slate-200 dark:border-white/10 hover:border-[#E36727] cursor-pointer transition-all flex items-center justify-between group block shadow-xs"
-                >
-                  <div>
-                    <div className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-[#E36727]">
-                      Limited Packages & Custom Menus
-                    </div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                      Explore curated Sri Lankan, Indian, Chinese & BBQ packages
                     </div>
                   </div>
                   <i className="fa-solid fa-chevron-right text-slate-400 group-hover:translate-x-1 transition-transform"></i>

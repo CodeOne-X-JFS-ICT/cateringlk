@@ -117,21 +117,22 @@ export default function RestaurantPage() {
   };
 
   return (
-    <div className="w-full transition-colors duration-300 font-sans bg-white dark:bg-[#0f0d0c] text-slate-800 dark:text-slate-100">
+    <div className="w-full transition-colors duration-300 font-sans">
       {/* HERO SECTION */}
-      <section className="relative min-h-[65vh] flex items-center justify-center overflow-hidden py-16">
+      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden py-16 sm:py-10 bg-white dark:bg-[#0f0d0c]">
         {/* Animated Ken Burns Background */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img
             src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1920&q=80"
             alt="Dining & Restaurant Experience"
-            className="w-full h-full object-cover object-center animate-hero-kenburns opacity-60 dark:opacity-40 filter contrast-105"
+            className="w-full h-full object-cover object-center animate-hero-kenburns opacity-50 dark:opacity-30 filter contrast-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/60 to-white dark:from-[#0f0d0c]/90 dark:via-[#0f0d0c]/80 dark:to-[#0f0d0c] transition-colors duration-300"></div>
+          {/* Ambient Particle Grid Overlay */}
+          <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#E36727_1.5px,transparent_1.5px)] [background-size:24px_24px] pointer-events-none"></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-4">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-500 text-xs sm:text-sm font-extrabold mb-4 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-500 text-xs sm:text-sm font-extrabold mb-6 shadow-sm">
             <i className="fa-solid fa-utensils"></i> Handapangoda Dining & Express
             Delivery Hub
           </div>
@@ -143,37 +144,21 @@ export default function RestaurantPage() {
             </span>
           </h1>
 
-          <p className="mt-4 text-sm sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
+          <p className="mt-4 text-sm sm:text-xl text-slate-900 dark:text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
             Choose your order preference below: Book a private dining table, arrange quick takeaway pick-up, or verify your 6km radius for express hot delivery.
           </p>
 
           {/* Order Mode Switcher Tabs (Dining, Takeaway, Delivery 6km) */}
-          <div className="mt-8 max-w-4xl mx-auto bg-[#FFFBF8]/95 dark:bg-[#1a1614]/95 border border-amber-500/40 p-3 sm:p-4 rounded-3xl portal-card-shadow backdrop-blur-md">
-            <div className="grid grid-cols-3 gap-2 text-center">
-              <button
-                type="button"
-                onClick={() => setActiveTab("dining")}
-                className={`py-3 px-3 sm:px-4 rounded-2xl font-extrabold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-2 transition-all cursor-pointer ${
-                  activeTab === "dining"
-                    ? "bg-[#E36727] text-white shadow-md"
-                    : "bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:text-[#E36727]"
-                }`}
-              >
-                <i
-                  className={`fa-solid fa-chair ${
-                    activeTab === "dining" ? "text-white" : "text-amber-500"
-                  }`}
-                ></i>
-                <span>Dining</span>
-              </button>
-
+          <div className="mt-8 max-w-2xl mx-auto bg-[#FFFBF8]/95 dark:bg-[#1a1614]/95 border border-amber-500/40 p-3 sm:p-4 rounded-3xl portal-card-shadow backdrop-blur-md">
+            <div className="grid grid-cols-2 gap-2 text-center">
+              
               <button
                 type="button"
                 onClick={() => setActiveTab("takeaway")}
                 className={`py-3 px-3 sm:px-4 rounded-2xl font-extrabold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-2 transition-all cursor-pointer ${
                   activeTab === "takeaway"
                     ? "bg-[#E36727] text-white shadow-md"
-                    : "bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:text-[#E36727]"
+                    : "bg-#FBEAD9 dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:text-[#E36727]"
                 }`}
               >
                 <i
@@ -190,7 +175,7 @@ export default function RestaurantPage() {
                 className={`py-3 px-3 sm:px-4 rounded-2xl font-extrabold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-2 transition-all cursor-pointer ${
                   activeTab === "delivery"
                     ? "bg-[#E36727] text-white shadow-md"
-                    : "bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:text-[#E36727]"
+                    : "bg-#FBEAD9 dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:text-[#E36727]"
                 }`}
               >
                 <i
@@ -208,107 +193,6 @@ export default function RestaurantPage() {
       {/* TAB CONTENT CONTAINER */}
       <section className="py-12 sm:py-16 bg-white dark:bg-[#0f0d0c] border-t border-slate-200 dark:border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* TAB 1: DINING */}
-          {activeTab === "dining" && (
-            <div className="space-y-10 animate-in fade-in duration-300">
-              <div className="text-center max-w-2xl mx-auto space-y-2">
-                <span className="text-[#E36727] text-xs font-extrabold uppercase tracking-widest bg-[#E36727]/10 px-3.5 py-1 rounded-full border border-[#E36727]/20 inline-block">
-                  In-House Restaurant Experience
-                </span>
-                <h2 className="font-serif text-3xl font-extrabold text-slate-900 dark:text-white">
-                  Reservations & Meal Time Slots
-                </h2>
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-                  Enjoy fresh meals served in our peaceful Handapangoda dining hall and garden pavilions.
-                </p>
-              </div>
-
-              {/* Open Time Slots & Categories */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="p-5 rounded-3xl bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 text-center space-y-2 shadow-xs">
-                  <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mx-auto text-lg">
-                    <i className="fa-solid fa-sun"></i>
-                  </div>
-                  <h3 className="font-serif font-bold text-base text-slate-900 dark:text-white">
-                    Breakfast Slot
-                  </h3>
-                  <p className="text-xs text-amber-500 font-bold">
-                    7:30 AM - 10:30 AM
-                  </p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    String Hoppers, Milk Rice, Pol Roti, Egg Dishes & Ceylon Tea.
-                  </p>
-                </div>
-
-                <div className="p-5 rounded-3xl bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 text-center space-y-2 shadow-xs">
-                  <div className="w-10 h-10 rounded-2xl bg-[#E36727]/10 text-[#E36727] flex items-center justify-center mx-auto text-lg">
-                    <i className="fa-solid fa-utensils"></i>
-                  </div>
-                  <h3 className="font-serif font-bold text-base text-slate-900 dark:text-white">
-                    Lunch Buffet
-                  </h3>
-                  <p className="text-xs text-[#E36727] font-bold">
-                    12:00 PM - 3:30 PM
-                  </p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Red/Yellow Basmati Rice, Black Pork Curry, Seafood & Veg Curries.
-                  </p>
-                </div>
-
-                <div className="p-5 rounded-3xl bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 text-center space-y-2 shadow-xs">
-                  <div className="w-10 h-10 rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center mx-auto text-lg">
-                    <i className="fa-solid fa-cloud-moon"></i>
-                  </div>
-                  <h3 className="font-serif font-bold text-base text-slate-900 dark:text-white">
-                    Dinner & Grill
-                  </h3>
-                  <p className="text-xs text-purple-500 font-bold">
-                    6:30 PM - 10:30 PM
-                  </p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Live Kottu Roti, Hopper Counters, Wok Fried Rice & Charcoal BBQ.
-                  </p>
-                </div>
-
-                <div className="p-5 rounded-3xl bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 text-center space-y-2 shadow-xs">
-                  <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto text-lg">
-                    <i className="fa-solid fa-mug-hot"></i>
-                  </div>
-                  <h3 className="font-serif font-bold text-base text-slate-900 dark:text-white">
-                    Sub-Meals & Snacks
-                  </h3>
-                  <p className="text-xs text-emerald-500 font-bold">
-                    All Day Service
-                  </p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Short eats, Fresh Fruit Juices, Watalappan, Ice Creams & Coffees.
-                  </p>
-                </div>
-              </div>
-
-              {/* Table Reservation Action Card */}
-              <div className="max-w-3xl mx-auto p-6 rounded-3xl bg-slate-100 dark:bg-[#26201d] border border-amber-500/30 text-center space-y-4 shadow-lg">
-                <h3 className="font-serif font-bold text-2xl text-slate-900 dark:text-white">
-                  Book a Table / Private Dining Pavilion
-                </h3>
-                <p className="text-xs text-slate-600 dark:text-slate-300">
-                  Hosting family dining or a small celebration? Reserve your preferred time slot and table layout in advance.
-                </p>
-                <button
-                  type="button"
-                  onClick={() =>
-                    showAlertNotice(
-                      "Dining Reservation",
-                      "Please contact our dining desk at +94 74 201 3332 to reserve your table slot."
-                    )
-                  }
-                  className="px-6 py-3 bg-[#E36727] hover:bg-amber-600 text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-md transition-all cursor-pointer"
-                >
-                  Reserve Table Now
-                </button>
-              </div>
-            </div>
-          )}
 
           {/* TAB 2: TAKEAWAY */}
           {activeTab === "takeaway" && (
@@ -326,7 +210,7 @@ export default function RestaurantPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-6 rounded-3xl bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 space-y-3 shadow-xs">
+                <div className="p-6 rounded-3xl bg-[#FFFBF8] dark:bg-[#1a1614] border border-amber-500/40 dark:border-amber-500/40 hover:border-[#E36727]/70 space-y-3 shadow-xs">
                   <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-xl">
                     <i className="fa-solid fa-clock"></i>
                   </div>
@@ -338,7 +222,7 @@ export default function RestaurantPage() {
                   </p>
                 </div>
 
-                <div className="p-6 rounded-3xl bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 space-y-3 shadow-xs">
+                <div className="p-6 rounded-3xl bg-[#FFFBF8] dark:bg-[#1a1614] border border-amber-500/40 dark:border-amber-500/40 hover:border-[#E36727]/70 space-y-3 shadow-xs">
                   <div className="w-12 h-12 rounded-2xl bg-[#E36727]/10 text-[#E36727] flex items-center justify-center text-xl">
                     <i className="fa-solid fa-box font-bold"></i>
                   </div>
@@ -350,7 +234,7 @@ export default function RestaurantPage() {
                   </p>
                 </div>
 
-                <div className="p-6 rounded-3xl bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 space-y-3 shadow-xs">
+                <div className="p-6 rounded-3xl bg-[#FFFBF8] dark:bg-[#1a1614] border border-amber-500/40 dark:border-amber-500/40 hover:border-[#E36727]/70 space-y-3 shadow-xs">
                   <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xl">
                     <i className="fa-solid fa-wallet"></i>
                   </div>
@@ -401,7 +285,7 @@ export default function RestaurantPage() {
               {/* Interactive Location Eligibility Checker & Map Simulation */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                 {/* Search & Checker Inputs (Left) */}
-                <div className="lg:col-span-6 bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 p-6 sm:p-8 rounded-3xl space-y-5 shadow-lg">
+                <div className="lg:col-span-6 bg-[#FBEAD9] dark:bg-[#1a1614] border border-amber-200 dark:border-amber-200/40 p-6 sm:p-8 rounded-3xl space-y-5 shadow-lg">
                   <label className="block text-xs font-extrabold text-amber-500 uppercase tracking-wider">
                     Check Delivery Eligibility in Your Suburb
                   </label>
