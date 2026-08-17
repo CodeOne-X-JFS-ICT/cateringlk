@@ -4,9 +4,11 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "./ThemeProvider";
+import { useOrder } from "@/context/OrderContext";
 
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
+  const { toggleCartDrawer, cartTotalCount } = useOrder();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -125,11 +127,25 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* Instant Quote Action CTA */}
-          <div className="hidden sm:flex items-center gap-3">
+          {/* Instant Quote Action CTA & Quick Cart */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={toggleCartDrawer}
+              type="button"
+              className="relative p-2.5 rounded-xl bg-[#E36727]/10 border border-[#E36727]/30 text-[#E36727] hover:bg-[#E36727] hover:text-white transition-all cursor-pointer shadow-xs active:scale-95"
+              aria-label="View Shopping Cart"
+            >
+              <i className="fa-solid fa-basket-shopping text-base"></i>
+              {cartTotalCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 bg-[#E36727] text-white text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-[#0f0d0c] shadow-xs">
+                  {cartTotalCount}
+                </span>
+              )}
+            </button>
+
             <Link
               href="/contact"
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-[#E36727]/30 transition-all transform hover:scale-105 active:scale-95"
+              className="hidden sm:block px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-[#E36727]/30 transition-all transform hover:scale-105 active:scale-95"
             >
               Instant Quote
             </Link>

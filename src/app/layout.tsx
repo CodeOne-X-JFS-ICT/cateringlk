@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { OrderProvider } from "@/context/OrderContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import CartDrawer from "@/components/CartDrawer";
 
 export const metadata: Metadata = {
   title: "Catering by Ahas Gawwa | Premier Restaurant & Catering Services",
@@ -44,9 +46,12 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-white dark:bg-[#0f0d0c] text-slate-800 dark:text-slate-100 font-sans antialiased transition-colors duration-300">
         <ThemeProvider>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <OrderProvider>
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <CartDrawer />
+          </OrderProvider>
         </ThemeProvider>
       </body>
     </html>

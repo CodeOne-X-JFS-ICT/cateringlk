@@ -1,751 +1,501 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Link from "next/link";
-
-interface CartItem {
-  name: string;
-  price: number;
-}
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useOrder } from "@/context/OrderContext";
 
 export default function RestaurantPage() {
-  // Tab State: 'dining' | 'takeaway' | 'delivery'
-  const [activeTab, setActiveTab] = useState<"dining" | "takeaway" | "delivery">("dining");
+  const router = useRouter();
+  const {
+    setOrderType,
+    verifiedLocation,
+    setVerifiedLocation,
+    isLocationVerified,
+    setIsLocationVerified,
+  } = useOrder();
 
-  // Reservation Modal State
-  const [isResModalOpen, setIsResModalOpen] = useState(false);
-  const [resSlotTitle, setResSlotTitle] = useState("Dining Table");
-  const [resName, setResName] = useState("");
-  const [resPhone, setResPhone] = useState("");
-  const [resDate, setResDate] = useState("");
-  const [resGuests, setResGuests] = useState(2);
+  // Active Tab State: 'dining' | 'takeaway' | 'delivery'
+  const [activeTab, setActiveTab] = useState<"dining" | "takeaway" | "delivery">(
+    "takeaway"
+  );
 
-  // Takeaway Cart State
-  const [takeawayCart, setTakeawayCart] = useState<CartItem[]>([]);
-  const [takeawayDate, setTakeawayDate] = useState("");
-  const [takeawaySlot, setTakeawaySlot] = useState("12:15 PM");
-
-  // Delivery Map State
-  const [searchCity, setSearchCity] = useState("");
-  const [mapPin, setMapPin] = useState<{ x: number; y: number } | null>(null);
-  const [mapStatus, setMapStatus] = useState({
-    title: "Central Location Selected: Handapangoda Hub",
-    desc: "Inside standard 6km coverage area. Estimated delivery time: 30 - 40 Mins.",
-    isCoverage: true,
-  });
+  // Delivery Location Input State
+  const [selectedCity, setSelectedCity] = useState("");
+  const [inputCity, setInputCity] = useState("");
+  const [deliveryResultMsg, setDeliveryResultMsg] = useState<React.ReactNode>(
+    <span className="text-slate-500">
+      <i className="fa-solid fa-circle-info text-amber-500 mr-1"></i> Select a city
+      above or use GPS to verify if your location is within the 6km express radius.
+    </span>
+  );
 
   // Notice Modal State
   const [isNoticeOpen, setIsNoticeOpen] = useState(false);
   const [noticeTitle, setNoticeTitle] = useState("");
   const [noticeDesc, setNoticeDesc] = useState("");
 
-  // Set today's date on mount
-  useEffect(() => {
-    const today = new Date().toISOString().split("T")[0];
-    setTakeawayDate(today);
-    setResDate(today);
-  }, []);
-
-  // Notice Helper
   const showAlertNotice = (title: string, desc: string) => {
     setNoticeTitle(title);
     setNoticeDesc(desc);
     setIsNoticeOpen(true);
   };
 
-  // Scroll Helper
-  const scrollToPortalContent = () => {
-    const el = document.getElementById("portal-content-section");
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+  /* TAKEAWAY ORDER FLOW */
+  const startTakeawayOrder = () => {
+    setOrderType("takeaway");
+    setVerifiedLocation("Handapangoda Hub Pick-up Counter");
+    router.push("/products");
   };
 
-  // Reservation Handlers
-  const openReservation = (slotTitle: string) => {
-    setResSlotTitle(slotTitle);
-    setIsResModalOpen(true);
-  };
+  /* DELIVERY LOCATION CHECKER LOGIC */
+  const checkDeliveryLocation = () => {
+    const query = (selectedCity || inputCity).toLowerCase().trim();
 
-  const handleReservationSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsResModalOpen(false);
-    showAlertNotice(
-      "Reservation Request Sent!",
-      `Your table reservation request for ${resSlotTitle} on ${resDate} (${resGuests} guests) has been received. Our floor manager will contact you shortly.`
-    );
-    setResName("");
-    setResPhone("");
-  };
-
-  // Takeaway Cart Handlers
-  const addTakeawayItem = (name: string, price: number) => {
-    setTakeawayCart((prev) => [...prev, { name, price }]);
-  };
-
-  const getTakeawayTotal = () => {
-    return takeawayCart.reduce((sum, item) => sum + item.price, 0);
-  };
-
-  const confirmTakeawayOrder = () => {
-    if (takeawayCart.length === 0) {
-      showAlertNotice(
-        "Cart Empty",
-        "Please add at least one meal box before confirming takeaway."
-      );
-      return;
-    }
-    showAlertNotice(
-      "Takeaway Order Scheduled!",
-      `Your order of ${takeawayCart.length} item(s) has been placed for pick-up on ${takeawayDate} at ${takeawaySlot}. Total: LKR ${getTakeawayTotal().toLocaleString()}.`
-    );
-    setTakeawayCart([]);
-  };
-
-  // Delivery Search & Pin Logic
-  const handleCitySearch = () => {
-    const query = searchCity.trim().toLowerCase();
     if (!query) {
-      showAlertNotice(
-        "Search Input Needed",
-        "Please enter a suburb or city name to check delivery coverage."
+      setDeliveryResultMsg(
+        <span className="text-amber-500">
+          <i className="fa-solid fa-circle-exclamation mr-1"></i> Please select or
+          type your suburb name above.
+        </span>
       );
+      setIsLocationVerified(false);
       return;
     }
 
-    const inCoverage = [
+    const validSuburbs = [
       "handapangoda",
-      "arakawila",
-      "bope",
-      "millewa",
-      "meepe",
-      "galagedara",
       "padukka",
-      "watareka",
-      "moragahahena",
+      "ingiriya",
+      "horana",
+      "bope",
+      "meepe",
     ];
+    const match = validSuburbs.some((s) => query.includes(s));
 
-    const isMatch = inCoverage.some(
-      (s) => query.includes(s) || s.includes(query)
-    );
-
-    if (isMatch) {
-      setMapStatus({
-        title: `✓ ${query.toUpperCase()} Verified - Inside 6KM Zone`,
-        desc: "Hot insulated delivery available within 30-40 minutes.",
-        isCoverage: true,
-      });
-      setMapPin({ x: 50, y: 50 });
+    if (match) {
+      const locName = selectedCity || inputCity;
+      setVerifiedLocation(locName);
+      setIsLocationVerified(true);
+      setDeliveryResultMsg(
+        <span className="text-emerald-500 dark:text-emerald-400 font-bold">
+          <i className="fa-solid fa-circle-check mr-1"></i> Great News!{" "}
+          <strong>&quot;{locName.toUpperCase()}&quot;</strong> is within our 6km express
+          delivery radius. Estimated delivery: 35 mins.
+        </span>
+      );
     } else {
-      setMapStatus({
-        title: `⚠️ ${query.toUpperCase()} Outside Standard 6KM Zone`,
-        desc: "Special catering van dispatch available. Contact catering coordinator for surcharge details.",
-        isCoverage: false,
-      });
+      setIsLocationVerified(false);
+      setDeliveryResultMsg(
+        <span className="text-[#E36727] font-bold">
+          <i className="fa-solid fa-triangle-exclamation mr-1"></i>{" "}
+          <strong>&quot;{(selectedCity || inputCity).toUpperCase()}&quot;</strong> is
+          beyond our 6km express delivery limit. Please select Takeaway or call
+          manager.
+        </span>
+      );
     }
   };
 
-  const useCurrentGeo = () => {
-    setMapPin({ x: 48, y: 42 });
-    setMapStatus({
-      title: "✓ Current Location Dropped: Handapangoda / Padukka Border (3.2KM from Hub)",
-      desc: "Well within express 6KM coverage. Live chef dispatch active.",
-      isCoverage: true,
-    });
-  };
-
-  const handleMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
-    const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
-
-    setMapPin({ x: xPercent, y: yPercent });
-    setMapStatus({
-      title: "✓ Custom Location Pin Dropped",
-      desc: "Coordinates verified inside 6KM express delivery zone. Dispatch time ~35 Mins.",
-      isCoverage: true,
-    });
-  };
-
-  const sendWhatsAppDelivery = () => {
-    const text = `Hi Ahas Gawwa Restaurant, I would like to order meal delivery within 6km radius to my location.`;
-    window.open(
-      `https://wa.me/94771234567?text=${encodeURIComponent(text)}`,
-      "_blank"
+  const useCurrentLocationSim = () => {
+    setSelectedCity("Padukka");
+    setInputCity("");
+    setVerifiedLocation("Padukka");
+    setIsLocationVerified(true);
+    setDeliveryResultMsg(
+      <span className="text-emerald-500 dark:text-emerald-400 font-bold">
+        <i className="fa-solid fa-circle-check mr-1"></i> GPS Dropped:{" "}
+        <strong>&quot;PADUKKA (3.5KM FROM HUB)&quot;</strong> is inside 6km express
+        delivery radius.
+      </span>
     );
+  };
+
+  const startDeliveryOrder = () => {
+    if (!isLocationVerified) return;
+    setOrderType("delivery");
+    router.push("/products");
   };
 
   return (
     <div className="w-full transition-colors duration-300 font-sans bg-white dark:bg-[#0f0d0c] text-slate-800 dark:text-slate-100">
       {/* HERO SECTION */}
-      <section className="relative min-h-[75vh] flex items-center justify-center overflow-hidden py-16 sm:py-10">
-        {/* Background Image with Ken Burns Effect */}
+      <section className="relative min-h-[65vh] flex items-center justify-center overflow-hidden py-16">
+        {/* Animated Ken Burns Background */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img
-            src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1920&q=80"
-            alt="Ahas Gawwa Restaurant Ambiance"
-            className="w-full h-full object-cover object-center animate-hero-kenburns opacity-50 dark:opacity-30 filter contrast-105"
+            src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1920&q=80"
+            alt="Dining & Restaurant Experience"
+            className="w-full h-full object-cover object-center animate-hero-kenburns opacity-60 dark:opacity-40 filter contrast-105"
           />
-
-          {/* Ambient Grid Overlay */}
-          <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#E36727_1.5px,transparent_1.5px)] [background-size:24px_24px] pointer-events-none"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/60 to-white dark:from-[#0f0d0c]/90 dark:via-[#0f0d0c]/80 dark:to-[#0f0d0c] transition-colors duration-300"></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-4">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#E36727]/30 bg-[#E36727]/10 dark:bg-[#E36727]/20 text-[#E36727] text-xs sm:text-sm font-extrabold mb-6 shadow-sm">
-            <i className="fa-solid fa-utensils text-amber-500"></i> Authentic
-            Sri Lankan Fine Dining & Express Delivery
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-500 text-xs sm:text-sm font-extrabold mb-4 shadow-sm">
+            <i className="fa-solid fa-utensils"></i> Handapangoda Dining & Express
+            Delivery Hub
           </div>
 
-          {/* Headline */}
-          <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.12] max-w-4xl mx-auto">
-            Welcome to <span className="gold-gradient-text">Ahas Gawwa</span>{" "}
-            Restaurant
+          <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.15] max-w-4xl mx-auto">
+            Savor Authentic Sri Lankan & International{" "}
+            <span className="gold-gradient-text">
+              Flavors Fresh From Our Kitchen
+            </span>
           </h1>
 
-          <p className="mt-4 text-base sm:text-xl text-slate-900 dark:text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
-            Choose from private dining slot reservations, instant takeaway
-            orders, or 6km express meal delivery right to your doorstep.
+          <p className="mt-4 text-sm sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
+            Choose your order preference below: Book a private dining table, arrange quick takeaway pick-up, or verify your 6km radius for express hot delivery.
           </p>
 
-          {/* Tab Selector Bar */}
-          <div className="mt-10 max-w-3xl mx-auto bg-[#FFFBF8]/95 dark:bg-[#1a1614]/95 border border-[#E36727]/30 p-3 sm:p-4 rounded-3xl portal-card-shadow backdrop-blur-md">
-            <div className="grid grid-cols-3 gap-2 text-xs sm:text-sm font-bold">
+          {/* Order Mode Switcher Tabs (Dining, Takeaway, Delivery 6km) */}
+          <div className="mt-8 max-w-4xl mx-auto bg-[#FFFBF8]/95 dark:bg-[#1a1614]/95 border border-amber-500/40 p-3 sm:p-4 rounded-3xl portal-card-shadow backdrop-blur-md">
+            <div className="grid grid-cols-3 gap-2 text-center">
               <button
-                onClick={() => {
-                  setActiveTab("dining");
-                  scrollToPortalContent();
-                }}
-                className={`py-3 sm:py-3.5 px-3 rounded-2xl transition-all flex flex-col sm:flex-row items-center justify-center gap-2 cursor-pointer ${
+                type="button"
+                onClick={() => setActiveTab("dining")}
+                className={`py-3 px-3 sm:px-4 rounded-2xl font-extrabold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-2 transition-all cursor-pointer ${
                   activeTab === "dining"
-                    ? "bg-gradient-to-r from-[#E36727] to-amber-600 text-white shadow-md font-bold"
-                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
+                    ? "bg-[#E36727] text-white shadow-md"
+                    : "bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:text-[#E36727]"
                 }`}
               >
-                <i className="fa-solid fa-chair text-sm sm:text-base"></i>
-                <span>Dining / Private</span>
+                <i
+                  className={`fa-solid fa-chair ${
+                    activeTab === "dining" ? "text-white" : "text-amber-500"
+                  }`}
+                ></i>
+                <span>Dining</span>
               </button>
 
               <button
-                onClick={() => {
-                  setActiveTab("takeaway");
-                  scrollToPortalContent();
-                }}
-                className={`py-3 sm:py-3.5 px-3 rounded-2xl transition-all flex flex-col sm:flex-row items-center justify-center gap-2 cursor-pointer ${
+                type="button"
+                onClick={() => setActiveTab("takeaway")}
+                className={`py-3 px-3 sm:px-4 rounded-2xl font-extrabold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-2 transition-all cursor-pointer ${
                   activeTab === "takeaway"
-                    ? "bg-gradient-to-r from-[#E36727] to-amber-600 text-white shadow-md font-bold"
-                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
+                    ? "bg-[#E36727] text-white shadow-md"
+                    : "bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:text-[#E36727]"
                 }`}
               >
-                <i className="fa-solid fa-bag-shopping text-sm sm:text-base"></i>
+                <i
+                  className={`fa-solid fa-bag-shopping ${
+                    activeTab === "takeaway" ? "text-white" : "text-amber-500"
+                  }`}
+                ></i>
                 <span>Takeaway</span>
               </button>
 
               <button
-                onClick={() => {
-                  setActiveTab("delivery");
-                  scrollToPortalContent();
-                }}
-                className={`py-3 sm:py-3.5 px-3 rounded-2xl transition-all flex flex-col sm:flex-row items-center justify-center gap-2 cursor-pointer ${
+                type="button"
+                onClick={() => setActiveTab("delivery")}
+                className={`py-3 px-3 sm:px-4 rounded-2xl font-extrabold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-2 transition-all cursor-pointer ${
                   activeTab === "delivery"
-                    ? "bg-gradient-to-r from-[#E36727] to-amber-600 text-white shadow-md font-bold"
-                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
+                    ? "bg-[#E36727] text-white shadow-md"
+                    : "bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:text-[#E36727]"
                 }`}
               >
-                <i className="fa-solid fa-truck-fast text-sm sm:text-base"></i>
-                <span>6km Delivery</span>
+                <i
+                  className={`fa-solid fa-motorcycle ${
+                    activeTab === "delivery" ? "text-white" : "text-amber-500"
+                  }`}
+                ></i>
+                <span>Delivery (6km)</span>
               </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* PORTAL CONTENT SECTION */}
-      <section
-        id="portal-content-section"
-        className="py-12 sm:py-20 bg-white dark:bg-[#0f0d0c] border-t border-slate-200 dark:border-white/10"
-      >
+      {/* TAB CONTENT CONTAINER */}
+      <section className="py-12 sm:py-16 bg-white dark:bg-[#0f0d0c] border-t border-slate-200 dark:border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* ========================================================= */}
-          {/* 1. DINING PANEL CONTENT                                   */}
-          {/* ========================================================= */}
+          {/* TAB 1: DINING */}
           {activeTab === "dining" && (
-            <div className="space-y-12 animate-in fade-in duration-300">
-              <div className="text-center max-w-3xl mx-auto space-y-3">
-                <span className="text-[#E36727] text-xs uppercase font-extrabold tracking-widest bg-[#E36727]/10 px-3.5 py-1.5 rounded-full border border-[#E36727]/20 inline-block">
-                  Fine Dining & Open Slots
+            <div className="space-y-10 animate-in fade-in duration-300">
+              <div className="text-center max-w-2xl mx-auto space-y-2">
+                <span className="text-[#E36727] text-xs font-extrabold uppercase tracking-widest bg-[#E36727]/10 px-3.5 py-1 rounded-full border border-[#E36727]/20 inline-block">
+                  In-House Restaurant Experience
                 </span>
-                <h2 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">
-                  Reserve Your Private Table & Open Time Slots
+                <h2 className="font-serif text-3xl font-extrabold text-slate-900 dark:text-white">
+                  Reservations & Meal Time Slots
                 </h2>
-                <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base">
-                  Select an available dining period below to reserve your table
-                  for intimate family meals or executive private dining rooms.
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+                  Enjoy fresh meals served in our peaceful Handapangoda dining hall and garden pavilions.
                 </p>
               </div>
 
-              {/* Open Time Slots Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* Breakfast Slot */}
-                <div className="bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-300 dark:border-white/10 rounded-3xl p-6 space-y-4 hover:border-[#E36727] transition-all shadow-sm group">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center text-xl group-hover:bg-amber-500 group-hover:text-white transition-all">
-                    <i className="fa-solid fa-sun-plant-wilt"></i>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-slate-900 dark:text-white text-lg">
-                      Breakfast Slots
-                    </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                      07:30 AM – 10:30 AM Daily
-                    </p>
-                  </div>
-                  <div className="text-xs space-y-2 text-slate-600 dark:text-slate-300 border-t border-slate-200 dark:border-white/10 pt-3">
-                    <div className="flex items-center gap-1.5">
-                      <i className="fa-solid fa-circle-check text-emerald-500"></i>{" "}
-                      String Hoppers & Milk Rice
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <i className="fa-solid fa-circle-check text-emerald-500"></i>{" "}
-                      Ceylon Tea & Coffee Bar
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => openReservation("Breakfast Slot")}
-                    className="w-full py-2.5 bg-[#E36727]/10 hover:bg-[#E36727] text-[#E36727] hover:text-white font-bold text-xs rounded-xl transition-all border border-[#E36727]/30 cursor-pointer"
-                  >
-                    Reserve Breakfast Slot
-                  </button>
-                </div>
-
-                {/* Lunch Slot */}
-                <div className="bg-[#FFFBF8] dark:bg-[#1a1614] border border-[#E36727]/40 rounded-3xl p-6 space-y-4 hover:border-[#E36727] transition-all portal-card-shadow group">
-                  <div className="w-12 h-12 rounded-2xl bg-[#E36727]/15 text-[#E36727] flex items-center justify-center text-xl group-hover:bg-[#E36727] group-hover:text-white transition-all">
+              {/* Open Time Slots & Categories */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="p-5 rounded-3xl bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 text-center space-y-2 shadow-xs">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mx-auto text-lg">
                     <i className="fa-solid fa-sun"></i>
                   </div>
-                  <div>
-                    <h3 className="font-bold text-slate-900 dark:text-white text-lg">
-                      Lunch Buffets
-                    </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                      12:00 PM – 03:30 PM Daily
-                    </p>
-                  </div>
-                  <div className="text-xs space-y-2 text-slate-600 dark:text-slate-300 border-t border-slate-200 dark:border-white/10 pt-3">
-                    <div className="flex items-center gap-1.5">
-                      <i className="fa-solid fa-circle-check text-emerald-500"></i>{" "}
-                      Authentic Rice & Curry Buffet
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <i className="fa-solid fa-circle-check text-emerald-500"></i>{" "}
-                      Black Pork & Seafood Specialties
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => openReservation("Lunch Buffet Slot")}
-                    className="w-full py-2.5 bg-[#E36727] text-white font-bold text-xs rounded-xl shadow-md hover:bg-amber-600 transition-all cursor-pointer"
-                  >
-                    Reserve Lunch Table
-                  </button>
+                  <h3 className="font-serif font-bold text-base text-slate-900 dark:text-white">
+                    Breakfast Slot
+                  </h3>
+                  <p className="text-xs text-amber-500 font-bold">
+                    7:30 AM - 10:30 AM
+                  </p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    String Hoppers, Milk Rice, Pol Roti, Egg Dishes & Ceylon Tea.
+                  </p>
                 </div>
 
-                {/* Sub Meals / High-Tea Slot */}
-                <div className="bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-300 dark:border-white/10 rounded-3xl p-6 space-y-4 hover:border-[#E36727] transition-all shadow-sm group">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center text-xl group-hover:bg-amber-500 group-hover:text-white transition-all">
+                <div className="p-5 rounded-3xl bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 text-center space-y-2 shadow-xs">
+                  <div className="w-10 h-10 rounded-2xl bg-[#E36727]/10 text-[#E36727] flex items-center justify-center mx-auto text-lg">
+                    <i className="fa-solid fa-utensils"></i>
+                  </div>
+                  <h3 className="font-serif font-bold text-base text-slate-900 dark:text-white">
+                    Lunch Buffet
+                  </h3>
+                  <p className="text-xs text-[#E36727] font-bold">
+                    12:00 PM - 3:30 PM
+                  </p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Red/Yellow Basmati Rice, Black Pork Curry, Seafood & Veg Curries.
+                  </p>
+                </div>
+
+                <div className="p-5 rounded-3xl bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 text-center space-y-2 shadow-xs">
+                  <div className="w-10 h-10 rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center mx-auto text-lg">
+                    <i className="fa-solid fa-cloud-moon"></i>
+                  </div>
+                  <h3 className="font-serif font-bold text-base text-slate-900 dark:text-white">
+                    Dinner & Grill
+                  </h3>
+                  <p className="text-xs text-purple-500 font-bold">
+                    6:30 PM - 10:30 PM
+                  </p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Live Kottu Roti, Hopper Counters, Wok Fried Rice & Charcoal BBQ.
+                  </p>
+                </div>
+
+                <div className="p-5 rounded-3xl bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 text-center space-y-2 shadow-xs">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto text-lg">
                     <i className="fa-solid fa-mug-hot"></i>
                   </div>
-                  <div>
-                    <h3 className="font-bold text-slate-900 dark:text-white text-lg">
-                      Sub Meals & High Tea
-                    </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                      04:00 PM – 06:30 PM Daily
-                    </p>
-                  </div>
-                  <div className="text-xs space-y-2 text-slate-600 dark:text-slate-300 border-t border-slate-200 dark:border-white/10 pt-3">
-                    <div className="flex items-center gap-1.5">
-                      <i className="fa-solid fa-circle-check text-emerald-500"></i>{" "}
-                      Short Eats & Cutlets
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <i className="fa-solid fa-circle-check text-emerald-500"></i>{" "}
-                      Fresh Juices & Desserts
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => openReservation("Sub Meals & High Tea Slot")}
-                    className="w-full py-2.5 bg-[#E36727]/10 hover:bg-[#E36727] text-[#E36727] hover:text-white font-bold text-xs rounded-xl transition-all border border-[#E36727]/30 cursor-pointer"
-                  >
-                    Reserve High Tea Slot
-                  </button>
-                </div>
-
-                {/* Dinner Slot */}
-                <div className="bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-300 dark:border-white/10 rounded-3xl p-6 space-y-4 hover:border-[#E36727] transition-all shadow-sm group">
-                  <div className="w-12 h-12 rounded-2xl bg-indigo-500/15 text-indigo-500 flex items-center justify-center text-xl group-hover:bg-indigo-500 group-hover:text-white transition-all">
-                    <i className="fa-solid fa-moon"></i>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-slate-900 dark:text-white text-lg">
-                      Dinner & Night Grill
-                    </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                      06:30 PM – 11:00 PM Daily
-                    </p>
-                  </div>
-                  <div className="text-xs space-y-2 text-slate-600 dark:text-slate-300 border-t border-slate-200 dark:border-white/10 pt-3">
-                    <div className="flex items-center gap-1.5">
-                      <i className="fa-solid fa-circle-check text-emerald-500"></i>{" "}
-                      Live Hoppers & Kottu
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <i className="fa-solid fa-circle-check text-emerald-500"></i>{" "}
-                      Charcoal Seafood BBQ Grill
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => openReservation("Dinner & Night Grill Slot")}
-                    className="w-full py-2.5 bg-[#E36727]/10 hover:bg-[#E36727] text-[#E36727] hover:text-white font-bold text-xs rounded-xl transition-all border border-[#E36727]/30 cursor-pointer"
-                  >
-                    Reserve Dinner Slot
-                  </button>
-                </div>
-              </div>
-
-              {/* Dining Menu Preview */}
-              <div className="bg-[#FBEAD9] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-3xl p-6 sm:p-8 space-y-6 shadow-md">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-white/10">
-                  <div>
-                    <h3 className="font-serif text-2xl font-bold text-slate-900 dark:text-white">
-                      Restaurant Menu & Packages
-                    </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Curated by Master Chef Sunil Perera
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <span className="px-3 py-1 bg-[#E36727]/10 text-[#E36727] text-xs font-bold rounded-lg border border-[#E36727]/20">
-                      <i className="fa-solid fa-fire"></i> Freshly Prepared On
-                      Order
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {/* Menu Dish 1 */}
-                  <div className="p-4 rounded-2xl bg-white dark:bg-[#26201d] border border-slate-300 dark:border-white/10 hover:border-[#E36727] space-y-2 shadow-xs">
-                    <div className="flex justify-between items-start">
-                      <h4 className="font-bold text-sm text-slate-900 dark:text-white">
-                        Black Pork Curry Feast
-                      </h4>
-                      <span className="text-xs font-bold text-[#E36727]">
-                        LKR 1,850
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                      Served with fragrant yellow basmati rice, tempered dhal,
-                      brinjal moju, and papadam.
-                    </p>
-                  </div>
-
-                  {/* Menu Dish 2 */}
-                  <div className="p-4 rounded-2xl bg-white dark:bg-[#26201d] border border-slate-300 dark:border-white/10 hover:border-[#E36727] space-y-2 shadow-xs">
-                    <div className="flex justify-between items-start">
-                      <h4 className="font-bold text-sm text-slate-900 dark:text-white">
-                        Hot Butter Sepia Cuttlefish
-                      </h4>
-                      <span className="text-xs font-bold text-[#E36727]">
-                        LKR 2,200
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                      Crispy wok-tossed cuttlefish in spicy chili butter, capsicum,
-                      and scallions.
-                    </p>
-                  </div>
-
-                  {/* Menu Dish 3 */}
-                  <div className="p-4 rounded-2xl bg-white dark:bg-[#26201d] border border-slate-300 dark:border-white/10 hover:border-[#E36727] space-y-2 shadow-xs">
-                    <div className="flex justify-between items-start">
-                      <h4 className="font-bold text-sm text-slate-900 dark:text-white">
-                        Live Hopper Platter
-                      </h4>
-                      <span className="text-xs font-bold text-[#E36727]">
-                        LKR 1,250
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                      4 Plain hoppers + 1 Egg hopper served with spicy katta
-                      sambal and chicken curry gravy.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ========================================================= */}
-          {/* 2. TAKEAWAY PANEL CONTENT                                 */}
-          {/* ========================================================= */}
-          {activeTab === "takeaway" && (
-            <div className="space-y-12 animate-in fade-in duration-300">
-              <div className="text-center max-w-3xl mx-auto space-y-3">
-                <span className="text-amber-500 text-xs uppercase font-extrabold tracking-widest bg-amber-500/10 px-3.5 py-1.5 rounded-full border border-amber-500/20 inline-block">
-                  Express Pick-up Orders
-                </span>
-                <h2 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">
-                  Available Takeaway Meals & Pick-Up Slots
-                </h2>
-                <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base">
-                  Pre-order online and collect hot meal boxes directly from our
-                  Rajagiriya counter with zero waiting time.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                {/* Takeaway Meal Box Selection */}
-                <div className="lg:col-span-8 bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-3xl p-6 sm:p-8 space-y-6 shadow-md">
-                  <div className="flex justify-between items-center pb-4 border-b border-slate-200 dark:border-white/10">
-                    <h3 className="font-serif text-2xl font-bold text-slate-900 dark:text-white">
-                      1. Select Takeaway Meal Boxes
-                    </h3>
-                    <span className="text-xs text-amber-500 font-bold bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
-                      Hot Pick-Up Ready in 20 Mins
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Box Item 1 */}
-                    <div className="p-4 rounded-2xl bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 hover:border-[#E36727] space-y-3 shadow-xs">
-                      <div className="flex justify-between">
-                        <div className="font-bold text-sm text-slate-900 dark:text-white">
-                          Executive Ceylon Rice Box
-                        </div>
-                        <div className="text-xs font-bold text-[#E36727]">
-                          LKR 950
-                        </div>
-                      </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Steamed Basmati, Chicken or Fish, 3 curries, papadam,
-                        fried chili, and salad.
-                      </p>
-                      <button
-                        onClick={() =>
-                          addTakeawayItem("Executive Ceylon Rice Box", 950)
-                        }
-                        className="w-full py-2 bg-[#E36727] text-white text-xs font-bold rounded-xl hover:bg-amber-600 transition-all cursor-pointer"
-                      >
-                        + Add to Takeaway Order
-                      </button>
-                    </div>
-
-                    {/* Box Item 2 */}
-                    <div className="p-4 rounded-2xl bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 hover:border-[#E36727] space-y-3 shadow-xs">
-                      <div className="flex justify-between">
-                        <div className="font-bold text-sm text-slate-900 dark:text-white">
-                          Authentic Lamprais Box
-                        </div>
-                        <div className="text-xs font-bold text-[#E36727]">
-                          LKR 1,400
-                        </div>
-                      </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Stock rice, mixed meat curry, ash plantain, blachan,
-                        frikkadels, wrapped in banana leaf.
-                      </p>
-                      <button
-                        onClick={() =>
-                          addTakeawayItem("Authentic Lamprais Box", 1400)
-                        }
-                        className="w-full py-2 bg-[#E36727] text-white text-xs font-bold rounded-xl hover:bg-amber-600 transition-all cursor-pointer"
-                      >
-                        + Add to Takeaway Order
-                      </button>
-                    </div>
-
-                    {/* Box Item 3 */}
-                    <div className="p-4 rounded-2xl bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 hover:border-[#E36727] space-y-3 shadow-xs">
-                      <div className="flex justify-between">
-                        <div className="font-bold text-sm text-slate-900 dark:text-white">
-                          Cheese Chicken Kottu Box
-                        </div>
-                        <div className="text-xs font-bold text-[#E36727]">
-                          LKR 1,200
-                        </div>
-                      </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Chopped roti with roast chicken, egg, vegetables, melt
-                        cheese, and side gravy.
-                      </p>
-                      <button
-                        onClick={() =>
-                          addTakeawayItem("Cheese Chicken Kottu Box", 1200)
-                        }
-                        className="w-full py-2 bg-[#E36727] text-white text-xs font-bold rounded-xl hover:bg-amber-600 transition-all cursor-pointer"
-                      >
-                        + Add to Takeaway Order
-                      </button>
-                    </div>
-
-                    {/* Box Item 4 */}
-                    <div className="p-4 rounded-2xl bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 hover:border-[#E36727] space-y-3 shadow-xs">
-                      <div className="flex justify-between">
-                        <div className="font-bold text-sm text-slate-900 dark:text-white">
-                          Seafood Fried Rice Meal Box
-                        </div>
-                        <div className="text-xs font-bold text-[#E36727]">
-                          LKR 1,350
-                        </div>
-                      </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Wok-fried rice with prawns, squid, devilled chicken, fried
-                        egg, and chili paste.
-                      </p>
-                      <button
-                        onClick={() =>
-                          addTakeawayItem("Seafood Fried Rice Box", 1350)
-                        }
-                        className="w-full py-2 bg-[#E36727] text-white text-xs font-bold rounded-xl hover:bg-amber-600 transition-all cursor-pointer"
-                      >
-                        + Add to Takeaway Order
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Takeaway Time Slot & Order Summary Sticky Sidebar */}
-                <div className="lg:col-span-4 bg-[#FBEAD9] dark:bg-[#1a1614] border border-amber-500/40 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl sticky top-28">
-                  <h3 className="font-serif text-xl font-bold text-slate-900 dark:text-white pb-3 border-b border-slate-200 dark:border-white/10">
-                    2. Pick-Up Slot & Summary
+                  <h3 className="font-serif font-bold text-base text-slate-900 dark:text-white">
+                    Sub-Meals & Snacks
                   </h3>
-
-                  <div className="space-y-3 text-xs">
-                    <label className="block font-bold text-[#E36727] uppercase">
-                      Select Pick-Up Date & Slot
-                    </label>
-                    <input
-                      type="date"
-                      value={takeawayDate}
-                      onChange={(e) => setTakeawayDate(e.target.value)}
-                      className="w-full bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 p-3 rounded-xl text-slate-900 dark:text-white font-semibold"
-                    />
-
-                    <select
-                      value={takeawaySlot}
-                      onChange={(e) => setTakeawaySlot(e.target.value)}
-                      className="w-full bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 p-3 rounded-xl text-slate-900 dark:text-white font-semibold"
-                    >
-                      <option value="12:15 PM">
-                        12:15 PM - 12:45 PM (Express Lunch)
-                      </option>
-                      <option value="01:15 PM">
-                        01:15 PM - 01:45 PM (Express Lunch)
-                      </option>
-                      <option value="06:45 PM">
-                        06:45 PM - 07:15 PM (Express Evening)
-                      </option>
-                      <option value="08:15 PM">
-                        08:15 PM - 08:45 PM (Express Dinner)
-                      </option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-2 border-t border-slate-200 dark:border-white/10 pt-4 text-xs">
-                    <div className="font-bold text-slate-900 dark:text-white">
-                      Order Cart ({takeawayCart.length} items):
-                    </div>
-
-                    {takeawayCart.length === 0 ? (
-                      <div className="text-slate-500 dark:text-slate-400 italic">
-                        No items added yet. Click &quot;+ Add to Takeaway Order&quot;.
-                      </div>
-                    ) : (
-                      <div className="space-y-1.5 max-h-40 overflow-y-auto">
-                        {takeawayCart.map((item, index) => (
-                          <div
-                            key={index}
-                            className="flex justify-between items-center text-xs text-slate-700 dark:text-slate-300"
-                          >
-                            <span>
-                              {index + 1}. {item.name}
-                            </span>
-                            <span className="font-bold text-[#E36727]">
-                              LKR {item.price.toLocaleString()}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    <div className="flex justify-between font-bold text-sm text-[#E36727] pt-2 border-t border-slate-200 dark:border-white/10">
-                      <span>Total Amount:</span>
-                      <span>LKR {getTakeawayTotal().toLocaleString()}</span>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={confirmTakeawayOrder}
-                    className="w-full py-3 bg-[#E36727] text-white font-bold text-xs rounded-xl shadow-md hover:bg-amber-600 transition-all cursor-pointer"
-                  >
-                    Confirm & Schedule Pick-Up
-                  </button>
+                  <p className="text-xs text-emerald-500 font-bold">
+                    All Day Service
+                  </p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Short eats, Fresh Fruit Juices, Watalappan, Ice Creams & Coffees.
+                  </p>
                 </div>
+              </div>
+
+              {/* Table Reservation Action Card */}
+              <div className="max-w-3xl mx-auto p-6 rounded-3xl bg-slate-100 dark:bg-[#26201d] border border-amber-500/30 text-center space-y-4 shadow-lg">
+                <h3 className="font-serif font-bold text-2xl text-slate-900 dark:text-white">
+                  Book a Table / Private Dining Pavilion
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-300">
+                  Hosting family dining or a small celebration? Reserve your preferred time slot and table layout in advance.
+                </p>
+                <button
+                  type="button"
+                  onClick={() =>
+                    showAlertNotice(
+                      "Dining Reservation",
+                      "Please contact our dining desk at +94 74 201 3332 to reserve your table slot."
+                    )
+                  }
+                  className="px-6 py-3 bg-[#E36727] hover:bg-amber-600 text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-md transition-all cursor-pointer"
+                >
+                  Reserve Table Now
+                </button>
               </div>
             </div>
           )}
 
-          {/* ========================================================= */}
-          {/* 3. DELIVERY PANEL CONTENT (6km Radius Simulator)          */}
-          {/* ========================================================= */}
-          {activeTab === "delivery" && (
-            <div className="space-y-12 animate-in fade-in duration-300">
-              <div className="text-center max-w-3xl mx-auto space-y-3">
-                <span className="text-emerald-500 text-xs uppercase font-extrabold tracking-widest bg-emerald-500/10 px-3.5 py-1.5 rounded-full border border-emerald-500/20 inline-block">
-                  Express 6KM Delivery Zone
+          {/* TAB 2: TAKEAWAY */}
+          {activeTab === "takeaway" && (
+            <div className="space-y-8 animate-in fade-in duration-300">
+              <div className="text-center max-w-2xl mx-auto space-y-2">
+                <span className="text-[#E36727] text-xs font-extrabold uppercase tracking-widest bg-[#E36727]/10 px-3.5 py-1 rounded-full border border-[#E36727]/20 inline-block">
+                  Express Pick-up Counter
                 </span>
-                <h2 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">
-                  Delivery Location Map
+                <h2 className="font-serif text-3xl font-extrabold text-slate-900 dark:text-white">
+                  Takeaway Meals & Quick Pick-up
                 </h2>
-                <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base">
-                  We deliver hot meals within a 6km radius of our central kitchen
-                  in Hadapangoda / Arakawila / Padukka. Search your suburb or drop a map pin
-                  below.
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+                  Order hot, fresh meal ranges online and collect them ready at our Handapangoda restaurant takeaway counter.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                {/* Map Visualizer Column */}
-                <div className="lg:col-span-7 bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
-                  {/* Search & Location Inputs */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="p-6 rounded-3xl bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 space-y-3 shadow-xs">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-xl">
+                    <i className="fa-solid fa-clock"></i>
+                  </div>
+                  <h3 className="font-serif font-bold text-xl text-slate-900 dark:text-white">
+                    Ready in 20-25 Minutes
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Your order is freshly prepared immediately upon submission. No waiting in line at the counter.
+                  </p>
+                </div>
+
+                <div className="p-6 rounded-3xl bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 space-y-3 shadow-xs">
+                  <div className="w-12 h-12 rounded-2xl bg-[#E36727]/10 text-[#E36727] flex items-center justify-center text-xl">
+                    <i className="fa-solid fa-box font-bold"></i>
+                  </div>
+                  <h3 className="font-serif font-bold text-xl text-slate-900 dark:text-white">
+                    Insulated Eco Packaging
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Packed in leak-proof, heat-retaining containers keeping your Fried Rice, Kottu, and BBQ piping hot.
+                  </p>
+                </div>
+
+                <div className="p-6 rounded-3xl bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 space-y-3 shadow-xs">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xl">
+                    <i className="fa-solid fa-wallet"></i>
+                  </div>
+                  <h3 className="font-serif font-bold text-xl text-slate-900 dark:text-white">
+                    Zero Delivery Charge
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Pay only for the food items. Pay online via card or cash upon collection at the counter.
+                  </p>
+                </div>
+              </div>
+
+              {/* Takeaway Call-to-Action Box */}
+              <div className="p-8 rounded-3xl bg-gradient-to-r from-[#E36727] to-amber-600 text-white text-center space-y-4 portal-card-shadow">
+                <h3 className="font-serif font-extrabold text-2xl sm:text-3xl">
+                  Ready to Pick Up Your Favorite Meal?
+                </h3>
+                <p className="text-xs sm:text-sm text-white/90 max-w-xl mx-auto">
+                  Explore our 5 signature meal ranges (Fried Rice, Kottu, Noodles, Pizza & Specials) and add items to your basket.
+                </p>
+                <button
+                  type="button"
+                  onClick={startTakeawayOrder}
+                  className="px-8 py-3.5 bg-white text-slate-900 hover:bg-amber-100 font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-xl transition-all transform hover:scale-105 active:scale-95 cursor-pointer"
+                >
+                  <i className="fa-solid fa-bag-shopping text-[#E36727] mr-1"></i>{" "}
+                  Order Now for Takeaway
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: DELIVERY (6KM RADIUS) */}
+          {activeTab === "delivery" && (
+            <div className="space-y-8 animate-in fade-in duration-300">
+              <div className="text-center max-w-2xl mx-auto space-y-2">
+                <span className="text-[#E36727] text-xs font-extrabold uppercase tracking-widest bg-[#E36727]/10 px-3.5 py-1 rounded-full border border-[#E36727]/20 inline-block">
+                  Hot Express Delivery
+                </span>
+                <h2 className="font-serif text-3xl font-extrabold text-slate-900 dark:text-white">
+                  6km Radius Service Checker
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+                  We deliver hot meals within a strict 6km radius from our Handapangoda Hub to guarantee food quality.
+                </p>
+              </div>
+
+              {/* Interactive Location Eligibility Checker & Map Simulation */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                {/* Search & Checker Inputs (Left) */}
+                <div className="lg:col-span-6 bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 p-6 sm:p-8 rounded-3xl space-y-5 shadow-lg">
+                  <label className="block text-xs font-extrabold text-amber-500 uppercase tracking-wider">
+                    Check Delivery Eligibility in Your Suburb
+                  </label>
+
                   <div className="space-y-3">
-                    <label className="block text-xs font-bold text-[#E36727] uppercase tracking-wider">
-                      Search City or Suburb Name
-                    </label>
+                    {/* City Dropdown */}
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">
+                        Select Suburb / City
+                      </label>
+                      <select
+                        value={selectedCity}
+                        onChange={(e) => {
+                          setSelectedCity(e.target.value);
+                          setInputCity("");
+                        }}
+                        className="w-full bg-slate-100 dark:bg-[#26201d] border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white font-bold focus:outline-none focus:border-[#E36727] cursor-pointer"
+                      >
+                        <option value="">-- Choose Suburb near Handapangoda --</option>
+                        <option value="Handapangoda (Hub)">
+                          Handapangoda (Central Hub - 0km)
+                        </option>
+                        <option value="Padukka">Padukka (3.5km)</option>
+                        <option value="Ingiriya">Ingiriya (4.8km)</option>
+                        <option value="Horana">Horana (5.2km)</option>
+                        <option value="Bope">Bope (2.1km)</option>
+                        <option value="Meepe">Meepe (5.9km)</option>
+                        <option value="Colombo">Colombo (&gt; 6km - Out of Range)</option>
+                        <option value="Maharagama">
+                          Maharagama (&gt; 6km - Out of Range)
+                        </option>
+                        <option value="Gampaha">Gampaha (&gt; 6km - Out of Range)</option>
+                      </select>
+                    </div>
+
+                    {/* Manual City Input */}
                     <div className="flex gap-2">
                       <input
                         type="text"
-                        value={searchCity}
-                        onChange={(e) => setSearchCity(e.target.value)}
-                        placeholder="Enter city e.g. Handapangoda, Arakawila, Meepe, Millewa, Padukka, Moragahahena..."
-                        className="w-full bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white rounded-xl px-4 py-3 text-xs font-semibold focus:outline-none focus:border-[#E36727]"
+                        value={inputCity}
+                        onChange={(e) => {
+                          setInputCity(e.target.value);
+                          setSelectedCity("");
+                        }}
+                        placeholder="Or type suburb name e.g. Padukka, Horana..."
+                        className="w-full bg-slate-100 dark:bg-[#26201d] border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#E36727] font-medium"
                       />
                       <button
-                        onClick={handleCitySearch}
-                        className="px-5 py-3 bg-[#E36727] text-white text-xs font-bold rounded-xl shrink-0 hover:bg-amber-600 transition-all cursor-pointer"
+                        type="button"
+                        onClick={checkDeliveryLocation}
+                        className="px-5 py-2.5 bg-[#E36727] hover:bg-amber-600 text-white font-extrabold text-xs rounded-xl transition-all cursor-pointer shrink-0"
                       >
-                        Check Radius
+                        Verify
                       </button>
                     </div>
+
+                    {/* Use My Current Location Button */}
                     <button
-                      onClick={useCurrentGeo}
-                      className="w-full py-2.5 bg-slate-100 dark:bg-[#26201d] hover:bg-[#E36727]/10 text-[#E36727] border border-[#E36727]/30 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
+                      type="button"
+                      onClick={useCurrentLocationSim}
+                      className="w-full py-2.5 bg-slate-200 dark:bg-[#26201d] border border-slate-300 dark:border-white/10 hover:border-[#E36727] text-slate-800 dark:text-slate-200 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
                     >
-                      <i className="fa-solid fa-location-crosshairs"></i> Use My
-                      Current Location
+                      <i className="fa-solid fa-location-crosshairs text-[#E36727]"></i>
+                      <span>Use My Current GPS Location</span>
                     </button>
                   </div>
 
-                  {/* Google Map Embedded Location for CATERING by AHAS GAWWA */}
-                  <div className="relative w-full h-85 rounded-2xl overflow-hidden border-2 border-[#E36727]/40 shadow-lg">
+                  {/* Result Feedback Box */}
+                  <div className="p-4 rounded-2xl bg-slate-100 dark:bg-[#26201d] border border-slate-200 dark:border-white/10 text-xs font-semibold min-h-[50px] flex items-center">
+                    {deliveryResultMsg}
+                  </div>
+
+                  {/* Action Button: Activated when verified */}
+                  <button
+                    type="button"
+                    disabled={!isLocationVerified}
+                    onClick={startDeliveryOrder}
+                    className={`w-full py-3.5 font-extrabold text-xs uppercase tracking-wider rounded-2xl transition-all shadow-md ${
+                      isLocationVerified
+                        ? "bg-[#E36727] hover:bg-amber-600 text-white cursor-pointer shadow-lg transform hover:scale-[1.01]"
+                        : "bg-slate-400 text-white cursor-not-allowed"
+                    }`}
+                  >
+                    {isLocationVerified
+                      ? `Proceed to Order for Delivery (${verifiedLocation})`
+                      : "Verify Location to Unlock Order Now"}
+                  </button>
+                </div>
+
+                {/* Map Graphic Simulation (Right) */}
+                <div className="lg:col-span-6 bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-3xl p-4 shadow-xl">
+                  <div className="relative w-full h-80 rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 bg-slate-900">
                     <iframe
+                      title="Catering by Ahas Gawwa Official Location Map"
                       src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63384.46628298207!2d80.14106971664121!3d6.826972822009899!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae3b3003f850aef%3A0x1a81112e03fc4530!2sCATERING%20by%20AHAS%20GAWWA!5e0!3m2!1sen!2slk!4v1786599526916!5m2!1sen!2slk"
                       width="100%"
                       height="100%"
@@ -753,143 +503,14 @@ export default function RestaurantPage() {
                       allowFullScreen
                       loading="lazy"
                       referrerPolicy="strict-origin-when-cross-origin"
-                      title="CATERING by AHAS GAWWA Location Map"
-                      className="w-full h-full"
+                      className="w-full h-full filter contrast-105 opacity-80"
                     ></iframe>
-                  </div>
 
-                  {/* Status Banner */}
-                  <div
-                    className={`p-4 rounded-2xl border text-xs font-semibold flex items-center gap-3 ${
-                      mapStatus.isCoverage
-                        ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
-                        : "bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400"
-                    }`}
-                  >
-                    <i
-                      className={`fa-solid ${
-                        mapStatus.isCoverage
-                          ? "fa-circle-check"
-                          : "fa-triangle-exclamation"
-                      } text-lg`}
-                    ></i>
-                    <div>
-                      <div className="font-bold">{mapStatus.title}</div>
-                      <div className="text-[11px] opacity-80">
-                        {mapStatus.desc}
-                      </div>
+                    <div className="absolute top-3 left-3 bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-amber-500/40 text-[11px] font-bold text-amber-400">
+                      <i className="fa-solid fa-bullseye text-[#E36727]"></i> 6km Express
+                      Delivery Zone
                     </div>
                   </div>
-                </div>
-
-                {/* Deliverable Meals Menu */}
-                <div className="lg:col-span-5 bg-[#FBEAD9] dark:bg-[#1a1614] border border-amber-500/40 dark:border-white/10 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
-                  <div className="pb-3 border-b border-slate-200 dark:border-white/10">
-                    <h3 className="font-serif text-xl font-bold text-slate-900 dark:text-white">
-                      Meals Available for Delivery
-                    </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Packed in heat-insulated thermal containers
-                    </p>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="p-3.5 rounded-2xl bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 flex items-center justify-between shadow-xs">
-                      <div>
-                        <div className="font-bold text-xs text-slate-900 dark:text-white">
-                          Hot Black Pork Curry Rice Box
-                        </div>
-                        <div className="text-[11px] text-[#E36727] font-bold">
-                          LKR 1,250
-                        </div>
-                      </div>
-                      <button
-                        onClick={() =>
-                          showAlertNotice(
-                            "Delivery Item Selected",
-                            "Added 'Hot Black Pork Curry Rice Box' to delivery dispatch list."
-                          )
-                        }
-                        className="px-3 py-1.5 bg-[#E36727] text-white text-xs font-bold rounded-lg hover:bg-amber-600 transition-all cursor-pointer"
-                      >
-                        Order Now
-                      </button>
-                    </div>
-
-                    <div className="p-3.5 rounded-2xl bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 flex items-center justify-between shadow-xs">
-                      <div>
-                        <div className="font-bold text-xs text-slate-900 dark:text-white">
-                          Butter Chicken & Naan Combo
-                        </div>
-                        <div className="text-[11px] text-[#E36727] font-bold">
-                          LKR 1,550
-                        </div>
-                      </div>
-                      <button
-                        onClick={() =>
-                          showAlertNotice(
-                            "Delivery Item Selected",
-                            "Added 'Butter Chicken & Naan Combo' to delivery dispatch list."
-                          )
-                        }
-                        className="px-3 py-1.5 bg-[#E36727] text-white text-xs font-bold rounded-lg hover:bg-amber-600 transition-all cursor-pointer"
-                      >
-                        Order Now
-                      </button>
-                    </div>
-
-                    <div className="p-3.5 rounded-2xl bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 flex items-center justify-between shadow-xs">
-                      <div>
-                        <div className="font-bold text-xs text-slate-900 dark:text-white">
-                          Devilled Seafood Kottu Special
-                        </div>
-                        <div className="text-[11px] text-[#E36727] font-bold">
-                          LKR 1,400
-                        </div>
-                      </div>
-                      <button
-                        onClick={() =>
-                          showAlertNotice(
-                            "Delivery Item Selected",
-                            "Added 'Devilled Seafood Kottu Special' to delivery dispatch list."
-                          )
-                        }
-                        className="px-3 py-1.5 bg-[#E36727] text-white text-xs font-bold rounded-lg hover:bg-amber-600 transition-all cursor-pointer"
-                      >
-                        Order Now
-                      </button>
-                    </div>
-
-                    <div className="p-3.5 rounded-2xl bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 flex items-center justify-between shadow-xs">
-                      <div>
-                        <div className="font-bold text-xs text-slate-900 dark:text-white">
-                          Claypot Watalappan Dessert Cup
-                        </div>
-                        <div className="text-[11px] text-[#E36727] font-bold">
-                          LKR 450
-                        </div>
-                      </div>
-                      <button
-                        onClick={() =>
-                          showAlertNotice(
-                            "Delivery Item Selected",
-                            "Added 'Claypot Watalappan Dessert Cup' to delivery dispatch list."
-                          )
-                        }
-                        className="px-3 py-1.5 bg-[#E36727] text-white text-xs font-bold rounded-lg hover:bg-amber-600 transition-all cursor-pointer"
-                      >
-                        Order Now
-                      </button>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={sendWhatsAppDelivery}
-                    className="w-full py-3 bg-emerald-600 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 shadow-md hover:bg-emerald-700 transition-all cursor-pointer"
-                  >
-                    <i className="fa-brands fa-whatsapp text-sm"></i> Order via
-                    WhatsApp Express
-                  </button>
                 </div>
               </div>
             </div>
@@ -897,97 +518,12 @@ export default function RestaurantPage() {
         </div>
       </section>
 
-      {/* RESERVATION MODAL */}
-      {isResModalOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-[#FFFBF8] dark:bg-[#1a1614] border border-[#E36727]/40 rounded-3xl max-w-md w-full p-6 sm:p-8 relative shadow-2xl portal-card-shadow animate-in zoom-in-95 duration-200">
-            <button
-              onClick={() => setIsResModalOpen(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-900 dark:hover:text-white text-lg cursor-pointer"
-            >
-              <i className="fa-solid fa-xmark"></i>
-            </button>
-            <h3 className="font-serif text-2xl font-bold text-slate-900 dark:text-white mb-1">
-              Table Reservation
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">
-              Reserve {resSlotTitle} at Ahas Gawwa Restaurant.
-            </p>
-
-            <form onSubmit={handleReservationSubmit} className="space-y-4 text-xs">
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
-                  Your Full Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={resName}
-                  onChange={(e) => setResName(e.target.value)}
-                  placeholder="e.g. Asanka Perera"
-                  className="w-full bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-900 dark:text-white font-medium focus:outline-none focus:border-[#E36727]"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
-                  Contact Phone / WhatsApp
-                </label>
-                <input
-                  type="tel"
-                  required
-                  value={resPhone}
-                  onChange={(e) => setResPhone(e.target.value)}
-                  placeholder="077 123 4567"
-                  className="w-full bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-900 dark:text-white font-medium focus:outline-none focus:border-[#E36727]"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
-                    Date
-                  </label>
-                  <input
-                    type="date"
-                    required
-                    value={resDate}
-                    onChange={(e) => setResDate(e.target.value)}
-                    className="w-full bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-900 dark:text-white font-medium focus:outline-none focus:border-[#E36727]"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
-                    Guests Count
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="30"
-                    value={resGuests}
-                    onChange={(e) => setResGuests(parseInt(e.target.value) || 1)}
-                    className="w-full bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-900 dark:text-white font-medium focus:outline-none focus:border-[#E36727]"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-3.5 bg-[#E36727] text-white font-bold text-xs rounded-xl shadow-md hover:bg-amber-600 transition-all cursor-pointer"
-              >
-                Confirm Table Reservation
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
       {/* NOTICE MODAL */}
       {isNoticeOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <div className="bg-[#FFFBF8] dark:bg-[#1a1614] border border-[#E36727]/40 rounded-3xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className="w-14 h-14 bg-emerald-500/20 text-emerald-500 rounded-full flex items-center justify-center mx-auto text-2xl">
-              <i className="fa-solid fa-check"></i>
+            <div className="w-12 h-12 bg-amber-500/20 text-amber-500 rounded-full flex items-center justify-center mx-auto text-xl">
+              <i className="fa-solid fa-circle-info"></i>
             </div>
             <h3 className="font-serif text-xl font-bold text-slate-900 dark:text-white">
               {noticeTitle}
@@ -996,8 +532,9 @@ export default function RestaurantPage() {
               {noticeDesc}
             </p>
             <button
+              type="button"
               onClick={() => setIsNoticeOpen(false)}
-              className="w-full py-2.5 bg-[#E36727] text-white font-bold text-xs rounded-xl cursor-pointer"
+              className="w-full py-2.5 bg-[#E36727] text-white font-bold text-xs rounded-xl cursor-pointer hover:bg-amber-600 transition-all"
             >
               Close
             </button>
