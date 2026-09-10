@@ -129,7 +129,7 @@ export default function Home() {
                   Grand & Sacred Events
                 </div>
                 <h2 className="font-serif text-2xl font-bold text-slate-900 dark:text-white">
-                  Catering Service Portal
+                  Catering Service
                 </h2>
                 <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                   Compute itemized quotes, select functions (Dana, Weddings, Corporate), and explore Sri Lankan & international menus.
@@ -155,7 +155,7 @@ export default function Home() {
                   Dining, Takeaway & Delivery
                 </div>
                 <h2 className="font-serif text-2xl font-bold text-slate-900 dark:text-white">
-                  Restaurant Portal
+                  Takeaway & Delivery Service
                 </h2>
                 <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                   Reserve private dining slots, schedule takeaway meal boxes, or verify your 6km radius for express hot delivery.
@@ -166,7 +166,7 @@ export default function Home() {
                 href="/restaurant"
                 className="w-full py-3 rounded-2xl bg-slate-900 dark:bg-[#26201d] hover:bg-[#E36727] dark:hover:bg-[#E36727] text-white font-extrabold text-xs uppercase tracking-wider shadow-md transition-all flex items-center justify-center gap-2 transform group-hover:translate-x-1 border border-slate-700 dark:border-white/10"
               >
-                <span>Enter Restaurant Portal</span>
+                <span>Explore Portal</span>
                 <i className="fa-solid fa-arrow-right text-xs"></i>
               </Link>
             </div>
@@ -344,7 +344,7 @@ export default function Home() {
                 <i className="fa-solid fa-basket-shopping"></i>
               </div>
               <h3 className="font-serif font-bold text-2xl text-slate-900 dark:text-white">
-                Browse Restaurant Product Menu
+                Browse Our Meals
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                 Explore our 5 signature ranges (Fried Rice, Kottu, Noodles, Pizza & Specials) with instant basket ordering.

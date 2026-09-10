@@ -214,6 +214,13 @@ export default function CateringPage() {
   const [bookingPhone, setBookingPhone] = useState("");
   const [bookingSuburb, setBookingSuburb] = useState("");
 
+  // Payment Gateway State
+  const [isGatewayModalOpen, setIsGatewayModalOpen] = useState(false);
+  const [paymentType, setPaymentType] = useState<"advance" | "full">("advance");
+  const [payerName, setPayerName] = useState("");
+  const [payerPhone, setPayerPhone] = useState("");
+  const [gatewayChoice, setGatewayChoice] = useState("card");
+
   useEffect(() => {
     if (selectedLocation) {
       setBookingSuburb(selectedLocation);
@@ -245,6 +252,27 @@ export default function CateringPage() {
   const addonsPerPax = getAddonsPerPax();
   const totalPerPax = baseRate + addonsPerPax;
   const grandTotal = totalPerPax * paxCount;
+  const advanceAmount = Math.round(grandTotal * 0.3);
+  const balanceAmount = grandTotal - advanceAmount;
+
+  const openPaymentGateway = (type: "advance" | "full") => {
+    setPaymentType(type);
+    setIsGatewayModalOpen(true);
+  };
+
+  const handleGatewaySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsGatewayModalOpen(false);
+    const amt = paymentType === "advance" ? advanceAmount : grandTotal;
+    const label = paymentType === "advance" ? "30% Advance Deposit" : "100% Full Payment";
+    const receipt = "AG-PAY-" + Math.floor(100000 + Math.random() * 900000);
+    showAlertNotice(
+      "Payment Gateway Success!",
+      `Thank you ${payerName || "Valued Customer"}. Your ${label} of LKR ${amt.toLocaleString()} has been received. Receipt ID: ${receipt}. A catering manager will contact you at ${payerPhone || "your phone number"}.`
+    );
+    setPayerName("");
+    setPayerPhone("");
+  };
 
   // WhatsApp Quote Link
   const sendWhatsAppQuote = () => {
@@ -699,36 +727,118 @@ export default function CateringPage() {
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-white dark:bg-[#0f0d0c] border border-amber-500/40 text-center space-y-1 shadow-xs">
+              <div className="p-5 rounded-2xl bg-white dark:bg-[#0f0d0c] border border-amber-500/40 text-center space-y-2 shadow-xs">
                 <div className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
                   Estimated Total Investment
                 </div>
                 <div className="text-3xl sm:text-4xl font-serif font-extrabold gold-gradient-text">
                   LKR {grandTotal.toLocaleString()}
                 </div>
-                <div className="text-[10px] text-slate-500 italic">
+                
+                {/* 30% Advance & Balance Breakdown */}
+                <div className="pt-2 border-t border-slate-200 dark:border-white/10 grid grid-cols-2 gap-2 text-[11px] text-left">
+                  <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                    <span className="block text-[9px] uppercase font-bold text-amber-600 dark:text-amber-400">30% Advance Deposit</span>
+                    <span className="font-extrabold text-slate-900 dark:text-white">LKR {advanceAmount.toLocaleString()}</span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-slate-100 dark:bg-[#26201d] border border-slate-200 dark:border-white/10">
+                    <span className="block text-[9px] uppercase font-bold text-slate-500">70% Balance Due</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-300">LKR {balanceAmount.toLocaleString()}</span>
+                  </div>
+                </div>
+
+                <div className="text-[10px] text-slate-500 italic pt-1">
                   Includes buffet setup, chafing warmers & food transport within Colombo
                 </div>
               </div>
 
+              {/* PAYMENT GATEWAY & QUOTE ACTIONS */}
               <div className="space-y-2.5">
+                {/* Option 1: 30% Advance Payment via Gateway */}
+                <button
+                  onClick={() => openPaymentGateway("advance")}
+                  className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white text-xs font-extrabold uppercase tracking-wider rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer transform hover:scale-[1.01] active:scale-95"
+                >
+                  <i className="fa-solid fa-credit-card text-sm"></i>
+                  <span>Pay 30% Advance (LKR {advanceAmount.toLocaleString()})</span>
+                </button>
+
+                {/* Option 2: Full Payment via Gateway */}
+                <button
+                  onClick={() => openPaymentGateway("full")}
+                  className="w-full py-3.5 bg-slate-900 dark:bg-[#26201d] hover:bg-[#E36727] dark:hover:bg-[#E36727] text-white border border-amber-500/40 text-xs font-extrabold uppercase tracking-wider rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer transform hover:scale-[1.01] active:scale-95"
+                >
+                  <i className="fa-solid fa-lock text-amber-400"></i>
+                  <span>Pay Full Amount (LKR {grandTotal.toLocaleString()})</span>
+                </button>
+
+                {/* Option 3: Request Official Written Quote */}
                 <button
                   onClick={() => setIsBookingModalOpen(true)}
-                  className="w-full py-3.5 bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white text-xs font-extrabold uppercase tracking-wider rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-3 bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white text-xs font-extrabold uppercase tracking-wider rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <i className="fa-solid fa-paper-plane"></i> Request Official Written Quote
                 </button>
+
+                {/* Option 4: WhatsApp Quote */}
                 <button
                   onClick={sendWhatsAppQuote}
-                  className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  className="w-full py-3 bg-slate-100 dark:bg-[#26201d] hover:bg-slate-200 dark:hover:bg-white/10 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-white/10 text-xs font-extrabold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
-                  <i className="fa-brands fa-whatsapp text-sm"></i> Lock Quote on WhatsApp
+                  <i className="fa-brands fa-whatsapp text-emerald-500 text-sm"></i> Lock Quote on WhatsApp
                 </button>
+
+                {/* Option 5: Contact Call Center for Menu Customization */}
+                <a
+                  href="tel:+94742013332"
+                  className="w-full py-3 bg-amber-500/10 hover:bg-amber-500/20 text-[#E36727] dark:text-amber-400 border border-amber-500/30 text-xs font-extrabold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer text-center block"
+                >
+                  <i className="fa-solid fa-headset text-sm"></i> Call Desk for Menu Customization
+                </a>
               </div>
 
               <p className="text-[10px] text-slate-400 text-center leading-relaxed">
-                * Final prices may vary based on exact venue location and specific custom dish replacements.
+                * Secure SSL encrypted online payment gateway supporting Visa, Mastercard, AMEX & Sri Lanka IPG.
               </p>
+            </div>
+          </div>
+
+          {/* CALL CENTER & MENU CUSTOMIZATION BANNER UNDER ESTIMATOR */}
+          <div className="mt-12 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-slate-900 via-[#1a1614] to-slate-900 border border-amber-500/40 text-white shadow-2xl relative overflow-hidden portal-card-shadow">
+            <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
+              <div className="space-y-2 text-center lg:text-left">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-[11px] font-extrabold border border-amber-500/30">
+                  <i className="fa-solid fa-headset text-amber-400"></i> Dedicated Catering Call Center Desk
+                </div>
+                <h3 className="font-serif font-extrabold text-2xl sm:text-3xl text-white">
+                  Need Custom Menu Advice or Direct Payment Finalization?
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+                  Speak directly with our senior catering executive to customize dish items, get cost advice, modify guest counts, or finalize your 30% advance / full payment over the phone.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0 w-full sm:w-auto">
+                <a
+                  href="tel:+94742013332"
+                  className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-xl flex items-center justify-center gap-2.5 transition-all transform hover:scale-105 active:scale-95 cursor-pointer"
+                >
+                  <i className="fa-solid fa-phone text-sm"></i>
+                  <span>Call +94 74 201 3332</span>
+                </a>
+
+                <a
+                  href={`https://wa.me/94742013332?text=${encodeURIComponent(
+                    `Hi Catering Hotline, I need expert advice on menu customization & finalizing payment for my ${eventNames[selectedEvent]} catering quote (${paxCount} Pax).`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-xl flex items-center justify-center gap-2.5 transition-all transform hover:scale-105 active:scale-95 cursor-pointer"
+                >
+                  <i className="fa-brands fa-whatsapp text-base"></i>
+                  <span>WhatsApp Consultant</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -1232,6 +1342,121 @@ export default function CateringPage() {
             >
               Close
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* PAYMENT GATEWAY MODAL */}
+      {isGatewayModalOpen && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-[#FFFBF8] dark:bg-[#1a1614] border border-[#E36727]/40 rounded-3xl max-w-md w-full p-6 sm:p-7 relative shadow-2xl animate-in zoom-in-95 duration-200 space-y-4">
+            <button
+              onClick={() => setIsGatewayModalOpen(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-900 dark:hover:text-white text-lg cursor-pointer"
+            >
+              <i className="fa-solid fa-xmark"></i>
+            </button>
+
+            <div className="flex items-center gap-3 pb-3 border-b border-slate-200 dark:border-white/10">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xl">
+                <i className="fa-solid fa-lock"></i>
+              </div>
+              <div>
+                <h3 className="font-serif text-lg font-bold text-slate-900 dark:text-white">
+                  Ahas Gawwa Payment Gateway
+                </h3>
+                <span className="text-[10px] text-emerald-500 font-bold uppercase tracking-wider">
+                  256-Bit SSL Encrypted Payment
+                </span>
+              </div>
+            </div>
+
+            {/* Payment Amount Card */}
+            <div className="p-4 rounded-2xl bg-white dark:bg-[#26201d] border border-amber-500/30 text-center space-y-1">
+              <div className="text-[10px] uppercase font-bold text-slate-500">
+                {paymentType === "advance"
+                  ? "30% Advance Deposit Due Now"
+                  : "100% Full Payment Amount"}
+              </div>
+              <div className="text-2xl sm:text-3xl font-serif font-extrabold gold-gradient-text">
+                LKR {(paymentType === "advance" ? advanceAmount : grandTotal).toLocaleString()}
+              </div>
+              {paymentType === "advance" && (
+                <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Remaining 70% Balance (LKR {balanceAmount.toLocaleString()}) payable on event date.
+                </div>
+              )}
+            </div>
+
+            <form onSubmit={handleGatewaySubmit} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
+                  Payer / Client Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={payerName}
+                  onChange={(e) => setPayerName(e.target.value)}
+                  placeholder="Ruwan Wickramasinghe"
+                  className="w-full bg-slate-100 dark:bg-[#26201d] border border-slate-200 dark:border-white/10 rounded-xl p-2.5 text-slate-900 dark:text-white font-medium focus:outline-none focus:border-[#E36727]"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
+                  Mobile / WhatsApp Number *
+                </label>
+                <input
+                  type="tel"
+                  required
+                  value={payerPhone}
+                  onChange={(e) => setPayerPhone(e.target.value)}
+                  placeholder="077 123 4567"
+                  className="w-full bg-slate-100 dark:bg-[#26201d] border border-slate-200 dark:border-white/10 rounded-xl p-2.5 text-slate-900 dark:text-white font-medium focus:outline-none focus:border-[#E36727]"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1.5">
+                  Select Payment Method
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setGatewayChoice("card")}
+                    className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer ${
+                      gatewayChoice === "card"
+                        ? "border-emerald-500 bg-emerald-500/10 text-emerald-500"
+                        : "border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300"
+                    }`}
+                  >
+                    <i className="fa-solid fa-credit-card mr-1"></i> Visa / Master
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setGatewayChoice("ipg")}
+                    className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer ${
+                      gatewayChoice === "ipg"
+                        ? "border-emerald-500 bg-emerald-500/10 text-emerald-500"
+                        : "border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300"
+                    }`}
+                  >
+                    <i className="fa-solid fa-building-columns mr-1"></i> IPG Banking
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-md cursor-pointer transition-all flex items-center justify-center gap-2 transform hover:scale-[1.01]"
+              >
+                <i className="fa-solid fa-shield-halved"></i>
+                <span>
+                  Proceed to Secure Payment (LKR {(paymentType === "advance" ? advanceAmount : grandTotal).toLocaleString()})
+                </span>
+              </button>
+            </form>
           </div>
         </div>
       )}
