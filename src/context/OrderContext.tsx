@@ -33,6 +33,9 @@ interface OrderContextType {
   isCartDrawerOpen: boolean;
   setIsCartDrawerOpen: (open: boolean) => void;
   toggleCartDrawer: () => void;
+  isInstantQuoteOpen: boolean;
+  setIsInstantQuoteOpen: (open: boolean) => void;
+  openInstantQuoteModal: () => void;
   cartTotalCount: number;
   cartSubtotal: number;
 }
@@ -214,6 +217,11 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
   const [isLocationVerified, setIsLocationVerified] = useState<boolean>(false);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartDrawerOpen, setIsCartDrawerOpen] = useState<boolean>(false);
+  const [isInstantQuoteOpen, setIsInstantQuoteOpen] = useState<boolean>(false);
+
+  const openInstantQuoteModal = () => {
+    setIsInstantQuoteOpen(true);
+  };
 
   // Load saved state from localStorage if available
   useEffect(() => {
@@ -307,6 +315,9 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
         isCartDrawerOpen,
         setIsCartDrawerOpen,
         toggleCartDrawer,
+        isInstantQuoteOpen,
+        setIsInstantQuoteOpen,
+        openInstantQuoteModal,
         cartTotalCount,
         cartSubtotal,
       }}

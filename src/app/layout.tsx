@@ -5,6 +5,7 @@ import { OrderProvider } from "@/context/OrderContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
+import InstantQuoteModal from "@/components/InstantQuoteModal";
 
 export const metadata: Metadata = {
   title: "Catering by Ahas Gawwa | Premier Restaurant & Catering Services",
@@ -51,6 +52,7 @@ export default function RootLayout({
             <main className="flex-1">{children}</main>
             <Footer />
             <CartDrawer />
+            <InstantQuoteModal />
           </OrderProvider>
         </ThemeProvider>
       </body>

@@ -8,7 +8,7 @@ import { useOrder } from "@/context/OrderContext";
 
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
-  const { toggleCartDrawer, cartTotalCount } = useOrder();
+  const { toggleCartDrawer, cartTotalCount, openInstantQuoteModal } = useOrder();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -39,11 +39,10 @@ export default function Navbar() {
           {/* Right Side: Phone Contact & Theme Switcher Button */}
           <div className="flex items-center gap-4 text-xs">
             <a
-              href="tel:+94771234567"
+              href="tel:+94742013332"
               className="hover:text-white transition-colors flex items-center gap-1.5 font-medium"
             >
-              <i className="fa-solid fa-phone text-amber-400"></i> +94 77 123
-              4567
+              <i className="fa-solid fa-phone text-amber-400"></i> +94 74 201 3332
             </a>
             <span className="text-amber-700/60">|</span>
 
@@ -143,12 +142,13 @@ export default function Navbar() {
               )}
             </button>
 
-            <Link
-              href="/contact"
-              className="hidden sm:block px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-[#E36727]/30 transition-all transform hover:scale-105 active:scale-95"
+            <button
+              type="button"
+              onClick={openInstantQuoteModal}
+              className="hidden sm:block px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-[#E36727]/30 transition-all transform hover:scale-105 active:scale-95 cursor-pointer"
             >
               Instant Quote
-            </Link>
+            </button>
           </div>
 
           {/* Mobile Hamburger Button */}
@@ -190,13 +190,16 @@ export default function Navbar() {
             })}
 
             <div className="pt-4 border-t border-slate-200 dark:border-white/10 flex flex-col gap-2">
-              <Link
-                href="/contact"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full py-3 rounded-xl bg-[#E36727] text-white font-bold text-center text-sm shadow-md"
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  openInstantQuoteModal();
+                }}
+                className="w-full py-3 rounded-xl bg-[#E36727] text-white font-bold text-center text-sm shadow-md cursor-pointer hover:bg-amber-600 transition-all"
               >
                 Instant Quote
-              </Link>
+              </button>
             </div>
           </div>
         )}
