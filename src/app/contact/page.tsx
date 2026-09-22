@@ -162,11 +162,9 @@ export default function ContactPage() {
                 Central Kitchen & Restaurant
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                No. 142, Nawala Road,
+                No. 226, Arakawila
                 <br />
-                Rajagiriya / Nugegoda,
-                <br />
-                Colombo, Western Province, Sri Lanka.
+                Handapangoda
               </p>
               <a
                 href="#find-us"
@@ -190,21 +188,12 @@ export default function ContactPage() {
               </h3>
               <div className="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 leading-relaxed">
                 <p className="flex items-center gap-2">
-                  <i className="fa-solid fa-utensils text-[#E36727] text-[11px]"></i>
-                  <a
-                    href="mailto:catering@ahasgawwa.lk"
-                    className="hover:text-[#E36727] font-semibold"
-                  >
-                    catering@ahasgawwa.lk
-                  </a>
-                </p>
-                <p className="flex items-center gap-2">
                   <i className="fa-solid fa-circle-info text-[#E36727] text-[11px]"></i>
                   <a
-                    href="mailto:info@ahasgawwa.lk"
+                    href="mailto:info@catering.lk"
                     className="hover:text-[#E36727] font-semibold"
                   >
-                    info@ahasgawwa.lk
+                    info@catering.lk
                   </a>
                 </p>
               </div>
@@ -242,10 +231,10 @@ export default function ContactPage() {
                 <p className="flex items-center gap-2">
                   <i className="fa-solid fa-phone-flip text-[#E36727] text-[11px]"></i>
                   <a
-                    href="tel:+94112859900"
+                    href="tel:+94112175275"
                     className="hover:text-[#E36727] font-bold text-slate-900 dark:text-white"
                   >
-                    +94 11 285 9900
+                    +94 11 217 5275
                   </a>{" "}
                   (Office Landline)
                 </p>
