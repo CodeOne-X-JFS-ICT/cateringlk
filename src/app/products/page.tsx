@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useOrder, productCatalog, Product } from "@/context/OrderContext";
+import { useOrder, Product } from "@/context/OrderContext";
 
 export default function ProductsPage() {
   const router = useRouter();
@@ -20,8 +20,44 @@ export default function ProductsPage() {
 
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [fetchedProducts, setFetchedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredProducts = productCatalog.filter((product) => {
+  React.useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("http://localhost:5050/api/public/products");
+        if (!response.ok) throw new Error("Failed to fetch products");
+        const json = await response.json();
+        
+        if (json.success && json.data) {
+          // Flatten categories into a single array of products matching the context interface
+          const mappedProducts = json.data.flatMap((cat: any) => 
+            cat.products.map((p: any) => ({
+              id: p.id.toString(),
+              category: cat.slug,
+              name: p.name,
+              desc: p.description,
+              price: typeof p.price === 'string' ? parseFloat(p.price) : p.price,
+              portion: p.portion_label,
+              img: p.image_url,
+            }))
+          );
+          setFetchedProducts(mappedProducts);
+        } else {
+          setError(json.message || "Failed to load products");
+        }
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  const filteredProducts = fetchedProducts.filter((product) => {
     const matchesCategory =
       activeCategory === "all" || product.category === activeCategory;
     const matchesSearch =
@@ -116,80 +152,91 @@ export default function ProductsPage() {
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProducts.length === 0 ? (
-            <div className="col-span-full text-center py-12 text-slate-500 text-xs">
-              No meal items found matching your search filter.
-            </div>
-          ) : (
-            filteredProducts.map((p: Product) => {
-              const cartItem = cart.find((item) => item.id === p.id);
-              const qty = cartItem ? cartItem.qty : 0;
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E36727]"></div>
+          </div>
+        ) : error ? (
+          <div className="text-center py-12 text-red-500 text-sm bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-200 dark:border-red-800/30">
+            <i className="fa-solid fa-circle-exclamation text-2xl mb-2"></i>
+            <p>{error}</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProducts.length === 0 ? (
+              <div className="col-span-full text-center py-12 text-slate-500 text-xs">
+                No meal items found matching your search filter.
+              </div>
+            ) : (
+              filteredProducts.map((p: Product) => {
+                const cartItem = cart.find((item) => item.id === p.id);
+                const qty = cartItem ? cartItem.qty : 0;
 
-              return (
-                <div
-                  key={p.id}
-                  className="bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-3xl overflow-hidden space-y-3 shadow-md hover:border-[#E36727] transition-all flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="relative h-44 overflow-hidden">
-                      <img
-                        src={p.img}
-                        alt={p.name}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                      />
-                      <span className="absolute top-3 left-3 bg-black/75 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-extrabold text-amber-400">
-                        {p.portion}
-                      </span>
-                    </div>
-
-                    <div className="p-4 space-y-1.5">
-                      <h3 className="font-serif font-bold text-base text-slate-900 dark:text-white">
-                        {p.name}
-                      </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        {p.desc}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="p-4 pt-0 flex justify-between items-center border-t border-slate-200 dark:border-white/5">
-                    <div className="font-serif font-extrabold text-base text-[#E36727]">
-                      LKR {p.price.toLocaleString()}
-                    </div>
-
-                    {qty > 0 ? (
-                      <div className="flex items-center gap-2 bg-[#E36727]/10 border border-[#E36727]/30 px-2 py-1 rounded-xl text-xs">
-                        <button
-                          onClick={() => updateQty(p.id, -1)}
-                          className="w-6 h-6 rounded-lg bg-[#E36727] text-white font-bold cursor-pointer hover:bg-amber-600 transition-colors"
-                        >
-                          -
-                        </button>
-                        <span className="font-bold text-[#E36727] px-1">
-                          {qty}
+                return (
+                  <div
+                    key={p.id}
+                    className="bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-3xl overflow-hidden space-y-3 shadow-md hover:border-[#E36727] transition-all flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="relative h-44 overflow-hidden">
+                        <img
+                          src={p.img}
+                          alt={p.name}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                        />
+                        <span className="absolute top-3 left-3 bg-black/75 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-extrabold text-amber-400">
+                          {p.portion}
                         </span>
-                        <button
-                          onClick={() => updateQty(p.id, 1)}
-                          className="w-6 h-6 rounded-lg bg-[#E36727] text-white font-bold cursor-pointer hover:bg-amber-600 transition-colors"
-                        >
-                          +
-                        </button>
                       </div>
-                    ) : (
-                      <button
-                        onClick={() => addToCart(p)}
-                        className="px-4 py-2 bg-[#E36727] hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer transform hover:scale-105 active:scale-95"
-                      >
-                        + Add to Basket
-                      </button>
-                    )}
+
+                      <div className="p-4 space-y-1.5">
+                        <h3 className="font-serif font-bold text-base text-slate-900 dark:text-white">
+                          {p.name}
+                        </h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                          {p.desc}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-4 pt-0 flex justify-between items-center border-t border-slate-200 dark:border-white/5">
+                      <div className="font-serif font-extrabold text-base text-[#E36727]">
+                        LKR {p.price.toLocaleString()}
+                      </div>
+
+                      {qty > 0 ? (
+                        <div className="flex items-center gap-2 bg-[#E36727]/10 border border-[#E36727]/30 px-2 py-1 rounded-xl text-xs">
+                          <button
+                            onClick={() => updateQty(p.id, -1)}
+                            className="w-6 h-6 rounded-lg bg-[#E36727] text-white font-bold cursor-pointer hover:bg-amber-600 transition-colors"
+                          >
+                            -
+                          </button>
+                          <span className="font-bold text-[#E36727] px-1">
+                            {qty}
+                          </span>
+                          <button
+                            onClick={() => updateQty(p.id, 1)}
+                            className="w-6 h-6 rounded-lg bg-[#E36727] text-white font-bold cursor-pointer hover:bg-amber-600 transition-colors"
+                          >
+                            +
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => addToCart(p)}
+                          className="px-4 py-2 bg-[#E36727] hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer transform hover:scale-105 active:scale-95"
+                        >
+                          + Add to Basket
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })
-          )}
-        </div>
+                );
+              })
+            )}
+          </div>
+        )}
       </div>
 
       {/* STICKY FLOATING CART BAR */}
