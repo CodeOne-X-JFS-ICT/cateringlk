@@ -163,7 +163,7 @@ export default function Home() {
               </div>
 
               <Link
-                href="/restaurant"
+                href="/takeaway&delivery"
                 className="w-full py-3 rounded-2xl bg-slate-900 dark:bg-[#26201d] hover:bg-[#E36727] dark:hover:bg-[#E36727] text-white font-extrabold text-xs uppercase tracking-wider shadow-md transition-all flex items-center justify-center gap-2 transform group-hover:translate-x-1 border border-slate-700 dark:border-white/10"
               >
                 <span>Explore Portal</span>
@@ -370,7 +370,7 @@ export default function Home() {
                 Verify your suburb address in Handapangoda, Padukka, Ingiriya, or Horana for hot thermal-box delivery.
               </p>
               <Link
-                href="/restaurant"
+                href="/takeaway&delivery"
                 className="inline-flex items-center gap-2 text-xs font-extrabold text-[#E36727] hover:underline pt-2"
               >
                 <span>Check Delivery Radius</span>

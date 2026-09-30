@@ -67,7 +67,7 @@ export default function CheckoutPage() {
   const handleFinishOrder = () => {
     clearCart();
     setIsReceiptOpen(false);
-    router.push("/restaurant");
+    router.push("/takeaway&delivery");
   };
 
   return (

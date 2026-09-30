@@ -93,7 +93,7 @@ export default function ProductsPage() {
 
           <div className="flex items-center gap-3">
             <button
-              onClick={() => router.push("/restaurant")}
+              onClick={() => router.push("/takeaway&delivery")}
               className="px-4 py-2 bg-slate-200 dark:bg-[#26201d] hover:bg-slate-300 dark:hover:bg-white/10 text-slate-800 dark:text-slate-200 font-bold text-xs rounded-xl transition-all cursor-pointer shadow-xs"
             >
               Change Mode
