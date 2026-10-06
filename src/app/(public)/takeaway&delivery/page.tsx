@@ -151,20 +151,18 @@ export default function RestaurantPage() {
           {/* Order Mode Switcher Tabs (Dining, Takeaway, Delivery 6km) */}
           <div className="mt-8 max-w-2xl mx-auto bg-[#FFFBF8]/95 dark:bg-[#1a1614]/95 border border-amber-500/40 p-3 sm:p-4 rounded-3xl portal-card-shadow backdrop-blur-md">
             <div className="grid grid-cols-2 gap-2 text-center">
-              
+
               <button
                 type="button"
                 onClick={() => setActiveTab("takeaway")}
-                className={`py-3 px-3 sm:px-4 rounded-2xl font-extrabold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-2 transition-all cursor-pointer ${
-                  activeTab === "takeaway"
+                className={`py-3 px-3 sm:px-4 rounded-2xl font-extrabold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-2 transition-all cursor-pointer ${activeTab === "takeaway"
                     ? "bg-[#E36727] text-white shadow-md"
                     : "bg-#FBEAD9 dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:text-[#E36727]"
-                }`}
+                  }`}
               >
                 <i
-                  className={`fa-solid fa-bag-shopping ${
-                    activeTab === "takeaway" ? "text-white" : "text-amber-500"
-                  }`}
+                  className={`fa-solid fa-bag-shopping ${activeTab === "takeaway" ? "text-white" : "text-amber-500"
+                    }`}
                 ></i>
                 <span>Takeaway</span>
               </button>
@@ -172,16 +170,14 @@ export default function RestaurantPage() {
               <button
                 type="button"
                 onClick={() => setActiveTab("delivery")}
-                className={`py-3 px-3 sm:px-4 rounded-2xl font-extrabold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-2 transition-all cursor-pointer ${
-                  activeTab === "delivery"
+                className={`py-3 px-3 sm:px-4 rounded-2xl font-extrabold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-2 transition-all cursor-pointer ${activeTab === "delivery"
                     ? "bg-[#E36727] text-white shadow-md"
                     : "bg-#FBEAD9 dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:text-[#E36727]"
-                }`}
+                  }`}
               >
                 <i
-                  className={`fa-solid fa-motorcycle ${
-                    activeTab === "delivery" ? "text-white" : "text-amber-500"
-                  }`}
+                  className={`fa-solid fa-motorcycle ${activeTab === "delivery" ? "text-white" : "text-amber-500"
+                    }`}
                 ></i>
                 <span>Delivery (6km)</span>
               </button>
@@ -253,7 +249,7 @@ export default function RestaurantPage() {
                   Ready to Pick Up Your Favorite Meal?
                 </h3>
                 <p className="text-xs sm:text-sm text-white/90 max-w-xl mx-auto">
-                  Explore our 5 signature meal ranges (Fried Rice, Kottu, Noodles, Pizza & Specials) and add items to your basket.
+                  Explore our 5 signature meal ranges (Fried Rice, Kottu, Noodles, Bites & Specials) and add items to your basket.
                 </p>
                 <button
                   type="button"
@@ -363,11 +359,10 @@ export default function RestaurantPage() {
                     type="button"
                     disabled={!isLocationVerified}
                     onClick={startDeliveryOrder}
-                    className={`w-full py-3.5 font-extrabold text-xs uppercase tracking-wider rounded-2xl transition-all shadow-md ${
-                      isLocationVerified
+                    className={`w-full py-3.5 font-extrabold text-xs uppercase tracking-wider rounded-2xl transition-all shadow-md ${isLocationVerified
                         ? "bg-[#E36727] hover:bg-amber-600 text-white cursor-pointer shadow-lg transform hover:scale-[1.01]"
                         : "bg-slate-400 text-white cursor-not-allowed"
-                    }`}
+                      }`}
                   >
                     {isLocationVerified
                       ? `Proceed to Order for Delivery (${verifiedLocation})`
