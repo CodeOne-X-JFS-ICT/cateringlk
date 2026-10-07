@@ -6,15 +6,7 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // Mock data for preview if auth fails (since login page isn't built yet)
-  const mockStats = {
-    orders: { today: 12, pending: 5 },
-    revenue: { total: 45000 },
-    catering: { pending_quotes: 3 },
-    inquiries: { new: 8 },
-    catalog: { active_products: 24 },
-    team: { active_admins: 2 },
-  };
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -23,16 +15,17 @@ export default function DashboardPage() {
         const res = await fetch("http://localhost:5050/api/admin/dashboard/stats", {
           headers: { Authorization: `Bearer ${token}` },
         });
+        if (!res.ok) throw new Error("Failed to fetch dashboard stats.");
+        
         const json = await res.json();
         
         if (json.success) {
           setStats(json.data);
         } else {
-          // Fallback to mock data for presentation purposes
-          setStats(mockStats);
+          setError(json.message || "Failed to load stats.");
         }
-      } catch (err) {
-        setStats(mockStats);
+      } catch (err: any) {
+        setError(err.message || "Failed to connect to the server.");
       } finally {
         setLoading(false);
       }
@@ -42,19 +35,37 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center">
+      <div className="flex h-full items-center justify-center min-h-[60vh]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E36727]"></div>
       </div>
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+        <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 text-red-500 rounded-full flex items-center justify-center mb-4">
+          <i className="fa-solid fa-triangle-exclamation text-2xl"></i>
+        </div>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Error Loading Dashboard</h2>
+        <p className="text-slate-500">{error}</p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="mt-6 px-4 py-2 bg-[#E36727] text-white rounded-lg font-bold hover:bg-amber-600 transition-colors"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
+
   const statCards = [
-    { title: "Today's Orders", value: stats?.orders.today, icon: "fa-bag-shopping", color: "text-blue-500", bg: "bg-blue-500/10" },
-    { title: "Pending Orders", value: stats?.orders.pending, icon: "fa-clock-rotate-left", color: "text-amber-500", bg: "bg-amber-500/10" },
-    { title: "Pending Quotes", value: stats?.catering.pending_quotes, icon: "fa-file-invoice", color: "text-purple-500", bg: "bg-purple-500/10" },
-    { title: "New Inquiries", value: stats?.inquiries.new, icon: "fa-envelope", color: "text-emerald-500", bg: "bg-emerald-500/10" },
-    { title: "Total Revenue", value: `Rs. ${stats?.revenue.total.toLocaleString()}`, icon: "fa-chart-line", color: "text-green-500", bg: "bg-green-500/10" },
-    { title: "Active Products", value: stats?.catalog.active_products, icon: "fa-burger", color: "text-[#E36727]", bg: "bg-[#E36727]/10" },
+    { title: "Today's Orders", value: stats?.orders?.today || 0, icon: "fa-bag-shopping", color: "text-blue-500", bg: "bg-blue-500/10" },
+    { title: "Pending Orders", value: stats?.orders?.pending || 0, icon: "fa-clock-rotate-left", color: "text-amber-500", bg: "bg-amber-500/10" },
+    { title: "Pending Quotes", value: stats?.catering?.pending_quotes || 0, icon: "fa-file-invoice", color: "text-purple-500", bg: "bg-purple-500/10" },
+    { title: "New Inquiries", value: stats?.inquiries?.new || 0, icon: "fa-envelope", color: "text-emerald-500", bg: "bg-emerald-500/10" },
+    { title: "Total Revenue", value: `Rs. ${(stats?.revenue?.total || 0).toLocaleString()}`, icon: "fa-chart-line", color: "text-green-500", bg: "bg-green-500/10" },
+    { title: "Active Products", value: stats?.catalog?.active_products || 0, icon: "fa-burger", color: "text-[#E36727]", bg: "bg-[#E36727]/10" },
   ];
 
   return (
@@ -95,9 +106,6 @@ export default function DashboardPage() {
               <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${stat.bg} ${stat.color}`}>
                 <i className={`fa-solid ${stat.icon} text-xl`}></i>
               </div>
-            </div>
-            <div className="mt-4 flex items-center text-xs font-bold text-emerald-500 bg-emerald-500/10 w-fit px-2 py-1 rounded-md">
-              <i className="fa-solid fa-arrow-trend-up mr-1.5"></i> +12% from yesterday
             </div>
           </div>
         ))}
