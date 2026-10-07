@@ -23,7 +23,7 @@ export default function Footer() {
           <ul className="space-y-2 font-medium">
             <li>
               <Link
-                href="/restaurant"
+                href="/takeaway&delivery"
                 className="hover:text-white transition-colors"
               >
                 Dining Reservations
@@ -31,7 +31,7 @@ export default function Footer() {
             </li>
             <li>
               <Link
-                href="/restaurant"
+                href="/takeaway&delivery"
                 className="hover:text-white transition-colors"
               >
                 Express Takeaway
@@ -39,7 +39,7 @@ export default function Footer() {
             </li>
             <li>
               <Link
-                href="/restaurant"
+                href="/takeaway&delivery"
                 className="hover:text-white transition-colors"
               >
                 6km Radius Map Delivery

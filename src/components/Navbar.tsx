@@ -14,7 +14,7 @@ export default function Navbar() {
 
   const navLinks = [
     { name: "Home", href: "/" },
-    { name: "Restaurant", href: "/restaurant" },
+    { name: "Takeaway & Delivery", href: "/takeaway&delivery" },
     { name: "Catering", href: "/catering" },
     { name: "Contact", href: "/contact" },
   ];
@@ -113,11 +113,10 @@ export default function Navbar() {
                   )}
                   <Link
                     href={link.href}
-                    className={`transition-colors duration-200 tracking-wide ${
-                      isActive
+                    className={`transition-colors duration-200 tracking-wide ${isActive
                         ? "text-[#E36727] font-bold"
                         : "text-slate-700 dark:text-slate-300 hover:text-[#E36727] dark:hover:text-[#E36727]"
-                    }`}
+                      }`}
                   >
                     {link.name}
                   </Link>
@@ -159,9 +158,8 @@ export default function Navbar() {
             aria-label="Toggle menu"
           >
             <i
-              className={`fa-solid ${
-                mobileMenuOpen ? "fa-xmark" : "fa-bars"
-              } text-xl`}
+              className={`fa-solid ${mobileMenuOpen ? "fa-xmark" : "fa-bars"
+                } text-xl`}
             ></i>
           </button>
         </div>
@@ -178,11 +176,10 @@ export default function Navbar() {
                   key={link.name}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`block w-full text-left font-semibold py-2 transition-colors ${
-                    isActive
+                  className={`block w-full text-left font-semibold py-2 transition-colors ${isActive
                       ? "text-[#E36727] font-bold"
                       : "text-slate-800 dark:text-slate-200 hover:text-[#E36727]"
-                  }`}
+                    }`}
                 >
                   {link.name}
                 </Link>

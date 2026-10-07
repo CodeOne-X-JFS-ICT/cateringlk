@@ -58,8 +58,13 @@ export default function CartDrawer() {
                   className="flex justify-between items-center p-3 rounded-2xl bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 text-xs shadow-xs"
                 >
                   <div>
-                    <div className="font-bold text-slate-900 dark:text-white">
-                      {item.name}
+                    <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 flex-wrap">
+                      <span>{item.name}</span>
+                      {item.portion && (
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-[#E36727] dark:text-amber-400 border border-amber-500/20">
+                          {item.portion}
+                        </span>
+                      )}
                     </div>
                     <div className="text-slate-500 dark:text-slate-400 text-[11px]">
                       LKR {item.price.toLocaleString()} x {item.qty}
