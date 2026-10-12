@@ -103,7 +103,7 @@ export default function Home() {
           {/* Pill Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#E36727]/30 bg-[#E36727]/10 dark:bg-[#E36727]/20 text-[#E36727] text-xs sm:text-sm font-extrabold mb-6 shadow-sm">
             <i className="fa-solid fa-crown text-amber-500"></i> Sri Lanka’s Premier
-            Catering & Dining Hub
+            Catering & Takeaway Hub
           </div>
 
           {/* Main Headline */}
@@ -152,13 +152,13 @@ export default function Home() {
                   <i className="fa-solid fa-chair"></i>
                 </div>
                 <div className="inline-block text-[10px] font-extrabold text-[#E36727] uppercase tracking-widest bg-[#E36727]/10 px-2.5 py-0.5 rounded-full">
-                  Dining, Takeaway & Delivery
+                  Takeaway & Delivery
                 </div>
                 <h2 className="font-serif text-2xl font-bold text-slate-900 dark:text-white">
                   Takeaway & Delivery Service
                 </h2>
                 <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  Reserve private dining slots, schedule takeaway meal boxes, or verify your 6km radius for express hot delivery.
+                  Reserve takeaway meal boxes, or verify your 6km radius for express hot delivery.
                 </p>
               </div>
 
@@ -486,11 +486,10 @@ export default function Home() {
                 key={idx}
                 type="button"
                 onClick={() => setCurrentSlide(idx)}
-                className={`transition-all duration-300 cursor-pointer rounded-full ${
-                  currentSlide === idx
-                    ? "w-8 h-2.5 bg-[#E36727]"
-                    : "w-2.5 h-2.5 bg-slate-300 dark:bg-white/20 hover:bg-[#E36727]/50"
-                }`}
+                className={`transition-all duration-300 cursor-pointer rounded-full ${currentSlide === idx
+                  ? "w-8 h-2.5 bg-[#E36727]"
+                  : "w-2.5 h-2.5 bg-slate-300 dark:bg-white/20 hover:bg-[#E36727]/50"
+                  }`}
                 aria-label={`Go to slide ${idx + 1}`}
               ></button>
             ))}
