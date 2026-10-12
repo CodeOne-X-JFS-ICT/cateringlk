@@ -393,7 +393,7 @@ export default function Home() {
                 Clients&apos; Stories
               </span>
               <h2 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white mt-3">
-                Client Words & Experience
+                Client Words & Experience...
               </h2>
             </div>
 
