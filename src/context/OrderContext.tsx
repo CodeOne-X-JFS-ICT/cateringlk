@@ -25,6 +25,10 @@ interface OrderContextType {
   setVerifiedLocation: (location: string) => void;
   isLocationVerified: boolean;
   setIsLocationVerified: (verified: boolean) => void;
+  deliveryZoneId: number | null;
+  setDeliveryZoneId: (id: number | null) => void;
+  deliveryFee: number;
+  setDeliveryFee: (fee: number) => void;
   cart: CartItem[];
   addToCart: (product: Product) => void;
   updateQty: (productId: string, delta: number) => void;
@@ -50,6 +54,8 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     "Handapangoda Hub Pick-up Counter"
   );
   const [isLocationVerified, setIsLocationVerified] = useState<boolean>(false);
+  const [deliveryZoneId, setDeliveryZoneId] = useState<number | null>(null);
+  const [deliveryFee, setDeliveryFee] = useState<number>(0);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartDrawerOpen, setIsCartDrawerOpen] = useState<boolean>(false);
   const [isInstantQuoteOpen, setIsInstantQuoteOpen] = useState<boolean>(false);
@@ -73,6 +79,18 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       if (savedLoc) {
         setVerifiedLocation(savedLoc);
       }
+      const savedZoneId = localStorage.getItem("ahasgawwa_zone_id");
+      if (savedZoneId) {
+        setDeliveryZoneId(parseInt(savedZoneId, 10));
+      }
+      const savedFee = localStorage.getItem("ahasgawwa_delivery_fee");
+      if (savedFee) {
+        setDeliveryFee(parseFloat(savedFee));
+      }
+      const savedVerified = localStorage.getItem("ahasgawwa_location_verified");
+      if (savedVerified) {
+        setIsLocationVerified(savedVerified === "true");
+      }
     } catch {
       // Ignore storage errors
     }
@@ -84,10 +102,17 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem("ahasgawwa_cart", JSON.stringify(cart));
       localStorage.setItem("ahasgawwa_order_type", orderType);
       localStorage.setItem("ahasgawwa_location", verifiedLocation);
+      if (deliveryZoneId) {
+        localStorage.setItem("ahasgawwa_zone_id", deliveryZoneId.toString());
+      } else {
+        localStorage.removeItem("ahasgawwa_zone_id");
+      }
+      localStorage.setItem("ahasgawwa_delivery_fee", deliveryFee.toString());
+      localStorage.setItem("ahasgawwa_location_verified", isLocationVerified.toString());
     } catch {
       // Ignore storage errors
     }
-  }, [cart, orderType, verifiedLocation]);
+  }, [cart, orderType, verifiedLocation, deliveryZoneId, deliveryFee, isLocationVerified]);
 
   const addToCart = (product: Product) => {
     setCart((prev) => {
@@ -142,6 +167,10 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
         setVerifiedLocation,
         isLocationVerified,
         setIsLocationVerified,
+        deliveryZoneId,
+        setDeliveryZoneId,
+        deliveryFee,
+        setDeliveryFee,
         cart,
         addToCart,
         updateQty,

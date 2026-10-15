@@ -38,6 +38,8 @@ export default function RestaurantPage() {
     setVerifiedLocation,
     isLocationVerified,
     setIsLocationVerified,
+    setDeliveryZoneId,
+    setDeliveryFee,
   } = useOrder();
 
   // Active Tab State: 'takeaway' | 'delivery'
@@ -118,6 +120,9 @@ export default function RestaurantPage() {
   const startTakeawayOrder = () => {
     setOrderType("takeaway");
     setVerifiedLocation("Handapangoda Hub Pick-up Counter");
+    setDeliveryZoneId(null);
+    setDeliveryFee(0);
+    setIsLocationVerified(true);
     router.push("/products");
   };
 
@@ -151,6 +156,8 @@ export default function RestaurantPage() {
         const data = json.data;
         setVerifiedLocation(data.city_name);
         setIsLocationVerified(true);
+        setDeliveryZoneId(data.id);
+        setDeliveryFee(parseFloat(data.delivery_fee));
         setDeliveryResultMsg(
           <span className="text-emerald-500 dark:text-emerald-400 font-bold">
             <i className="fa-solid fa-circle-check mr-1"></i> Great News!{" "}
@@ -160,6 +167,8 @@ export default function RestaurantPage() {
         );
       } else {
         setIsLocationVerified(false);
+        setDeliveryZoneId(null);
+        setDeliveryFee(0);
         setDeliveryResultMsg(
           <span className="text-[#E36727] font-bold">
             <i className="fa-solid fa-triangle-exclamation mr-1"></i>{" "}
@@ -186,10 +195,12 @@ export default function RestaurantPage() {
       setInputCity("");
       setVerifiedLocation(defaultZone.city_name);
       setIsLocationVerified(true);
+      setDeliveryZoneId(defaultZone.id);
+      setDeliveryFee(parseFloat(defaultZone.delivery_fee as any));
       setDeliveryResultMsg(
         <span className="text-emerald-500 dark:text-emerald-400 font-bold">
           <i className="fa-solid fa-circle-check mr-1"></i> GPS Dropped:{" "}
-          <strong>&quot;{defaultZone.city_name.toUpperCase()} ({defaultZone.distance_km}KM FROM HUB)&quot;</strong> is inside 6km express delivery radius.
+          <strong>&quot;{defaultZone.city_name.toUpperCase()} ({defaultZone.distance_km}KM FROM HUB)&quot;</strong> is inside 6km express delivery radius. Delivery Fee: Rs. {Number(defaultZone.delivery_fee).toLocaleString()}.
         </span>
       );
     } else {
@@ -197,6 +208,7 @@ export default function RestaurantPage() {
       setInputCity("");
       setVerifiedLocation("Padukka");
       setIsLocationVerified(true);
+      setDeliveryFee(250);
       setDeliveryResultMsg(
         <span className="text-emerald-500 dark:text-emerald-400 font-bold">
           <i className="fa-solid fa-circle-check mr-1"></i> GPS Dropped:{" "}
@@ -532,8 +544,32 @@ export default function RestaurantPage() {
                           <select
                             value={selectedCity}
                             onChange={(e) => {
-                              setSelectedCity(e.target.value);
+                              const val = e.target.value;
+                              setSelectedCity(val);
                               setInputCity("");
+                              const matchedZone = deliveryZones.find((z) => z.city_name === val);
+                              if (matchedZone) {
+                                setVerifiedLocation(matchedZone.city_name);
+                                setIsLocationVerified(true);
+                                setDeliveryZoneId(matchedZone.id);
+                                setDeliveryFee(parseFloat(matchedZone.delivery_fee as any));
+                                setDeliveryResultMsg(
+                                  <span className="text-emerald-500 dark:text-emerald-400 font-bold">
+                                    <i className="fa-solid fa-circle-check mr-1"></i> Selected:{" "}
+                                    <strong>&quot;{matchedZone.city_name.toUpperCase()}&quot;</strong> ({matchedZone.distance_km}km from Hub). Estimated delivery: {matchedZone.estimated_delivery_mins} mins. Delivery Fee: Rs. {Number(matchedZone.delivery_fee).toLocaleString()}.
+                                  </span>
+                                );
+                              } else {
+                                setIsLocationVerified(false);
+                                setDeliveryZoneId(null);
+                                setDeliveryFee(0);
+                                setDeliveryResultMsg(
+                                  <span className="text-slate-500">
+                                    <i className="fa-solid fa-circle-info text-amber-500 mr-1"></i> Select a city
+                                    above or use GPS to verify if your location is within the 6km express radius.
+                                  </span>
+                                );
+                              }
                             }}
                             className="w-full bg-slate-100 dark:bg-[#26201d] border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white font-bold focus:outline-none focus:border-[#E36727] cursor-pointer"
                           >

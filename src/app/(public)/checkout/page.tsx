@@ -4,6 +4,13 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useOrder } from "@/context/OrderContext";
+import MapPinPicker from "@/components/MapPinPicker";
+
+const PAYMENT_OPTIONS = [
+  { label: "Cash on Delivery / Collection", code: "COD", icon: "fa-money-bill-wave" },
+  { label: "Card on Collection / POS", code: "CARD_POS", icon: "fa-credit-card" },
+  { label: "WhatsApp Direct Order", code: "WHATSAPP", icon: "fa-brands fa-whatsapp" },
+];
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -12,6 +19,8 @@ export default function CheckoutPage() {
     cartSubtotal,
     orderType,
     verifiedLocation,
+    deliveryZoneId,
+    deliveryFee: contextDeliveryFee,
     clearCart,
   } = useOrder();
 
@@ -19,7 +28,11 @@ export default function CheckoutPage() {
   const [phone, setPhone] = useState("");
   const [timeSlot, setTimeSlot] = useState("ASAP (30-40 mins)");
   const [address, setAddress] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("Cash on Delivery / Collection");
+  const [specialInstructions, setSpecialInstructions] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("COD");
+
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Receipt Modal State
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
@@ -33,39 +46,83 @@ export default function CheckoutPage() {
     total: number;
   } | null>(null);
 
-  const deliveryFee = orderType === "delivery" ? 250 : 0;
+  const deliveryFee = orderType === "delivery" ? (contextDeliveryFee || 250) : 0;
   const grandTotal = cartSubtotal + deliveryFee;
 
-  const handlePlaceOrder = (e: React.FormEvent) => {
+  const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (cart.length === 0) return;
 
-    const orderId = "AG-" + Math.floor(100000 + Math.random() * 900000);
-    const details = {
-      orderId,
-      custName: name,
-      custPhone: phone,
-      mode: `${orderType.toUpperCase()} (${verifiedLocation})`,
-      time: timeSlot,
-      payment: paymentMethod,
-      total: grandTotal,
-    };
+    if (orderType === "delivery" && !address.trim()) {
+      setErrorMsg("Please enter your complete delivery street address.");
+      return;
+    }
 
-    setReceiptDetails(details);
-    setIsReceiptOpen(true);
+    setSubmitting(true);
+    setErrorMsg(null);
 
-    // WhatsApp Dispatch simulation
-    if (paymentMethod.includes("WhatsApp")) {
-      const text = `Hi Catering by Ahas Gawwa, I placed an Order (${orderId}):\n- Customer: ${name} (${phone})\n- Mode: ${orderType.toUpperCase()} (${verifiedLocation})\n- Time: ${timeSlot}\n- Total: LKR ${grandTotal.toLocaleString()}`;
-      window.open(
-        `https://wa.me/94742013332?text=${encodeURIComponent(text)}`,
-        "_blank"
-      );
+    try {
+      const payload = {
+        order_type: orderType.toUpperCase(),
+        customer_name: name.trim(),
+        customer_phone: phone.trim(),
+        delivery_address: orderType === "delivery" ? address.trim() : null,
+        delivery_zone_id: orderType === "delivery" ? (deliveryZoneId || 1) : null,
+        verified_location: verifiedLocation,
+        time_slot: timeSlot,
+        payment_method: paymentMethod,
+        special_instructions: specialInstructions.trim() || null,
+        items: cart.map((item) => ({
+          product_id: parseInt(item.id, 10),
+          quantity: item.qty,
+        })),
+      };
+
+      const res = await fetch("http://localhost:5050/api/public/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || "Failed to process order. Please try again.");
+      }
+
+      const orderData = json.data;
+      const ref = orderData.order_ref;
+
+      const details = {
+        orderId: ref,
+        custName: orderData.customer_name,
+        custPhone: orderData.customer_phone,
+        mode: `${orderData.order_type} (${orderData.verified_location || "Pick-up"})`,
+        time: orderData.time_slot || timeSlot,
+        payment: orderData.payment_method,
+        total: parseFloat(orderData.grand_total),
+      };
+
+      setReceiptDetails(details);
+      setIsReceiptOpen(true);
+      clearCart();
+
+      // WhatsApp Dispatch if selected
+      if (paymentMethod === "WHATSAPP") {
+        const text = `Hi Catering by Ahas Gawwa, I placed an Order (${ref}):\n- Customer: ${name} (${phone})\n- Mode: ${orderType.toUpperCase()} (${verifiedLocation})\n- Time: ${timeSlot}\n- Total: LKR ${parseFloat(orderData.grand_total).toLocaleString()}`;
+        window.open(
+          `https://wa.me/94742013332?text=${encodeURIComponent(text)}`,
+          "_blank"
+        );
+      }
+    } catch (err: any) {
+      console.error("Order placement error:", err);
+      setErrorMsg(err.message || "An unexpected error occurred while placing your order.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleFinishOrder = () => {
-    clearCart();
     setIsReceiptOpen(false);
     router.push("/takeaway&delivery");
   };
@@ -91,6 +148,22 @@ export default function CheckoutPage() {
             Confirm your item list, pick-up or delivery details, and select your preferred payment option.
           </p>
         </div>
+
+        {/* Global Error Banner */}
+        {errorMsg && (
+          <div className="max-w-5xl mx-auto p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-xs font-semibold flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <i className="fa-solid fa-circle-exclamation text-base"></i>
+              <span>{errorMsg}</span>
+            </div>
+            <button
+              onClick={() => setErrorMsg(null)}
+              className="text-red-400 hover:text-red-700 cursor-pointer"
+            >
+              <i className="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Customer Information Form (Left) */}
@@ -137,7 +210,7 @@ export default function CheckoutPage() {
                   <select
                     value={timeSlot}
                     onChange={(e) => setTimeSlot(e.target.value)}
-                    className="w-full bg-slate-100 dark:bg-[#26201d] border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-900 dark:text-white font-bold focus:outline-none focus:border-[#E36727]"
+                    className="w-full bg-slate-100 dark:bg-[#26201d] border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-900 dark:text-white font-bold focus:outline-none focus:border-[#E36727] cursor-pointer"
                   >
                     <option value="ASAP (30-40 mins)">ASAP (30-40 mins)</option>
                     <option value="12:30 PM Lunch Slot">12:30 PM Lunch Slot</option>
@@ -148,24 +221,45 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Conditional Delivery Address / Instructions */}
+              {/* Delivery Address & Map Pinning if delivery */}
+              {orderType === "delivery" && (
+                <div className="space-y-4 pt-1">
+                  {/* Interactive Map Pin Picker */}
+                  <MapPinPicker
+                    zoneName={verifiedLocation}
+                    onLocationSelect={(formattedAddr) => {
+                      setAddress(formattedAddr);
+                    }}
+                  />
+
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
+                      Delivery Address & Doorstep Notes *
+                    </label>
+                    <textarea
+                      rows={2}
+                      required
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      placeholder="Auto-filled by pinning on map above. You may add house number, apartment or gate color..."
+                      className="w-full bg-slate-100 dark:bg-[#26201d] border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-900 dark:text-white font-medium focus:outline-none focus:border-[#E36727]"
+                    ></textarea>
+                  </div>
+                </div>
+              )}
+
+              {/* Special Instructions */}
               <div>
                 <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
-                  {orderType === "delivery"
-                    ? "Delivery Address & Special Instructions *"
-                    : "Pick-up Notes (Optional)"}
+                  Special Kitchen Instructions (Optional)
                 </label>
-                <textarea
-                  rows={2}
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder={
-                    orderType === "delivery"
-                      ? "Enter house number, street name or landmark for express delivery..."
-                      : "Any special food preparation instructions..."
-                  }
+                <input
+                  type="text"
+                  value={specialInstructions}
+                  onChange={(e) => setSpecialInstructions(e.target.value)}
+                  placeholder="e.g. Less spicy, extra sauce, call upon arrival..."
                   className="w-full bg-slate-100 dark:bg-[#26201d] border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-900 dark:text-white font-medium focus:outline-none focus:border-[#E36727]"
-                ></textarea>
+                />
               </div>
 
               {/* Payment Choice */}
@@ -174,29 +268,25 @@ export default function CheckoutPage() {
                   Select Payment Method
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                  {[
-                    "Cash on Delivery / Collection",
-                    "Card on Collection / POS",
-                    "WhatsApp Direct Order",
-                  ].map((method) => (
+                  {PAYMENT_OPTIONS.map((opt) => (
                     <label
-                      key={method}
+                      key={opt.code}
                       className={`flex items-center gap-2 p-3 rounded-xl border cursor-pointer transition-all ${
-                        paymentMethod === method
-                          ? "border-[#E36727] bg-[#E36727]/10"
-                          : "border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#26201d]"
+                        paymentMethod === opt.code
+                          ? "border-[#E36727] bg-[#E36727]/10 ring-1 ring-[#E36727]"
+                          : "border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#26201d] hover:border-slate-300"
                       }`}
                     >
                       <input
                         type="radio"
                         name="payment-method"
-                        value={method}
-                        checked={paymentMethod === method}
-                        onChange={() => setPaymentMethod(method)}
+                        value={opt.code}
+                        checked={paymentMethod === opt.code}
+                        onChange={() => setPaymentMethod(opt.code)}
                         className="accent-[#E36727]"
                       />
                       <span className="font-bold text-slate-800 dark:text-slate-200 text-xs">
-                        {method.split(" ")[0]}
+                        {opt.label}
                       </span>
                     </label>
                   ))}
@@ -205,12 +295,19 @@ export default function CheckoutPage() {
 
               <button
                 type="submit"
-                disabled={cart.length === 0}
-                className={`w-full py-4 bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-xl transition-all cursor-pointer ${
-                  cart.length === 0 ? "opacity-50 pointer-events-none" : ""
+                disabled={cart.length === 0 || submitting}
+                className={`w-full py-4 bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-xl transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                  cart.length === 0 || submitting ? "opacity-60 pointer-events-none" : ""
                 }`}
               >
-                Confirm & Place Order Now
+                {submitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Placing Your Order in Database...</span>
+                  </>
+                ) : (
+                  <span>Confirm & Place Order Now</span>
+                )}
               </button>
             </form>
           </div>
@@ -250,7 +347,7 @@ export default function CheckoutPage() {
                         )}
                       </div>
                       <div className="text-slate-500 dark:text-slate-400">
-                        Qty: {item.qty}
+                        Qty: {item.qty} × LKR {item.price.toLocaleString()}
                       </div>
                     </div>
                     <div className="font-bold text-[#E36727]">
@@ -279,7 +376,7 @@ export default function CheckoutPage() {
                   }
                 >
                   {orderType === "delivery"
-                    ? `LKR ${deliveryFee} (6km Radius)`
+                    ? `LKR ${deliveryFee.toLocaleString()} (${verifiedLocation})`
                     : "LKR 0 (Free Pick-up)"}
                 </span>
               </div>
@@ -311,16 +408,16 @@ export default function CheckoutPage() {
               <i className="fa-solid fa-circle-check"></i>
             </div>
             <h3 className="font-serif text-2xl font-extrabold text-slate-900 dark:text-white">
-              Order Confirmed!
+              Order Placed Successfully!
             </h3>
             <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Your order has been submitted to Catering by Ahas Gawwa restaurant kitchen.
+              Your order is recorded in our system and kitchen staff has been notified.
             </p>
 
-            <div className="p-4 rounded-2xl bg-slate-100 dark:bg-[#26201d] text-xs text-left space-y-1.5 border border-slate-200 dark:border-white/10">
-              <div className="flex justify-between text-slate-500">
-                <span>Order ID:</span>
-                <span className="font-bold text-[#E36727]">
+            <div className="p-4 rounded-2xl bg-slate-100 dark:bg-[#26201d] text-xs text-left space-y-2 border border-slate-200 dark:border-white/10">
+              <div className="flex justify-between items-center text-slate-500 pb-1.5 border-b border-slate-200 dark:border-white/10">
+                <span className="font-bold">Order Reference:</span>
+                <span className="font-mono font-extrabold text-sm text-[#E36727] bg-[#E36727]/10 px-2 py-0.5 rounded">
                   {receiptDetails.orderId}
                 </span>
               </div>
@@ -356,12 +453,21 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            <button
-              onClick={handleFinishOrder}
-              className="w-full py-3 bg-[#E36727] text-white font-bold text-xs uppercase tracking-wider rounded-2xl shadow-md cursor-pointer hover:bg-amber-600 transition-all"
-            >
-              Back to Restaurant Portal
-            </button>
+            <div className="space-y-2 pt-2">
+              <Link
+                href={`/orders/track?ref=${receiptDetails.orderId}`}
+                className="w-full py-3 bg-[#E36727] text-white font-bold text-xs uppercase tracking-wider rounded-2xl shadow-md cursor-pointer hover:bg-amber-600 transition-all flex items-center justify-center gap-2"
+              >
+                <i className="fa-solid fa-radar"></i>
+                <span>Track Order Status Live</span>
+              </Link>
+              <button
+                onClick={handleFinishOrder}
+                className="w-full py-2.5 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase tracking-wider rounded-2xl hover:bg-slate-300 dark:hover:bg-slate-700 transition-all cursor-pointer"
+              >
+                Back to Restaurant Menu
+              </button>
+            </div>
           </div>
         </div>
       )}
