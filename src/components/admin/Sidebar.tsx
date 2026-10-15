@@ -3,10 +3,12 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTheme } from "@/components/ThemeProvider";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [userRole, setUserRole] = useState<string | null>(null);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     // Read and decode the JWT token to get the role
@@ -99,6 +101,16 @@ export default function Sidebar() {
               {userRole === "SUPER_ADMIN" ? "Super Admin" : "Store Admin"}
             </div>
           </div>
+          {/* Theme Quick Toggle */}
+          <button
+            type="button"
+            className="w-8 h-8 rounded-lg hover:bg-slate-700 hover:text-amber-400 text-slate-400 flex items-center justify-center transition-colors cursor-pointer"
+            title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+            aria-label="Toggle dark / light theme"
+            onClick={toggleTheme}
+          >
+            <i className={`fa-solid ${theme === "dark" ? "fa-sun text-amber-400" : "fa-moon text-slate-300"} text-xs`}></i>
+          </button>
           <button 
             className="w-8 h-8 rounded-lg hover:bg-red-500/10 hover:text-red-400 text-slate-500 flex items-center justify-center transition-colors cursor-pointer"
             title="Sign Out"
