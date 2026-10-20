@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useOrder, Product, productCatalog } from "@/context/OrderContext";
+import { useOrder, Product } from "@/context/OrderContext";
 
 interface DishGroup {
   key: string;
@@ -33,38 +33,42 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch("http://localhost:5050/api/public/products");
-        if (!response.ok) throw new Error("Failed to fetch products");
-        const json = await response.json();
+  const fetchProducts = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch("http://localhost:5050/api/public/products");
+      if (!response.ok) throw new Error("Backend server responded with an error");
+      const json = await response.json();
 
-        if (json.success && json.data) {
-          // Flatten categories into an array of products
-          const mappedProducts = json.data.flatMap((cat: any) =>
-            cat.products.map((p: any) => ({
-              id: p.id.toString(),
-              category: cat.slug,
-              name: p.name,
-              desc: p.description,
-              price: typeof p.price === "string" ? parseFloat(p.price) : p.price,
-              portion: p.portion_label,
-              img: p.image_url,
-            }))
-          );
-          setFetchedProducts(mappedProducts);
-        } else {
-          // Fallback to local catalog
-          setFetchedProducts(productCatalog);
-        }
-      } catch (err: any) {
-        // Fallback to local catalog if backend is momentarily unreachable
-        setFetchedProducts(productCatalog);
-      } finally {
-        setLoading(false);
+      if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+        // Flatten categories into an array of products
+        const mappedProducts = json.data.flatMap((cat: any) =>
+          (cat.products || []).map((p: any) => ({
+            id: p.id.toString(),
+            category: cat.slug,
+            name: p.name,
+            desc: p.description,
+            price: typeof p.price === "string" ? parseFloat(p.price) : p.price,
+            portion: p.portion_label,
+            img: p.image_url,
+          }))
+        );
+        setFetchedProducts(mappedProducts);
+        setError(null);
+      } else {
+        throw new Error("No menu products returned from database");
       }
-    };
+    } catch (err: any) {
+      console.error("Takeaway products fetch error:", err);
+      setError("Menu cannot be fetched! Backend service is offline or unreachable.");
+      setFetchedProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchProducts();
   }, []);
 
@@ -189,13 +193,30 @@ export default function ProductsPage() {
 
         {/* Products Grid */}
         {loading ? (
-          <div className="flex justify-center items-center py-20">
+          <div className="flex flex-col justify-center items-center py-24 space-y-3">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E36727]"></div>
+            <p className="text-xs text-slate-500 font-bold animate-pulse">Loading live menu from backend...</p>
           </div>
-        ) : error ? (
-          <div className="text-center py-12 text-red-500 text-sm bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-200 dark:border-red-800/30">
-            <i className="fa-solid fa-circle-exclamation text-2xl mb-2"></i>
-            <p>{error}</p>
+        ) : error || fetchedProducts.length === 0 ? (
+          <div className="py-16 px-6 rounded-3xl bg-red-500/10 border-2 border-red-500/30 text-center space-y-4 max-w-2xl mx-auto my-6 shadow-sm">
+            <div className="w-16 h-16 rounded-3xl bg-red-500/20 text-red-500 flex items-center justify-center text-3xl mx-auto shadow-xs">
+              <i className="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 className="font-serif font-extrabold text-2xl sm:text-3xl text-red-600 dark:text-red-400">
+              Menu cannot be fetched!
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-md mx-auto">
+              All takeaway and delivery menu items must be rendered through the backend server. The backend is currently offline or unreachable. Please verify that the backend is running and try again.
+            </p>
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={fetchProducts}
+                className="px-6 py-3 bg-[#E36727] hover:bg-amber-600 text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-lg transition-all cursor-pointer transform hover:scale-105 active:scale-95"
+              >
+                <i className="fa-solid fa-arrows-rotate mr-2"></i> Try Again
+              </button>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

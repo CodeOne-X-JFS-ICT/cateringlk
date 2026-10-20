@@ -3,208 +3,96 @@
 import React, { useState, useEffect } from "react";
 
 // Types & Data
-type EventKey =
-  | "wedding"
-  | "dana"
-  | "corporate"
-  | "birthday"
-  | "private"
-  | "funeral";
-
-type TierKey = "silver" | "gold" | "platinum";
-
 type MenuTabKey = "srilankan" | "indian" | "chinese" | "bbq" | "desserts";
 
-interface MenuItem {
+export interface MenuItem {
   title: string;
   desc: string;
   badge: string;
 }
 
-const tierPrices: Record<TierKey, number> = {
-  silver: 1850,
-  gold: 2750,
-  platinum: 3950,
-};
+export interface CateringPackageData {
+  id: number;
+  name: string;
+  badge: string;
+  description: string;
+  price_per_pax: number;
+  min_pax: number;
+  inclusions_text: string;
+  dessert_text?: string;
+  is_featured: boolean;
+  sort_order: number;
+}
 
-const tierNames: Record<TierKey, string> = {
-  silver: "Silver Essential",
-  gold: "Royal Gold",
-  platinum: "Imperial Platinum",
-};
+export interface CateringCategoryData {
+  id: number;
+  name: string;
+  slug: string;
+  icon?: string;
+  subtitle?: string;
+  description?: string;
+  min_pax?: number;
+  sort_order?: number;
+}
 
-const eventNames: Record<EventKey, string> = {
-  wedding: "Wedding Reception",
-  dana: "Sacred Dana Alms-Giving",
-  corporate: "Corporate Gala",
-  birthday: "Birthday Celebration",
-  private: "Private Garden BBQ",
-  funeral: "Funeral Commemoration",
-};
+export interface CateringAddonData {
+  id: number;
+  name: string;
+  description: string;
+  price_per_pax: number;
+  icon: string;
+  sort_order: number;
+}
 
-const menuData: Record<MenuTabKey, MenuItem[]> = {
-  srilankan: [
-    {
-      title: "Fragrant Steamed Basmati Yellow Rice",
-      desc: "Cardamom, cloves, ghee, and roasted cashew nuts.",
-      badge: "Chef Special",
-    },
-    {
-      title: "Traditional Black Pork Curry",
-      desc: "Slow-roasted spices, goraka tamarind infusion.",
-      badge: "Signature",
-    },
-    {
-      title: "Ceylon Spiced Chicken Curry",
-      desc: "Creamy coconut milk gravy with roasted curry powder.",
-      badge: "Popular",
-    },
-    {
-      title: "Devilled Sepia Squid or Prawns",
-      desc: "Wok-tossed with capsicum, onions, and tomato reduction.",
-      badge: "Spicy",
-    },
-    {
-      title: "Creamy Cashew & Green Pea Curry",
-      desc: "Raw cashew nuts stewed in coconut cream.",
-      badge: "Vegetarian",
-    },
-    {
-      title: "Brinjal Moju (Eggplant Pickle)",
-      desc: "Sweet & sour fried brinjal with mustard seeds.",
-      badge: "Traditional",
-    },
-  ],
-  indian: [
-    {
-      title: "Kashmiri Chicken Biryani",
-      desc: "Aromatic basmati rice with whole spices, chicken, and saffron.",
-      badge: "Royal",
-    },
-    {
-      title: "Butter Chicken Masala",
-      desc: "Tandoori chicken in rich creamy tomato butter gravy.",
-      badge: "Mild & Rich",
-    },
-    {
-      title: "Paneer Butter Masala",
-      desc: "Fresh cottage cheese cubes in spiced gravy.",
-      badge: "Vegetarian",
-    },
-    {
-      title: "Garlic & Butter Tandoori Naan",
-      desc: "Baked live on-site in tandoor oven.",
-      badge: "Live Station",
-    },
-  ],
-  chinese: [
-    {
-      title: "Special Seafood Fried Rice",
-      desc: "Wok-tossed basmati with prawns, squid, and light soy.",
-      badge: "Classic",
-    },
-    {
-      title: "Chilli Garlic Seafood Noodles",
-      desc: "Stir-fried noodles with chili garlic paste.",
-      badge: "Spicy",
-    },
-    {
-      title: "Hot Butter Sepia Cuttlefish",
-      desc: "Crispy cuttlefish tossed in butter, capsicum, and chili.",
-      badge: "Must Try",
-    },
-  ],
-  bbq: [
-    {
-      title: "Live Hopper & Egg Hopper Station",
-      desc: "Crispy hoppers prepared live with lunu miris and katta sambal.",
-      badge: "Live Station",
-    },
-    {
-      title: "Live BBQ Grilled Jumbo Prawns",
-      desc: "Garlic butter and local herbs charcoal grill.",
-      badge: "Seafood BBQ",
-    },
-    {
-      title: "Live Kottu Roti Action Station",
-      desc: "Chicken, Beef, or Cheese Kottu chopped fresh live.",
-      badge: "Crowd Pleaser",
-    },
-  ],
-  desserts: [
-    {
-      title: "Traditional Claypot Watalappan",
-      desc: "Authentic kitul jaggery custard with coconut cream.",
-      badge: "Iconic SL",
-    },
-    {
-      title: "Fresh Fruit Trifle",
-      desc: "Sponge cake, custard, fresh fruits, and whipped cream.",
-      badge: "Classic",
-    },
-    {
-      title: "Iced Woodapple Nectar / Passion Drink",
-      desc: "Refreshing traditional fruit coolers.",
-      badge: "Beverage",
-    },
-  ],
-};
+// Note: Live catering packages are fetched dynamically from the database.
+export const fallbackCateringPackages: CateringPackageData[] = [];
 
-const locationsList = [
-  "Padukka",
-  "Handapangoda",
-  "Ingiriya",
-  "Horana",
-  "Bope",
-  "Meepe",
-  "Labugama",
-  "Colombo",
-  "Dehiwala-Mount Lavinia",
-  "Kottawa",
-  "Maharagama",
-  "Nugegoda",
-  "Pannipitiya",
-  "Homagama",
-  "Malabe",
-  "Kaduwela",
-  "Battaramulla",
-  "Gampaha",
-  "Ja-Ela",
-  "Ragama",
-  "Kadawatha",
-  "Kelaniya",
-  "Wattala",
-  "Kalutara",
-  "Panadura",
-  "Beruwala",
-  "Bandaragama",
-  "Matugama",
-  "Avissawella",
-  "Ratnapura",
-  "Deraniyagala",
-  "Yatiyanthota",
-];
+export const fallbackCateringAddons: CateringAddonData[] = [];
 
 export default function CateringPage() {
-  // Calculator State
+  // Calculator State (aligned with Catering Menus)
   const [selectedLocation, setSelectedLocation] = useState("");
-  const [selectedEvent, setSelectedEvent] = useState<EventKey>("wedding");
-  const [selectedTier, setSelectedTier] = useState<TierKey>("silver");
+  const [selectedMenuId, setSelectedMenuId] = useState<number>(1);
+  const [estimatorCategory, setEstimatorCategory] = useState<string>("all");
   const [paxCount, setPaxCount] = useState(100);
-
-  // Add-on State
-  const [addonHoppers, setAddonHoppers] = useState(false);
-  const [addonBbq, setAddonBbq] = useState(false);
-  const [addonDessert, setAddonDessert] = useState(false);
-  const [addonCutlery, setAddonCutlery] = useState(false);
 
   // Menu Tab State
   const [activeMenuTab, setActiveMenuTab] = useState<MenuTabKey>("srilankan");
 
+  // Dynamic Catering Packages & Addons State (Fetched from Backend DB)
+  const [packages, setPackages] = useState<CateringPackageData[]>([]);
+  const [addons, setAddons] = useState<CateringAddonData[]>([]);
+  const [cateringCategories, setCateringCategories] = useState<CateringCategoryData[]>([]);
+  const [locations, setLocations] = useState<string[]>([]);
+  const [cateringLoading, setCateringLoading] = useState<boolean>(true);
+  const [cateringError, setCateringError] = useState<string | null>(null);
+  const [cateringCategoryTab, setCateringCategoryTab] = useState<string>("bana");
+  const [bookingPackage, setBookingPackage] = useState<string>("");
+
+  // Free Services / Terms & Policies State (Dynamic from Backend Settings)
+  const [serviceTerms, setServiceTerms] = useState<{
+    section_title: string;
+    policies: Array<{ id: string; title: string; icon: string; description: string }>;
+  }>({
+    section_title: "Important Service Terms & Logistics Policies",
+    policies: [
+      {
+        id: "equipment-staff",
+        title: "Equipment & Staff",
+        icon: "fa-utensils",
+        description: "Service includes Plateware, Glassware, Cutlery, Trays, Serviettes, Water Dispensers, and Hand Washing Sinks. Experienced serving staff supervised directly by our floor managers.",
+      },
+      {
+        id: "large-event-amenities",
+        title: "Large Event Amenities",
+        icon: "fa-tent",
+        description: "Hut / Canopy, Tables, and Plastic Chairs will be provided Free of Charge for above 150 Guests. Lighting & Transport charges will be added additionally based on distance.",
+      },
+    ],
+  });
+
   // Modals State
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
-  const [infoModalKey, setInfoModalKey] = useState<EventKey | "bbq">("wedding");
   const [isNoticeOpen, setIsNoticeOpen] = useState(false);
   const [noticeTitle, setNoticeTitle] = useState("");
   const [noticeDesc, setNoticeDesc] = useState("");
@@ -213,6 +101,122 @@ export default function CateringPage() {
   const [bookingName, setBookingName] = useState("");
   const [bookingPhone, setBookingPhone] = useState("");
   const [bookingSuburb, setBookingSuburb] = useState("");
+
+  // Match package with category key/slug/name
+  const matchPackageCategory = (p: CateringPackageData, catKey: string) => {
+    const badge = (p.badge || "").toLowerCase();
+    const key = catKey.toLowerCase();
+
+    if (key === "bana" || key.includes("bana")) {
+      return badge.includes("bana") || badge.includes("feast");
+    }
+    if (key === "dana_monk" || key === "dana-monk" || key.includes("monk")) {
+      return badge === "dana - monk" || badge.includes("monk");
+    }
+    if (key === "dana_guest" || key === "dana-guest" || key.includes("guest")) {
+      return badge === "dana - guest" || badge.includes("guest");
+    }
+    return badge === key || badge.includes(key) || key.includes(badge);
+  };
+
+  // Fetch catering packages, addons, categories, and menus from backend API (no fake UI fallback)
+  const fetchCateringData = async () => {
+    setCateringLoading(true);
+    setCateringError(null);
+    try {
+      const [pkgRes, addonRes, locRes, termsRes, catRes] = await Promise.all([
+        fetch("http://localhost:5050/api/public/catering/packages"),
+        fetch("http://localhost:5050/api/public/catering/addons"),
+        fetch("http://localhost:5050/api/public/catering/locations"),
+        fetch("http://localhost:5050/api/public/settings/catering_service_terms"),
+        fetch("http://localhost:5050/api/public/catering/event-types"),
+      ]);
+
+      if (!pkgRes.ok || !addonRes.ok) {
+        throw new Error("Backend server responded with error status");
+      }
+
+      const pkgJson = await pkgRes.json();
+      const addonJson = await addonRes.json();
+
+      if (!pkgJson.success || !Array.isArray(pkgJson.data) || pkgJson.data.length === 0) {
+        throw new Error("No catering packages found in backend database");
+      }
+
+      const mappedPackages: CateringPackageData[] = pkgJson.data.map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        badge: p.badge || "",
+        description: p.description || "",
+        price_per_pax: typeof p.price_per_pax === "string" ? parseFloat(p.price_per_pax) : p.price_per_pax,
+        min_pax: p.min_pax || 20,
+        inclusions_text: p.inclusions_text || "",
+        dessert_text: p.dessert_text || "",
+        is_featured: Boolean(p.is_featured),
+        sort_order: p.sort_order || 0,
+      }));
+
+      setPackages(mappedPackages);
+      if (mappedPackages.length > 0 && !selectedMenuId) {
+        setSelectedMenuId(mappedPackages[0].id);
+      }
+
+      if (addonJson.success && Array.isArray(addonJson.data)) {
+        setAddons(
+          addonJson.data.map((a: any) => ({
+            id: a.id,
+            name: a.name,
+            description: a.description || "",
+            price_per_pax: typeof a.price_per_pax === "string" ? parseFloat(a.price_per_pax) : a.price_per_pax,
+            icon: a.icon || "fa-utensils",
+            sort_order: a.sort_order || 0,
+          }))
+        );
+      }
+
+      if (catRes && catRes.ok) {
+        const catJson = await catRes.json();
+        if (catJson.success && Array.isArray(catJson.data)) {
+          setCateringCategories(catJson.data);
+        }
+      }
+
+
+      if (locRes && locRes.ok) {
+        const locJson = await locRes.json();
+        if (locJson.success && Array.isArray(locJson.data)) {
+          setLocations(locJson.data.map((l: any) => l.city_name));
+        }
+      }
+
+      if (termsRes && termsRes.ok) {
+        const termsJson = await termsRes.json();
+        if (termsJson.success && termsJson.data?.setting_value) {
+          const parsed = typeof termsJson.data.setting_value === "string"
+            ? JSON.parse(termsJson.data.setting_value)
+            : termsJson.data.setting_value;
+          if (parsed && Array.isArray(parsed.policies)) {
+            setServiceTerms(parsed);
+          }
+        }
+      }
+
+      setCateringError(null);
+    } catch (err: any) {
+      console.error("Failed to load catering data from backend:", err);
+      setCateringError("Menu cannot be fetched! Backend service is offline or unreachable.");
+      setPackages([]);
+      setAddons([]);
+      setCateringCategories([]);
+      setLocations([]);
+    } finally {
+      setCateringLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCateringData();
+  }, []);
 
   // Payment Gateway State
   const [isGatewayModalOpen, setIsGatewayModalOpen] = useState(false);
@@ -238,20 +242,25 @@ export default function CateringPage() {
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Calculations
-  const getAddonsPerPax = () => {
-    let sum = 0;
-    if (addonHoppers) sum += 450;
-    if (addonBbq) sum += 650;
-    if (addonDessert) sum += 300;
-    if (addonCutlery) sum += 250;
-    return sum;
-  };
+  // Calculations aligned with selected catering menu
+  const selectedPackage: CateringPackageData | null =
+    packages.find((p) => p.id === selectedMenuId) ||
+    packages[0] ||
+    null;
 
-  const baseRate = tierPrices[selectedTier];
-  const addonsPerPax = getAddonsPerPax();
-  const totalPerPax = baseRate + addonsPerPax;
-  const grandTotal = totalPerPax * paxCount;
+  const baseRate = selectedPackage ? Number(selectedPackage.price_per_pax) : 0;
+  const isServiceChargeApplicable = selectedPackage
+    ? selectedPackage.name.includes("Menu 02") ||
+      selectedPackage.name.includes("Menu 03") ||
+      selectedPackage.name.includes("Menu 04") ||
+      selectedPackage.name.includes("Menu 05") ||
+      selectedPackage.badge === "Dana - Guest" ||
+      selectedPackage.name.toLowerCase().includes("guest")
+    : false;
+
+  const foodSubtotal = baseRate * paxCount;
+  const serviceChargeAmount = isServiceChargeApplicable ? Math.round(foodSubtotal * 0.1) : 0;
+  const grandTotal = foodSubtotal + serviceChargeAmount;
   const advanceAmount = Math.round(grandTotal * 0.3);
   const balanceAmount = grandTotal - advanceAmount;
 
@@ -268,7 +277,7 @@ export default function CateringPage() {
     const receipt = "AG-PAY-" + Math.floor(100000 + Math.random() * 900000);
     showAlertNotice(
       "Payment Gateway Success!",
-      `Thank you ${payerName || "Valued Customer"}. Your ${label} of LKR ${amt.toLocaleString()} has been received. Receipt ID: ${receipt}. A catering manager will contact you at ${payerPhone || "your phone number"}.`
+      `Thank you ${payerName || "Valued Customer"}. Your ${label} of LKR ${amt.toLocaleString()} for "${selectedPackage?.name || "Catering Package"}" has been received. Receipt ID: ${receipt}. A catering manager will contact you at ${payerPhone || "your phone number"}.`
     );
     setPayerName("");
     setPayerPhone("");
@@ -276,10 +285,11 @@ export default function CateringPage() {
 
   // WhatsApp Quote Link
   const sendWhatsAppQuote = () => {
+    if (!selectedPackage) return;
     const text = `Hi Ahas Gawwa Catering, I calculated an estimated quote:\n- Location: ${
       selectedLocation || "Not Specified"
-    }\n- Event: ${eventNames[selectedEvent]}\n- Guests: ${paxCount} Pax\n- Tier: ${
-      tierNames[selectedTier]
+    }\n- Selected Menu: ${selectedPackage.name} (Rs. ${baseRate.toLocaleString()}/plate)\n- Guests: ${paxCount} Pax\n- Food Subtotal: LKR ${foodSubtotal.toLocaleString()}${
+      serviceChargeAmount > 0 ? `\n- 10% Service Charge: LKR ${serviceChargeAmount.toLocaleString()}` : ""
     }\n- Grand Estimated Budget: LKR ${grandTotal.toLocaleString()}`;
     window.open(
       `https://wa.me/94742013332?text=${encodeURIComponent(text)}`,
@@ -292,16 +302,13 @@ export default function CateringPage() {
     setIsBookingModalOpen(false);
     showAlertNotice(
       "Quote Request Sent",
-      `Your written quote request for ${bookingName} (${bookingSuburb}) has been submitted. Our catering coordinator will contact you shortly.`
+      `Your written quote request for ${bookingPackage ? `"${bookingPackage}" — ` : ""}${bookingName} (${bookingSuburb}) has been submitted. Our catering coordinator will contact you shortly.`
     );
     setBookingName("");
     setBookingPhone("");
+    setBookingPackage("");
   };
 
-  const openServiceModal = (key: EventKey | "bbq") => {
-    setInfoModalKey(key);
-    setIsInfoModalOpen(true);
-  };
 
   return (
     <div className="w-full transition-colors duration-300 font-sans bg-white dark:bg-[#0f0d0c] text-slate-800 dark:text-slate-100">
@@ -348,12 +355,17 @@ export default function CateringPage() {
                 <select
                   value={selectedLocation}
                   onChange={(e) => setSelectedLocation(e.target.value)}
-                  className="w-full bg-transparent text-slate-900 dark:text-white text-xs font-bold focus:outline-none cursor-pointer"
+                  disabled={locations.length === 0}
+                  className="w-full bg-transparent text-slate-900 dark:text-white text-xs font-bold focus:outline-none cursor-pointer disabled:opacity-50"
                 >
                   <option value="" disabled className="bg-[#FFFBF8] dark:bg-[#1a1614] text-slate-900 dark:text-white">
-                    Select City / Suburb
+                    {locations.length > 0
+                      ? "Select City / Suburb"
+                      : cateringError
+                      ? "Locations unavailable"
+                      : "Loading locations..."}
                   </option>
-                  {locationsList.map((loc) => (
+                  {locations.map((loc) => (
                     <option key={loc} value={loc} className="bg-[#FFFBF8] dark:bg-[#1a1614] text-slate-900 dark:text-white">
                       {loc}
                     </option>
@@ -361,34 +373,32 @@ export default function CateringPage() {
                 </select>
               </div>
 
-              {/* 2. Event Type */}
+              {/* 2. Select Menu */}
               <div className="p-3 rounded-2xl bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 shadow-md shadow-#E36727">
                 <label className="block text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-1">
-                  Event Type
+                  Catering Menu
                 </label>
                 <select
-                  value={selectedEvent}
-                  onChange={(e) => setSelectedEvent(e.target.value as EventKey)}
-                  className="w-full bg-transparent text-slate-900 dark:text-white text-xs font-bold focus:outline-none cursor-pointer"
+                  value={selectedMenuId}
+                  onChange={(e) => setSelectedMenuId(Number(e.target.value))}
+                  disabled={packages.length === 0}
+                  className="w-full bg-transparent text-slate-900 dark:text-white text-xs font-bold focus:outline-none cursor-pointer truncate disabled:opacity-50"
                 >
-                  <option value="wedding" className="bg-[#FFFBF8] dark:bg-[#1a1614] text-slate-900 dark:text-white">
-                    Wedding Reception
-                  </option>
-                  <option value="dana" className="bg-[#FFFBF8] dark:bg-[#1a1614] text-slate-900 dark:text-white">
-                    Sacred Dana / Alms Giving
-                  </option>
-                  <option value="corporate" className="bg-[#FFFBF8] dark:bg-[#1a1614] text-slate-900 dark:text-white">
-                    Corporate Gala / Lunch
-                  </option>
-                  <option value="birthday" className="bg-[#FFFBF8] dark:bg-[#1a1614] text-slate-900 dark:text-white">
-                    Birthday Celebration
-                  </option>
-                  <option value="private" className="bg-[#FFFBF8] dark:bg-[#1a1614] text-slate-900 dark:text-white">
-                    Private Garden BBQ
-                  </option>
-                  <option value="funeral" className="bg-[#FFFBF8] dark:bg-[#1a1614] text-slate-900 dark:text-white">
-                    Funeral Commemoration
-                  </option>
+                  {packages.length === 0 ? (
+                    <option value="" disabled className="bg-[#FFFBF8] dark:bg-[#1a1614] text-slate-500">
+                      {cateringError ? "Menu cannot be fetched!" : "Loading menus..."}
+                    </option>
+                  ) : (
+                    packages.map((pkg) => (
+                      <option
+                        key={pkg.id}
+                        value={pkg.id}
+                        className="bg-[#FFFBF8] dark:bg-[#1a1614] text-slate-900 dark:text-white"
+                      >
+                        {pkg.name} — Rs. {Number(pkg.price_per_pax).toLocaleString()}
+                      </option>
+                    ))
+                  )}
                 </select>
               </div>
 
@@ -422,6 +432,13 @@ export default function CateringPage() {
                 <i className="fa-solid fa-arrow-right text-xs"></i>
               </button>
             </div>
+
+            {cateringError && (
+              <div className="mt-3.5 p-3 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-xs font-bold flex items-center justify-center gap-2">
+                <i className="fa-solid fa-triangle-exclamation"></i>
+                <span>Menu cannot be fetched! Backend service is offline or unreachable.</span>
+              </div>
+            )}
           </div>
 
           {/* Stats Grid */}
@@ -476,54 +493,144 @@ export default function CateringPage() {
               Catering Cost Estimator
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-              Adjust guest numbers, select your menu tier, and add live stations
-              to get an immediate itemized estimated budget in LKR.
+              Select your catering menu and number of guests to get an immediate itemized estimated budget in LKR.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {cateringLoading ? (
+            <div className="flex flex-col items-center justify-center py-20 space-y-3">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E36727]"></div>
+              <p className="text-xs text-slate-500 font-bold animate-pulse">Loading live catering menus...</p>
+            </div>
+          ) : cateringError || packages.length === 0 || !selectedPackage ? (
+            <div className="py-14 px-6 rounded-3xl bg-red-500/10 border-2 border-red-500/30 text-center space-y-4 max-w-xl mx-auto shadow-sm">
+              <div className="w-16 h-16 rounded-3xl bg-red-500/20 text-red-500 flex items-center justify-center text-3xl mx-auto shadow-xs">
+                <i className="fa-solid fa-triangle-exclamation"></i>
+              </div>
+              <h3 className="font-serif font-extrabold text-2xl sm:text-3xl text-red-600 dark:text-red-400">
+                Menu cannot be fetched!
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-md mx-auto">
+                Catering menus and budget estimators must be loaded live from the backend database. The backend server is currently offline or unreachable.
+              </p>
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={fetchCateringData}
+                  className="px-6 py-2.5 bg-[#E36727] hover:bg-amber-600 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer"
+                >
+                  <i className="fa-solid fa-arrows-rotate mr-2"></i> Try Again
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Controls Column (Left) */}
             <div className="lg:col-span-7 bg-[#FBEAD9] dark:bg-[#1a1614] border border-amber-200 dark:border-white/10 rounded-3xl p-6 sm:p-8 space-y-6 shadow-lg">
-              {/* 1. Event Type Selection */}
+              {/* 1. Select Menu */}
               <div>
-                <label className="block text-xs font-bold text-amber-500 uppercase tracking-wider mb-2.5">
-                  1. Select Event Type
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                  {(
-                    [
-                      { key: "wedding", icon: "fa-heart", label: "Wedding", sub: "Reception & Poruwa" },
-                      { key: "dana", icon: "fa-hands-praying", label: "Sacred Dana", sub: "Alms Giving Protocols" },
-                      { key: "corporate", icon: "fa-briefcase", label: "Corporate", sub: "Galas & Lunches" },
-                      { key: "birthday", icon: "fa-cake-candles", label: "Birthday", sub: "Kids & Parties" },
-                      { key: "private", icon: "fa-fire", label: "Private BBQ", sub: "Garden & Beach" },
-                      { key: "funeral", icon: "fa-dove", label: "Funeral", sub: "Solemn Refreshments" },
-                    ] as const
-                  ).map((ev) => (
-                    <button
-                      key={ev.key}
-                      type="button"
-                      onClick={() => setSelectedEvent(ev.key)}
-                      className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
-                        selectedEvent === ev.key
-                          ? "border-amber-500 bg-amber-500/10"
-                          : "border-slate-200 dark:border-white/10 bg-white dark:bg-[#26201d]"
-                      }`}
-                    >
-                      <i className={`fa-solid ${ev.icon} text-amber-500 text-base mb-1 block`}></i>
-                      <span className="text-xs font-bold text-slate-900 dark:text-white block">
-                        {ev.label}
-                      </span>
-                      <span className="text-[10px] text-slate-500 dark:text-slate-400">
-                        {ev.sub}
-                      </span>
-                    </button>
-                  ))}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                  <label className="text-xs font-bold text-amber-500 uppercase tracking-wider">
+                    1. Select Menu
+                  </label>
+                  {/* Category Filter Pills */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      { key: "all", label: "All Menus" },
+                      ...(cateringCategories.length > 0
+                        ? cateringCategories.map((c) => ({
+                            key: c.slug || String(c.id),
+                            label: c.name,
+                          }))
+                        : [
+                            { key: "bana", label: "Bana / Pirith" },
+                            { key: "dana_monk", label: "Monk Dana" },
+                            { key: "dana_guest", label: "Guest Dana" },
+                          ]),
+                    ].map((tab) => (
+                      <button
+                        key={tab.key}
+                        type="button"
+                        onClick={() => setEstimatorCategory(tab.key)}
+                        className={`px-2.5 py-1 rounded-xl text-[10px] font-bold cursor-pointer transition-all ${
+                          estimatorCategory === tab.key
+                            ? "bg-[#E36727] text-white shadow-xs"
+                            : "bg-white dark:bg-[#26201d] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:border-amber-400"
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Menu Selection Cards Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[460px] overflow-y-auto pr-1">
+                  {packages
+                    .filter((pkg) => {
+                      if (estimatorCategory === "all") return true;
+                      return matchPackageCategory(pkg, estimatorCategory);
+                    })
+                    .map((pkg) => {
+                      const isSelected = selectedMenuId === pkg.id;
+                      const hasSC =
+                        pkg.name.includes("Menu 02") ||
+                        pkg.name.includes("Menu 03") ||
+                        pkg.name.includes("Menu 04") ||
+                        pkg.name.includes("Menu 05") ||
+                        pkg.badge === "Dana - Guest";
+
+                      return (
+                        <div
+                          key={pkg.id}
+                          onClick={() => setSelectedMenuId(pkg.id)}
+                          className={`p-3.5 rounded-2xl border cursor-pointer transition-all text-left flex flex-col justify-between ${
+                            isSelected
+                              ? "border-[#E36727] bg-[#E36727]/10 ring-2 ring-[#E36727]/30 shadow-md"
+                              : "border-slate-200 dark:border-white/10 bg-white dark:bg-[#26201d] hover:border-amber-400"
+                          }`}
+                        >
+                          <div>
+                            <div className="flex justify-between items-start gap-1 mb-1.5">
+                              <span
+                                className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full ${
+                                  isSelected
+                                    ? "bg-[#E36727] text-white"
+                                    : "bg-amber-500/15 text-amber-600 dark:text-amber-400"
+                                }`}
+                              >
+                                {pkg.badge}
+                              </span>
+                              <span className="font-serif font-extrabold text-xs text-[#E36727]">
+                                Rs. {Number(pkg.price_per_pax).toLocaleString()}/=
+                              </span>
+                            </div>
+
+                            <h4 className="font-bold text-xs text-slate-900 dark:text-white leading-snug">
+                              {pkg.name}
+                            </h4>
+
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-2 mt-1 leading-snug">
+                              {pkg.description}
+                            </p>
+                          </div>
+
+                          <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[10px]">
+                            <span className="text-slate-400 font-semibold">Min: {pkg.min_pax} Pax</span>
+                            {hasSC && (
+                              <span className="text-amber-600 dark:text-amber-400 font-bold text-[9px]">
+                                +10% SC
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
 
               {/* 2. Guest Count Slider */}
-              <div>
+              <div className="pt-2 border-t border-slate-200 dark:border-white/10">
                 <div className="flex justify-between items-center mb-1.5">
                   <label className="text-xs font-bold text-amber-500 uppercase tracking-wider">
                     2. Number of Guests (Pax)
@@ -534,139 +641,20 @@ export default function CateringPage() {
                 </div>
                 <input
                   type="range"
-                  min="20"
+                  min={selectedPackage.min_pax || 20}
                   max="1000"
-                  step="10"
+                  step="5"
                   value={paxCount}
-                  onChange={(e) => setPaxCount(parseInt(e.target.value) || 20)}
+                  onChange={(e) =>
+                    setPaxCount(parseInt(e.target.value) || selectedPackage.min_pax || 20)
+                  }
                   className="w-full h-2.5 bg-slate-200 dark:bg-[#26201d] rounded-lg accent-[#E36727] cursor-pointer"
                 />
                 <div className="flex justify-between text-[10px] text-slate-500 dark:text-slate-400 font-bold mt-1">
-                  <span>20 Pax (Min)</span>
+                  <span>{selectedPackage.min_pax || 20} Pax (Min)</span>
+                  <span>100 Pax</span>
                   <span>250 Pax</span>
-                  <span>500 Pax</span>
-                  <span>1000+ Pax</span>
-                </div>
-              </div>
-
-              {/* 3. Package Tier Selector */}
-              <div>
-                <label className="block text-xs font-bold text-amber-500 uppercase tracking-wider mb-2.5">
-                  3. Select Package Tier
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {(
-                    [
-                      {
-                        key: "silver",
-                        name: "Silver Essential",
-                        price: "LKR 1,850/pax",
-                        desc: "2 Mains, 3 Curries, Salad, Dessert, Welcome Drink.",
-                      },
-                      {
-                        key: "gold",
-                        name: "Royal Gold",
-                        price: "LKR 2,750/pax",
-                        desc: "3 Mains, 5 Curries, Seafood, Dual Desserts & Cutlery.",
-                      },
-                      {
-                        key: "platinum",
-                        name: "Imperial Platinum",
-                        price: "LKR 3,950/pax",
-                        desc: "Full International Buffet, Live Hoppers/BBQ, Premium Chafers.",
-                      },
-                    ] as const
-                  ).map((tier) => (
-                    <div
-                      key={tier.key}
-                      onClick={() => setSelectedTier(tier.key)}
-                      className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${
-                        selectedTier === tier.key
-                          ? "border-amber-500 bg-amber-500/10"
-                          : "border-slate-200 dark:border-white/10 bg-white dark:bg-[#26201d]"
-                      }`}
-                    >
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="font-bold text-xs text-slate-900 dark:text-white">
-                          {tier.name}
-                        </span>
-                        <span className="text-[11px] text-amber-500 font-bold">
-                          {tier.price}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
-                        {tier.desc}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* 4. Add-ons & Upgrades */}
-              <div>
-                <label className="block text-xs font-bold text-amber-500 uppercase tracking-wider mb-2.5">
-                  4. Add Live Stations & Upgrades
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-                  <label className="flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 cursor-pointer shadow-xs">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={addonHoppers}
-                        onChange={(e) => setAddonHoppers(e.target.checked)}
-                        className="rounded text-[#E36727] accent-[#E36727]"
-                      />
-                      <span className="font-semibold text-slate-800 dark:text-slate-200">
-                        Live Hopper Station
-                      </span>
-                    </div>
-                    <span className="font-bold text-amber-500">+LKR 450/pax</span>
-                  </label>
-
-                  <label className="flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 cursor-pointer shadow-xs">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={addonBbq}
-                        onChange={(e) => setAddonBbq(e.target.checked)}
-                        className="rounded text-[#E36727] accent-[#E36727]"
-                      />
-                      <span className="font-semibold text-slate-800 dark:text-slate-200">
-                        Live BBQ Grill Station
-                      </span>
-                    </div>
-                    <span className="font-bold text-amber-500">+LKR 650/pax</span>
-                  </label>
-
-                  <label className="flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 cursor-pointer shadow-xs">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={addonDessert}
-                        onChange={(e) => setAddonDessert(e.target.checked)}
-                        className="rounded text-[#E36727] accent-[#E36727]"
-                      />
-                      <span className="font-semibold text-slate-800 dark:text-slate-200">
-                        Claypot Watalappan & Ice Cream
-                      </span>
-                    </div>
-                    <span className="font-bold text-amber-500">+LKR 300/pax</span>
-                  </label>
-
-                  <label className="flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 cursor-pointer shadow-xs">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={addonCutlery}
-                        onChange={(e) => setAddonCutlery(e.target.checked)}
-                        className="rounded text-[#E36727] accent-[#E36727]"
-                      />
-                      <span className="font-semibold text-slate-800 dark:text-slate-200">
-                        Porcelain & Waitstaff Service
-                      </span>
-                    </div>
-                    <span className="font-bold text-amber-500">+LKR 250/pax</span>
-                  </label>
+                  <span>500+ Pax</span>
                 </div>
               </div>
             </div>
@@ -688,9 +676,18 @@ export default function CateringPage() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Selected Event:</span>
+                  <span>Selected Menu:</span>
+                  <span
+                    className="font-bold text-[#E36727] text-right max-w-[210px] truncate"
+                    title={selectedPackage.name}
+                  >
+                    {selectedPackage.name}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Rate Per Plate:</span>
                   <span className="font-bold text-slate-900 dark:text-white">
-                    {eventNames[selectedEvent]}
+                    LKR {baseRate.toLocaleString()} / plate
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -700,31 +697,56 @@ export default function CateringPage() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Selected Tier:</span>
-                  <span className="font-bold text-amber-500">
-                    {tierNames[selectedTier]}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Base Rate Per Pax:</span>
+                  <span>Food Subtotal:</span>
                   <span className="font-bold text-slate-900 dark:text-white">
-                    LKR {baseRate.toLocaleString()}
+                    LKR {foodSubtotal.toLocaleString()}
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Add-ons Per Pax:</span>
-                  <span className="font-bold text-amber-500">
-                    +LKR {addonsPerPax.toLocaleString()}
-                  </span>
-                </div>
+                {isServiceChargeApplicable ? (
+                  <div className="flex justify-between text-amber-600 dark:text-amber-400">
+                    <span>10% Service Charge:</span>
+                    <span className="font-bold">
+                      +LKR {serviceChargeAmount.toLocaleString()}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex justify-between text-emerald-600 dark:text-emerald-400 text-[11px]">
+                    <span>Service Charge:</span>
+                    <span className="font-bold">Included</span>
+                  </div>
+                )}
                 <div className="pt-2 border-t border-slate-200 dark:border-white/10 flex justify-between text-sm">
                   <span className="font-bold text-slate-900 dark:text-white">
-                    Total Per Pax Cost:
+                    Effective Rate / Pax:
                   </span>
                   <span className="font-bold text-[#E36727]">
-                    LKR {totalPerPax.toLocaleString()} / pax
+                    LKR {Math.round(grandTotal / paxCount).toLocaleString()} / plate
                   </span>
                 </div>
+              </div>
+
+              {/* Selected Menu Inclusions Pill Box */}
+              <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-[11px] space-y-2">
+                <div>
+                  <div className="font-bold text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+                    <i className="fa-solid fa-utensils text-xs"></i>
+                    <span>Included in {selectedPackage.badge}:</span>
+                  </div>
+                  <p className="text-slate-600 dark:text-slate-300 text-[10px] leading-relaxed line-clamp-3 mt-0.5">
+                    {selectedPackage.inclusions_text}
+                  </p>
+                </div>
+                {selectedPackage.dessert_text && (
+                  <div className="pt-1.5 border-t border-amber-500/20 flex items-start gap-1.5">
+                    <span className="font-bold text-amber-700 dark:text-amber-300 text-[10px] uppercase tracking-wider shrink-0 flex items-center gap-1">
+                      <i className="fa-solid fa-ice-cream text-[10px]"></i>
+                      <span>Dessert:</span>
+                    </span>
+                    <span className="text-slate-700 dark:text-slate-300 text-[10px] font-medium leading-snug">
+                      {selectedPackage.dessert_text}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="p-5 rounded-2xl bg-white dark:bg-[#0f0d0c] border border-amber-500/40 text-center space-y-2 shadow-xs">
@@ -734,21 +756,29 @@ export default function CateringPage() {
                 <div className="text-3xl sm:text-4xl font-serif font-extrabold gold-gradient-text">
                   LKR {grandTotal.toLocaleString()}
                 </div>
-                
+
                 {/* 30% Advance & Balance Breakdown */}
                 <div className="pt-2 border-t border-slate-200 dark:border-white/10 grid grid-cols-2 gap-2 text-[11px] text-left">
                   <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
-                    <span className="block text-[9px] uppercase font-bold text-amber-600 dark:text-amber-400">30% Advance Deposit</span>
-                    <span className="font-extrabold text-slate-900 dark:text-white">LKR {advanceAmount.toLocaleString()}</span>
+                    <span className="block text-[9px] uppercase font-bold text-amber-600 dark:text-amber-400">
+                      30% Advance Deposit
+                    </span>
+                    <span className="font-extrabold text-slate-900 dark:text-white">
+                      LKR {advanceAmount.toLocaleString()}
+                    </span>
                   </div>
                   <div className="p-2 rounded-xl bg-slate-100 dark:bg-[#26201d] border border-slate-200 dark:border-white/10">
-                    <span className="block text-[9px] uppercase font-bold text-slate-500">70% Balance Due</span>
-                    <span className="font-bold text-slate-700 dark:text-slate-300">LKR {balanceAmount.toLocaleString()}</span>
+                    <span className="block text-[9px] uppercase font-bold text-slate-500">
+                      70% Balance Due
+                    </span>
+                    <span className="font-bold text-slate-700 dark:text-slate-300">
+                      LKR {balanceAmount.toLocaleString()}
+                    </span>
                   </div>
                 </div>
 
                 <div className="text-[10px] text-slate-500 italic pt-1">
-                  Includes buffet setup, chafing warmers & food transport within Colombo
+                  Includes plateware, glassware, cutlery, buffet tables & experienced servers
                 </div>
               </div>
 
@@ -774,7 +804,10 @@ export default function CateringPage() {
 
                 {/* Option 3: Request Official Written Quote */}
                 <button
-                  onClick={() => setIsBookingModalOpen(true)}
+                  onClick={() => {
+                    setBookingPackage(selectedPackage.name);
+                    setIsBookingModalOpen(true);
+                  }}
                   className="w-full py-3 bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white text-xs font-extrabold uppercase tracking-wider rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <i className="fa-solid fa-paper-plane"></i> Request Official Written Quote
@@ -802,6 +835,7 @@ export default function CateringPage() {
               </p>
             </div>
           </div>
+          )}
 
           {/* CALL CENTER & MENU CUSTOMIZATION BANNER UNDER ESTIMATOR */}
           <div className="mt-12 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-slate-900 via-[#1a1614] to-slate-900 border border-amber-500/40 text-white shadow-2xl relative overflow-hidden portal-card-shadow">
@@ -829,7 +863,7 @@ export default function CateringPage() {
 
                 <a
                   href={`https://wa.me/94742013332?text=${encodeURIComponent(
-                    `Hi Catering Hotline, I need expert advice on menu customization & finalizing payment for my ${eventNames[selectedEvent]} catering quote (${paxCount} Pax).`
+                    `Hi Catering Hotline, I need expert advice on menu customization & finalizing payment for my ${selectedPackage?.name || "catering"} quote (${paxCount} Pax).`
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -844,173 +878,7 @@ export default function CateringPage() {
         </div>
       </section>
 
-      {/* SECTION 2: FUNCTIONS / EVENTS LIST */}
-      <section
-        id="functions"
-        className="py-16 sm:py-20 bg-[#FBEAD9] dark:bg-[#1a1614] border-t border-slate-200 dark:border-white/10"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-          <div className="text-center max-w-3xl mx-auto space-y-2">
-            <span className="text-[#E36727] text-xs font-extrabold uppercase tracking-widest bg-[#E36727]/10 px-3.5 py-1 rounded-full border border-[#E36727]/20 inline-block">
-              Functions List
-            </span>
-            <h2 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">
-              Specialized Event Catering Solutions
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-              Tailored culinary protocols, presentation styles, and dedicated team assignments for every occasion.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Function 1: Wedding */}
-            <div className="p-6 rounded-3xl bg-white dark:bg-[#26201d] border border-amber-500/40 dark:border-white/40 portal-card-shadow space-y-3 hover:border-[#E36727] transition-all shadow-xs">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-xl">
-                <i className="fa-solid fa-heart"></i>
-              </div>
-              <h3 className="font-serif font-bold text-xl text-slate-900 dark:text-white">
-                Wedding Reception & Poruwa
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Welcome fruit punch, multi-course buffets, live hoppers/BBQ, cake structure assistance, porcelain dinnerware, and dedicated floor captain management.
-              </p>
-              <div className="pt-3 border-t border-slate-200 dark:border-white/10 flex justify-between items-center text-xs">
-                <span className="font-bold text-[#E36727]">
-                  From LKR 2,750 / Pax
-                </span>
-                <button
-                  onClick={() => openServiceModal("wedding")}
-                  className="text-[#E36727] font-bold hover:underline cursor-pointer"
-                >
-                  Details <i className="fa-solid fa-arrow-right text-[10px]"></i>
-                </button>
-              </div>
-            </div>
-
-            {/* Function 2: Sacred Dana */}
-            <div className="p-6 rounded-3xl bg-white dark:bg-[#26201d] border border-amber-500/40 hover:border-[#E36727] space-y-3 portal-card-shadow">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-500 flex items-center justify-center text-xl">
-                <i className="fa-solid fa-hands-praying"></i>
-              </div>
-              <h3 className="font-serif font-bold text-xl text-amber-500">
-                Sacred Dana / Alms Giving
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Strict vegetarian/mild traditional options, precise timing for Sangha Buddha Pooja, clean silver & claypot presentation, zero garlic/onion options.
-              </p>
-              <div className="pt-3 border-t border-slate-200 dark:border-white/10 flex justify-between items-center text-xs">
-                <span className="font-bold text-amber-500">
-                  From LKR 1,850 / Pax
-                </span>
-                <button
-                  onClick={() => openServiceModal("dana")}
-                  className="text-amber-500 font-bold hover:underline cursor-pointer"
-                >
-                  Protocols <i className="fa-solid fa-arrow-right text-[10px]"></i>
-                </button>
-              </div>
-            </div>
-
-            {/* Function 3: Corporate */}
-            <div className="p-6 rounded-3xl bg-white dark:bg-[#26201d] border border-amber-500/40 dark:border-white/40 portal-card-shadow space-y-3 hover:border-[#E36727] transition-all shadow-xs">
-              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-xl">
-                <i className="fa-solid fa-briefcase"></i>
-              </div>
-              <h3 className="font-serif font-bold text-xl text-slate-900 dark:text-white">
-                Corporate Galas & AGM High-Teas
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Executive lunch boxes, board meeting platter spreads, AGM high-teas, and insulated hot delivery to Colombo business centers.
-              </p>
-              <div className="pt-3 border-t border-slate-200 dark:border-white/10 flex justify-between items-center text-xs">
-                <span className="font-bold text-[#E36727]">
-                  From LKR 1,450 / Pax
-                </span>
-                <button
-                  onClick={() => openServiceModal("corporate")}
-                  className="text-[#E36727] font-bold hover:underline cursor-pointer"
-                >
-                  Details <i className="fa-solid fa-arrow-right text-[10px]"></i>
-                </button>
-              </div>
-            </div>
-
-            {/* Function 4: Birthdays */}
-            <div className="p-6 rounded-3xl bg-white dark:bg-[#26201d] border border-amber-500/40 hover:border-[#E36727] space-y-3 portal-card-shadow  transition-all shadow-xs">
-              <div className="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center text-xl">
-                <i className="fa-solid fa-cake-candles"></i>
-              </div>
-              <h3 className="font-serif font-bold text-xl text-amber-500">
-                Birthdays & Family Parties
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Finger food spreads, live mini burger counters, juice bars, chocolate fountains, and kid-friendly menu selections.
-              </p>
-              <div className="pt-3 border-t border-slate-200 dark:border-white/10 flex justify-between items-center text-xs">
-                <span className="font-bold text-amber-500">
-                  From LKR 1,750 / Pax
-                </span>
-                <button
-                  onClick={() => openServiceModal("birthday")}
-                  className="text-amber-500 font-bold hover:underline cursor-pointer"
-                >
-                  Details <i className="fa-solid fa-arrow-right text-[10px]"></i>
-                </button>
-              </div>
-            </div>
-
-            {/* Function 5: Private BBQ */}
-            <div className="p-6 rounded-3xl bg-white dark:bg-[#26201d] border border-amber-500/40 dark:border-white/40 portal-card-shadow space-y-3 hover:border-[#E36727] transition-all shadow-xs">
-              <div className="w-12 h-12 rounded-2xl bg-red-500/10 text-red-500 flex items-center justify-center text-xl">
-                <i className="fa-solid fa-fire"></i>
-              </div>
-              <h3 className="font-serif font-bold text-xl text-slate-900 dark:text-white">
-                Private Garden & Beach BBQ
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                On-site chefs, marinated chicken drumsticks, grilled jumbo prawns, tenderloin steaks, garlic breads, and fresh salads.
-              </p>
-              <div className="pt-3 border-t border-slate-200 dark:border-white/10 flex justify-between items-center text-xs">
-                <span className="font-bold text-[#E36727]">
-                  From LKR 3,200 / Pax
-                </span>
-                <button
-                  onClick={() => openServiceModal("bbq")}
-                  className="text-[#E36727] font-bold hover:underline cursor-pointer"
-                >
-                  Details <i className="fa-solid fa-arrow-right text-[10px]"></i>
-                </button>
-              </div>
-            </div>
-
-            {/* Function 6: Funeral */}
-            <div className="p-6 rounded-3xl bg-white dark:bg-[#26201d] border border-amber-500/40 hover:border-[#E36727] space-y-3 portal-card-shadow transition-all shadow-xs">
-              <div className="w-12 h-12 rounded-2xl bg-slate-500/10 text-slate-400 flex items-center justify-center text-xl">
-                <i className="fa-solid fa-dove"></i>
-              </div>
-              <h3 className="font-serif font-bold text-xl text-amber-500">
-                Funeral & Commemoration
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Short-notice 24-hour setup, continuous tea/coffee service, sandwiches, and respectful, quiet buffet arrangements.
-              </p>
-              <div className="pt-3 border-t border-slate-200 dark:border-white/10 flex justify-between items-center text-xs">
-                <span className="font-bold text-amber-500">
-                  From LKR 1,200 / Pax
-                </span>
-                <button
-                  onClick={() => openServiceModal("funeral")}
-                  className="text-amber-500 font-bold hover:underline cursor-pointer"
-                >
-                  Details <i className="fa-solid fa-arrow-right text-[10px]"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 3: CATERING MENUS LIST */}
+      {/* SECTION 2: OFFICIAL CATERING PACKAGES & MENUS */}
       <section
         id="menus"
         className="py-16 sm:py-20 bg-white dark:bg-[#0f0d0c] border-t border-slate-200 dark:border-white/10"
@@ -1019,167 +887,469 @@ export default function CateringPage() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
             <div>
               <span className="text-[#E36727] text-xs font-extrabold uppercase tracking-widest bg-[#E36727]/10 px-3.5 py-1 rounded-full border border-[#E36727]/20 inline-block">
-                Menus List
+                Authentic Menus Database
               </span>
               <h2 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white mt-2">
-                Curated Banquet Selections
+                Catering Packages & Set Menus
               </h2>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1">
+                Authentic Sri Lankan Bana/Pirith dinners, Sacred Dana offerings, and customized banquet options.
+              </p>
             </div>
-            <button
-              onClick={() =>
-                showAlertNotice(
-                  "Menu PDF Requested",
-                  "The complete 2026 catering menu PDF has been simulated and prepared for download."
-                )
-              }
-              className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 hover:border-[#E36727] text-xs font-bold flex items-center gap-2 cursor-pointer"
-            >
-              <i className="fa-solid fa-file-pdf text-red-500"></i> Download 2026 PDF Menu
-            </button>
+            <div className="flex items-center gap-2">
+              {cateringLoading && (
+                <span className="text-[11px] text-amber-500 font-bold animate-pulse flex items-center gap-1.5 bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/20">
+                  <i className="fa-solid fa-arrows-rotate animate-spin"></i> Syncing Menu DB...
+                </span>
+              )}
+              <button
+                onClick={() =>
+                  showAlertNotice(
+                    "2026 Catering Menu Script",
+                    "The complete Catering Menu Script including Menus 01-06 and Alms Giving packages has been synced from the database."
+                  )
+                }
+                className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 hover:border-[#E36727] text-xs font-bold flex items-center gap-2 cursor-pointer bg-white dark:bg-[#26201d]"
+              >
+                <i className="fa-solid fa-file-lines text-amber-500"></i> View 2026 Menu Spec
+              </button>
+            </div>
           </div>
 
-          {/* Menu Category Tabs */}
-          <div className="flex overflow-x-auto gap-2 pb-2 no-scrollbar">
-            {(
-              [
-                { key: "srilankan", label: "🇱🇰 Sri Lankan Feast" },
-                { key: "indian", label: "🇮🇳 Royal Indian" },
-                { key: "chinese", label: "🥢 Chinese Fusion" },
-                { key: "bbq", label: "🔥 BBQ & Hoppers" },
-                { key: "desserts", label: "🍨 Desserts & Drinks" },
-              ] as const
-            ).map((tab) => (
+          {/* Error Message or Live Menus Container */}
+          {cateringLoading ? (
+            <div className="flex flex-col items-center justify-center py-24 space-y-3">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E36727]"></div>
+              <p className="text-xs text-slate-500 font-bold animate-pulse">Syncing menus from database...</p>
+            </div>
+          ) : cateringError || packages.length === 0 ? (
+            <div className="py-20 px-6 rounded-3xl bg-red-500/10 border-2 border-red-500/30 text-center space-y-4 max-w-2xl mx-auto my-6 shadow-sm">
+              <div className="w-16 h-16 rounded-3xl bg-red-500/20 text-red-500 flex items-center justify-center text-3xl mx-auto shadow-xs">
+                <i className="fa-solid fa-triangle-exclamation"></i>
+              </div>
+              <h3 className="font-serif font-extrabold text-2xl sm:text-3xl text-red-600 dark:text-red-400">
+                Menu cannot be fetched!
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-lg mx-auto">
+                All catering packages and set menus are rendered live from the backend database. We do not display fake menu data when the backend service is offline.
+              </p>
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={fetchCateringData}
+                  className="px-6 py-3 bg-[#E36727] hover:bg-amber-600 text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-lg transition-all cursor-pointer transform hover:scale-105 active:scale-95"
+                >
+                  <i className="fa-solid fa-arrows-rotate mr-2"></i> Retry Fetching Menu
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Complimentary Amenities Banner */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 border border-amber-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex items-start sm:items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#E36727] text-white flex items-center justify-center text-lg shrink-0 shadow-sm">
+                <i className="fa-solid fa-gift"></i>
+              </div>
+              <div className="text-xs">
+                <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <span>Free Of Charge Inclusions:</span>
+                  <span className="text-[10px] bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-extrabold px-2 py-0.5 rounded-full uppercase">All Menus Included</span>
+                </div>
+                <div className="text-slate-600 dark:text-slate-300 text-[11px] mt-0.5">
+                  Plateware, Glassware, Stainless Cutlery, Trays, Water Dispensers, Sinks, Buffet Tables & Uniformed Staff under personal supervision.
+                </div>
+              </div>
+            </div>
+            <div className="text-[10px] text-slate-500 dark:text-slate-400 bg-white/70 dark:bg-black/30 px-3 py-2 rounded-xl border border-amber-500/20 shrink-0">
+              <span className="font-bold text-amber-600 dark:text-amber-400">150+ Guests Special:</span> Hut, Tables & Chairs free of charge.
+            </div>
+          </div>
+
+          {/* Main Category Tabs */}
+          <div className="flex overflow-x-auto gap-2 pb-2 no-scrollbar border-b border-slate-200 dark:border-white/10">
+            {[
+              ...(cateringCategories.length > 0
+                ? cateringCategories.map((c) => ({
+                    key: c.slug || String(c.id),
+                    label: `${c.icon && !c.icon.startsWith("fa-") ? c.icon + " " : ""}${c.name}${c.subtitle ? ` (${c.subtitle})` : ""}`,
+                    icon: c.icon && c.icon.startsWith("fa-") ? c.icon : undefined,
+                    count: packages.filter((p) => matchPackageCategory(p, c.slug || c.name)).length,
+                  }))
+                : [
+                    { key: "bana", label: "🪷 Bana / Pirith Dinner (Menus 01-06)", icon: undefined, count: packages.filter((p) => p.badge.includes("Bana") || p.badge.includes("Feast")).length },
+                    { key: "dana_monk", label: "☸️ Alms Giving — For Monks", icon: undefined, count: packages.filter((p) => p.badge === "Dana - Monk").length },
+                    { key: "dana_guest", label: "👥 Alms Giving — For Guests", icon: undefined, count: packages.filter((p) => p.badge === "Dana - Guest").length },
+                  ]),
+              { key: "addons", label: "🍓 Additional Charge Items & Free Services.", icon: undefined, count: addons.length },
+            ].map((tab) => (
               <button
                 key={tab.key}
-                onClick={() => setActiveMenuTab(tab.key)}
-                className={`px-4 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                  activeMenuTab === tab.key
-                    ? "bg-[#E36727] text-white shadow-md"
+                onClick={() => setCateringCategoryTab(tab.key)}
+                className={`px-4 py-3 rounded-2xl text-xs font-bold cursor-pointer transition-all flex items-center gap-2 shrink-0 ${
+                  cateringCategoryTab === tab.key
+                    ? "bg-[#E36727] text-white shadow-md scale-[1.01]"
                     : "bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:bg-[#E36727]/10"
                 }`}
               >
-                {tab.label}
+                {tab.icon && <i className={`fa-solid ${tab.icon} text-xs`}></i>}
+                <span>{tab.label}</span>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold ${
+                  cateringCategoryTab === tab.key ? "bg-white/20 text-white" : "bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-400"
+                }`}>
+                  {tab.count}
+                </span>
               </button>
             ))}
           </div>
 
-          {/* Menu Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {menuData[activeMenuTab].map((item, idx) => (
-              <div
-                key={idx}
-                className="p-4 rounded-2xl bg-white dark:bg-[#26201d] border border-amber-200 dark:border-white/10  hover:border-[#E36727] space-y-1.5 shadow-xs"
-              >
-                <div className="flex justify-between items-center">
-                  <h4 className="font-bold text-xs text-slate-900 dark:text-white">
-                    {item.title}
-                  </h4>
-                  <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-[#E36727]/20 text-[#E36727]">
-                    {item.badge}
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                  {item.desc}
+          {/* Dynamic Package Category View */}
+          {cateringCategoryTab !== "addons" && (() => {
+            const currentCat = cateringCategories.find(
+              (c) => c.slug === cateringCategoryTab || String(c.id) === cateringCategoryTab || c.name.toLowerCase() === cateringCategoryTab.toLowerCase()
+            );
+            const categoryPackages = packages.filter((p) => matchPackageCategory(p, cateringCategoryTab));
+            const isMonk = cateringCategoryTab === "dana_monk" || (currentCat && currentCat.name.includes("Monk"));
+            const isGuest = cateringCategoryTab === "dana_guest" || (currentCat && currentCat.name.includes("Guest"));
+
+            return (
+              <div className="space-y-6">
+                {/* Specific Category Banners */}
+                {isMonk && (
+                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 flex items-center gap-3">
+                    <i className="fa-solid fa-hands-praying text-amber-500 text-lg shrink-0"></i>
+                    <div>
+                      <strong>Reverent Dana Protocol:</strong> All monk courses are prepared with highest standards of cleanliness and purity. Includes special Vegetable Courses Plate (4 Boiled Vegetables, 1 Veraniya Miris, 1 Tempered Garlic) and dedicated Buddha Pooja arrangements.
+                    </div>
+                  </div>
+                )}
+
+                {isGuest && (
+                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 flex items-center gap-3">
+                    <i className="fa-solid fa-users text-amber-500 text-lg shrink-0"></i>
+                    <div>
+                      <strong>Normal Guest Lunch Menus:</strong> Companion menus for relatives, upasakas, and devotees attending the alms giving. Note: 10% Service Charge applies to guest catering orders.
+                    </div>
+                  </div>
+                )}
+
+                {!isMonk && !isGuest && currentCat?.description && (
+                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 flex items-center gap-3">
+                    <i className={`fa-solid ${currentCat.icon || "fa-champagne-glasses"} text-amber-500 text-lg shrink-0`}></i>
+                    <div>
+                      <strong>{currentCat.name}:</strong> {currentCat.description}
+                    </div>
+                  </div>
+                )}
+
+                {categoryPackages.length === 0 ? (
+                  <div className="py-16 text-center bg-white dark:bg-[#26201d] rounded-3xl border border-amber-200 dark:border-white/10 p-8 shadow-xs">
+                    <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-500/10 text-[#E36727] flex items-center justify-center text-2xl mb-3">
+                      <i className={`fa-solid ${currentCat?.icon || "fa-utensils"}`}></i>
+                    </div>
+                    <h4 className="font-serif font-bold text-lg text-slate-900 dark:text-white mb-1">
+                      {currentCat?.name || "Category"} Packages
+                    </h4>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto mb-4">
+                      Preset catering packages for this category will be available soon, or we can tailor an exclusive customized package for your event today.
+                    </p>
+                    <a
+                      href={`https://wa.me/94742013332?text=${encodeURIComponent(
+                        `Hi Ahas Gawwa, I am looking for custom catering options for "${currentCat?.name || cateringCategoryTab}". Please share menu choices and pricing.`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#E36727] hover:bg-amber-600 text-white text-xs font-bold rounded-xl shadow-md cursor-pointer transition-all"
+                    >
+                      <i className="fa-brands fa-whatsapp text-sm"></i>
+                      <span>Inquire Custom {currentCat?.name || "Catering"} on WhatsApp</span>
+                    </a>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {categoryPackages.map((pkg) => {
+                      const hasServiceCharge =
+                        pkg.name.includes("Menu 02") ||
+                        pkg.name.includes("Menu 03") ||
+                        pkg.name.includes("Menu 04") ||
+                        pkg.name.includes("Menu 05") ||
+                        pkg.badge === "Dana - Guest";
+                      const inclusions = pkg.inclusions_text
+                        ? pkg.inclusions_text.split(",").map((s) => s.trim()).filter(Boolean)
+                        : [];
+
+                      return (
+                        <div
+                          key={pkg.id}
+                          className="rounded-3xl bg-white dark:bg-[#26201d] border border-amber-200 dark:border-white/10 hover:border-[#E36727] transition-all p-6 flex flex-col justify-between shadow-xs portal-card-shadow group"
+                        >
+                          <div className="space-y-4">
+                            <div className="flex justify-between items-start gap-2">
+                              <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                {pkg.badge}
+                              </span>
+                              {hasServiceCharge && (
+                                <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-[#1a1614] px-2 py-0.5 rounded border border-amber-500/30">
+                                  +10% Service Charge
+                                </span>
+                              )}
+                            </div>
+
+                            <div>
+                              <h3 className="font-serif font-bold text-xl text-slate-900 dark:text-white group-hover:text-[#E36727] transition-colors">
+                                {pkg.name}
+                              </h3>
+                              <div className="mt-2 flex items-baseline gap-2">
+                                <span className="font-serif text-3xl font-extrabold text-[#E36727]">
+                                  Rs. {Number(pkg.price_per_pax).toLocaleString()}/=
+                                </span>
+                                <span className="text-xs text-slate-500 font-bold">Per Plate</span>
+                              </div>
+                              <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+                                {pkg.description}
+                              </p>
+                            </div>
+
+                            {/* Inclusions List */}
+                            <div className="pt-3 border-t border-slate-100 dark:border-white/10 space-y-2">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">
+                                Menu Courses & Inclusions ({inclusions.length} items):
+                              </span>
+                              <div className="grid grid-cols-1 gap-1.5 max-h-72 overflow-y-auto pr-1">
+                                {inclusions.map((item, idx) => (
+                                  <div
+                                    key={idx}
+                                    className="text-xs text-slate-700 dark:text-slate-300 flex items-start gap-2"
+                                  >
+                                    <i className="fa-solid fa-circle-check text-emerald-500 text-[10px] mt-1 shrink-0"></i>
+                                    <span className="leading-snug">{item}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Dessert Section */}
+                            {pkg.dessert_text && (
+                              <div className="pt-3 border-t border-amber-500/20 dark:border-white/10 space-y-2 bg-amber-500/10 dark:bg-amber-500/10 p-3 rounded-2xl border border-amber-500/30">
+                                <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+                                  <i className="fa-solid fa-ice-cream text-xs text-[#E36727]"></i>
+                                  <span>Dessert</span>
+                                </span>
+                                <div className="grid grid-cols-1 gap-1.5">
+                                  {pkg.dessert_text
+                                    .split(",")
+                                    .map((dessert, dIdx) => (
+                                      <div
+                                        key={dIdx}
+                                        className="text-xs font-semibold text-slate-800 dark:text-slate-100 flex items-start gap-2"
+                                      >
+                                        <i className="fa-solid fa-spoon text-[#E36727] text-[10px] mt-1 shrink-0"></i>
+                                        <span className="leading-snug">{dessert.trim()}</span>
+                                      </div>
+                                    ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Card Actions */}
+                          <div className="pt-5 mt-4 border-t border-slate-100 dark:border-white/10 space-y-2">
+                            <button
+                              onClick={() => {
+                                setBookingPackage(pkg.name);
+                                setIsBookingModalOpen(true);
+                              }}
+                              className="w-full py-2.5 bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+                            >
+                              <i className="fa-solid fa-calendar-check"></i>
+                              <span>Select & Request Quote</span>
+                            </button>
+                            <a
+                              href={`https://wa.me/94742013332?text=${encodeURIComponent(
+                                `Hi Ahas Gawwa, I am interested in booking "${pkg.name}" (Rs. ${Number(
+                                  pkg.price_per_pax
+                                ).toLocaleString()}/plate). Please share available dates and custom options.`
+                              )}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="w-full py-2 bg-slate-100 dark:bg-[#1a1614] hover:bg-emerald-500/10 hover:text-emerald-500 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer border border-slate-200 dark:border-white/10"
+                            >
+                              <i className="fa-brands fa-whatsapp text-emerald-500"></i>
+                              <span>Inquire via WhatsApp</span>
+                            </a>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* TAB 4: ADD-ONS & SERVICE POLICIES */}
+          {cateringCategoryTab === "addons" && (
+            <div className="space-y-8">
+              <div>
+                <h3 className="font-serif text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                  Additional Charge Items & Free Services.
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400">
+                  Special paper-plate wraps, sweet arrangements, fruit platters, and complimentary event services.
                 </p>
               </div>
-            ))}
-          </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {addons.map((addon) => (
+                  <div
+                    key={addon.id}
+                    className="p-6 rounded-3xl bg-white dark:bg-[#26201d] border border-amber-200 dark:border-white/10 hover:border-[#E36727] transition-all space-y-4 portal-card-shadow"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="w-12 h-12 rounded-2xl bg-[#E36727]/10 text-[#E36727] flex items-center justify-center text-xl">
+                        <i className={`fa-solid ${addon.icon}`}></i>
+                      </div>
+                      <span className="font-serif text-2xl font-extrabold text-[#E36727]">
+                        Rs. {Number(addon.price_per_pax).toLocaleString()}/=
+                      </span>
+                    </div>
+
+                    <div>
+                      <h4 className="font-bold text-base text-slate-900 dark:text-white">
+                        {addon.name}
+                      </h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                        {addon.description}
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setBookingPackage(`Add-on: ${addon.name}`);
+                        setIsBookingModalOpen(true);
+                      }}
+                      className="w-full py-2 bg-slate-100 dark:bg-[#1a1614] hover:bg-[#E36727] hover:text-white text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl transition-all cursor-pointer"
+                    >
+                      Inquire / Add to Order
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Complimentary Policies Details (Rendered Dynamically from Backend) */}
+              <div className="p-6 rounded-3xl bg-[#FBEAD9] dark:bg-[#1a1614] border border-amber-500/30 space-y-4">
+                <h4 className="font-serif font-bold text-xl text-slate-900 dark:text-white flex items-center gap-2">
+                  <i className="fa-solid fa-circle-info text-[#E36727]"></i>
+                  <span>{serviceTerms.section_title || "Important Service Terms & Logistics Policies"}</span>
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-700 dark:text-slate-300">
+                  {serviceTerms.policies.map((policy) => (
+                    <div
+                      key={policy.id || policy.title}
+                      className="p-4 rounded-2xl bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 space-y-2 shadow-xs"
+                    >
+                      <span className="font-bold text-slate-900 dark:text-white block flex items-center gap-1.5">
+                        <i className={`fa-solid ${policy.icon || "fa-circle-check"} text-[#E36727]`}></i>{" "}
+                        {policy.title}
+                      </span>
+                      <p className="leading-relaxed whitespace-pre-line">
+                        {policy.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+            </>
+          )}
         </div>
       </section>
 
-      {/* SECTION 4: LIMITED PACKAGES */}
-      <section
-        id="packages"
-        className="py-16 sm:py-20 bg-[#FBEAD9] dark:bg-[#1a1614] border-t border-slate-200 dark:border-white/10"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="text-center max-w-3xl mx-auto space-y-2">
-            <span className="text-[#E36727] text-xs font-extrabold uppercase tracking-widest bg-[#E36727]/10 px-3.5 py-1 rounded-full border border-[#E36727]/20 inline-block">
-              Limited Packages
-            </span>
-            <h2 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">
-              Seasonal Featured Packages
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-              All-inclusive event packages with set menu items and equipment included.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Limited Package 1 */}
-            <div className="p-6 rounded-3xl bg-white dark:bg-[#26201d] border border-[#E36727]/40 space-y-4 portal-card-shadow">
-              <div className="flex justify-between items-start">
-                <div>
-                  <span className="text-[10px] font-bold text-[#E36727] uppercase bg-[#E36727]/10 px-2.5 py-0.5 rounded-full">
-                    Popular Wedding Offer
-                  </span>
-                  <h3 className="font-serif font-bold text-2xl text-slate-900 dark:text-white mt-1">
-                    Royal Poruwa Wedding Banquet
-                  </h3>
-                </div>
-                <div className="text-right">
-                  <div className="font-serif text-2xl font-extrabold text-[#E36727]">
-                    LKR 2,750
-                  </div>
-                  <div className="text-[10px] text-slate-500 font-bold">
-                    Per Pax (Min 100)
-                  </div>
-                </div>
-              </div>
-              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                Includes Welcome Fruit Punch, Yellow Rice, Spiced Chicken, Black Pork or Fish Curry, Cashew Curry, Brinjal Moju, Live Hopper Station, Claypot Watalappan, Porcelain Crockery & Uniformed Waiters.
+      {/* SECTION 4: SEASONAL FEATURED PACKAGES */}
+      {packages.length > 0 && packages.some((p) => p.is_featured) && (
+        <section
+          id="packages"
+          className="py-16 sm:py-20 bg-[#FBEAD9] dark:bg-[#1a1614] border-t border-slate-200 dark:border-white/10"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div className="text-center max-w-3xl mx-auto space-y-2">
+              <span className="text-[#E36727] text-xs font-extrabold uppercase tracking-widest bg-[#E36727]/10 px-3.5 py-1 rounded-full border border-[#E36727]/20 inline-block">
+                Top Value Offers
+              </span>
+              <h2 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">
+                Seasonal Featured Packages
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+                All-inclusive catering packages with complete course menus, service staff, and equipment included.
               </p>
-              <button
-                onClick={() =>
-                  showAlertNotice(
-                    "Package Selected",
-                    "Royal Poruwa Wedding Banquet reserved. A catering manager will contact you."
-                  )
-                }
-                className="w-full py-3 bg-[#E36727] text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md hover:bg-amber-600 transition-all cursor-pointer"
-              >
-                Reserve This Package
-              </button>
             </div>
 
-            {/* Limited Package 2 */}
-            <div className="p-6 rounded-3xl bg-white dark:bg-[#26201d] border border-amber-500/40 space-y-4 shadow-sm">
-              <div className="flex justify-between items-start">
-                <div>
-                  <span className="text-[10px] font-bold text-amber-500 uppercase bg-amber-500/10 px-2.5 py-0.5 rounded-full">
-                    Reverent Sacred Offer
-                  </span>
-                  <h3 className="font-serif font-bold text-2xl text-slate-900 dark:text-white mt-1">
-                    Sacred Sanghika Dana Package
-                  </h3>
-                </div>
-                <div className="text-right">
-                  <div className="font-serif text-2xl font-extrabold text-amber-500">
-                    LKR 1,850
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {packages
+                .filter((p) => p.is_featured)
+                .slice(0, 4)
+                .map((pkg) => (
+                  <div
+                    key={pkg.id}
+                    className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#26201d] border border-[#E36727]/40 space-y-4 portal-card-shadow flex flex-col justify-between"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-start gap-4">
+                        <div>
+                          <span className="text-[10px] font-bold text-[#E36727] uppercase bg-[#E36727]/10 px-2.5 py-0.5 rounded-full">
+                            {pkg.badge}
+                          </span>
+                          <h3 className="font-serif font-bold text-2xl text-slate-900 dark:text-white mt-1">
+                            {pkg.name}
+                          </h3>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <div className="font-serif text-2xl sm:text-3xl font-extrabold text-[#E36727]">
+                            Rs. {Number(pkg.price_per_pax).toLocaleString()}/=
+                          </div>
+                          <div className="text-[10px] text-slate-500 font-bold">
+                            Per Pax (Min {pkg.min_pax})
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        {pkg.description}
+                      </p>
+                      <div className="p-3 rounded-2xl bg-slate-50 dark:bg-black/20 text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed border border-slate-100 dark:border-white/5 space-y-1.5">
+                        <div>
+                          <strong className="text-slate-800 dark:text-slate-200">Main Courses: </strong>
+                          <span>{pkg.inclusions_text}</span>
+                        </div>
+                        {pkg.dessert_text && (
+                          <div className="pt-1.5 border-t border-slate-200/60 dark:border-white/5 flex items-start gap-1.5">
+                            <strong className="text-amber-600 dark:text-amber-400 shrink-0 flex items-center gap-1">
+                              <i className="fa-solid fa-ice-cream text-[10px]"></i>
+                              <span>Dessert:</span>
+                            </strong>
+                            <span className="text-slate-800 dark:text-slate-200 font-semibold">{pkg.dessert_text}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setBookingPackage(pkg.name);
+                        setIsBookingModalOpen(true);
+                      }}
+                      className="w-full py-3 bg-[#E36727] hover:bg-amber-600 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      <i className="fa-solid fa-check"></i>
+                      <span>Reserve This Package</span>
+                    </button>
                   </div>
-                  <div className="text-[10px] text-slate-500 font-bold">
-                    Per Pax (Min 20)
-                  </div>
-                </div>
-              </div>
-              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                Includes 100% Pure Vegetarian menu options, Sangha Pooja Tray, traditional Claypot setup, guaranteed morning Sudu Dana delivery, Curd & Kitul Treacle, and reverent service staff.
-              </p>
-              <button
-                onClick={() =>
-                  showAlertNotice(
-                    "Package Selected",
-                    "Sacred Sanghika Dana Package reserved. Contacting coordinator..."
-                  )
-                }
-                className="w-full py-3 bg-amber-500 text-slate-900 font-bold text-xs uppercase tracking-wider rounded-xl shadow-md hover:bg-amber-400 transition-all cursor-pointer"
-              >
-                Reserve This Package
-              </button>
+                ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* BOOKING MODAL */}
       {isBookingModalOpen && (
@@ -1197,6 +1367,23 @@ export default function CateringPage() {
             <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
               Our catering coordinator will contact you within 2 hours with an official quotation.
             </p>
+
+            {bookingPackage && (
+              <div className="p-3 mb-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between text-xs">
+                <div>
+                  <span className="text-[10px] text-amber-500 uppercase font-bold block">Selected Menu</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{bookingPackage}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setBookingPackage("")}
+                  className="text-slate-400 hover:text-slate-700 dark:hover:text-white text-sm"
+                >
+                  <i className="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            )}
+
             <form onSubmit={handleBookingSubmit} className="space-y-3 text-xs">
               <div>
                 <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
@@ -1251,77 +1438,6 @@ export default function CateringPage() {
         </div>
       )}
 
-      {/* SERVICE DETAILS INFO MODAL */}
-      {isInfoModalOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-[#FFFBF8] dark:bg-[#1a1614] border border-[#E36727]/40 rounded-3xl max-w-lg w-full p-6 relative shadow-2xl space-y-4 animate-in zoom-in-95 duration-200">
-            <button
-              onClick={() => setIsInfoModalOpen(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-900 dark:hover:text-white text-lg cursor-pointer"
-            >
-              <i className="fa-solid fa-xmark"></i>
-            </button>
-
-            {infoModalKey === "dana" ? (
-              <div className="space-y-3">
-                <span className="text-amber-500 text-xs font-bold uppercase tracking-wider">
-                  Sacred Dana Alms-Giving
-                </span>
-                <h3 className="font-serif text-2xl font-bold text-slate-900 dark:text-white">
-                  Sacred Dana Protocols & Menu
-                </h3>
-                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  We follow strict purity standards for Sangha Alms Giving:
-                </p>
-                <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 list-disc pl-4">
-                  <li>
-                    Separate cookware and utensils used exclusively for vegetarian Dana preparation.
-                  </li>
-                  <li>
-                    Precise morning (Sudu Dana) or midday (Dawal Dana) delivery timing guaranteed.
-                  </li>
-                  <li>Traditional clay pots and silver chafers setup included.</li>
-                  <li>Buddha Pooja tray arranged separately with reverence.</li>
-                </ul>
-                <button
-                  onClick={() => {
-                    setIsInfoModalOpen(false);
-                    setSelectedEvent("dana");
-                    scrollToCalculator();
-                  }}
-                  className="w-full py-2.5 bg-[#E36727] text-white font-bold text-xs rounded-xl mt-2 cursor-pointer hover:bg-amber-600 transition-all"
-                >
-                  Calculate Cost for Dana
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <span className="text-[#E36727] text-xs font-bold uppercase tracking-wider">
-                  Specialized Service
-                </span>
-                <h3 className="font-serif text-2xl font-bold text-slate-900 dark:text-white">
-                  {eventNames[infoModalKey as EventKey] || "Custom Event"}
-                </h3>
-                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  Tailored multi-course menus, chafing dish warmers, uniformed servers, and hot transport to your venue location across Colombo.
-                </p>
-                <button
-                  onClick={() => {
-                    setIsInfoModalOpen(false);
-                    if (infoModalKey !== "bbq") {
-                      setSelectedEvent(infoModalKey as EventKey);
-                    }
-                    scrollToCalculator();
-                  }}
-                  className="w-full py-2.5 bg-[#E36727] text-white font-bold text-xs rounded-xl mt-2 cursor-pointer hover:bg-amber-600 transition-all"
-                >
-                  Get Instant Estimate
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* NOTICE MODAL */}
       {isNoticeOpen && (
