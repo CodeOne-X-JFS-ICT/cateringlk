@@ -6,7 +6,7 @@ import { OrderProvider } from "@/context/OrderContext";
 export const metadata: Metadata = {
   title: "Catering by Ahas Gawwa | Premier Restaurant & Catering Services",
   description:
-    "Premier catering services and fine dining restaurant by Ahas Gawwa in Sri Lanka. PHI & SLSI 14001 Certified.",
+    "Premier catering services and fine dining restaurant by Ahas Gawwa in Sri Lanka. PHI & ISO Standard.",
 };
 
 export default function RootLayout({

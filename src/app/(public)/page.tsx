@@ -176,26 +176,19 @@ export default function Home() {
           <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-8 border-t border-slate-200 dark:border-white/10">
             <div className="p-3 text-center">
               <div className="font-serif text-3xl font-extrabold text-[#E36727]">
-                12+
+                3+
               </div>
               <div className="text-[11px] text-slate-500 dark:text-slate-400 uppercase font-bold mt-1">
                 Years Heritage
               </div>
             </div>
-            <div className="p-3 text-center">
-              <div className="font-serif text-3xl font-extrabold text-[#E36727]">
-                1,500+
-              </div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 uppercase font-bold mt-1">
-                Banquets Served
-              </div>
-            </div>
+
             <div className="p-3 text-center">
               <div className="font-serif text-3xl font-extrabold text-[#E36727]">
                 4.9 ★
               </div>
               <div className="text-[11px] text-slate-500 dark:text-slate-400 uppercase font-bold mt-1">
-                500+ Verified Reviews
+                70 Google reviews
               </div>
             </div>
             <div className="p-3 text-center">

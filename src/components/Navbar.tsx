@@ -27,8 +27,7 @@ export default function Navbar() {
           {/* Left Side: Certification Badge + Tagline */}
           <div className="flex items-center gap-3">
             <span className="inline-flex items-center gap-1.5 bg-amber-500/20 text-amber-200 px-2.5 py-0.5 rounded-full font-semibold text-[11px] border border-amber-500/30">
-              <i className="fa-solid fa-certificate text-[10px]"></i> PHI &
-              SLSI 14001 Certified
+              <i className="fa-solid fa-certificate text-[10px]"></i> PHI & ISO Standard
             </span>
             <span className="hidden md:inline text-amber-200/90 text-xs">
               🇱🇰 Catering & Fine Dining by Ahas Gawwa | Colombo & Western

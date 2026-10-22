@@ -85,8 +85,7 @@ export default function Footer() {
             Safety & Standards
           </div>
           <p className="text-slate-400 text-xs leading-relaxed mb-4">
-            ISO 22000 Food Safety & Public Health Inspector (PHI) Certified
-            Central Facilities.
+            We follow the ISO 22000 Food Safety & Public Health Inspector (PHI)
           </p>
           <div className="flex gap-4 text-[#e36727] text-lg">
             <a
