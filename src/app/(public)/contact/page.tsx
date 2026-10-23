@@ -7,11 +7,24 @@ export default function ContactPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [category, setCategory] = useState("catering");
+  const [category, setCategory] = useState("CATERING");
   const [targetDate, setTargetDate] = useState("");
   const [suburb, setSuburb] = useState("");
   const [pax, setPax] = useState(100);
   const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState<{
+    ref_code: string;
+    message: string;
+    customer_name: string;
+  } | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Status Lookup State
+  const [trackRef, setTrackRef] = useState("");
+  const [trackingLoading, setTrackingLoading] = useState(false);
+  const [trackedInquiry, setTrackedInquiry] = useState<any | null>(null);
+  const [trackError, setTrackError] = useState<string | null>(null);
 
   // Distance Checker Tool State
   const [distanceInput, setDistanceInput] = useState("");
@@ -89,27 +102,89 @@ export default function ContactPage() {
     }
   };
 
-  // Form Submit Handler
-  const handleInquirySubmit = (e: React.FormEvent) => {
+  // Form Submit Handler (Real API)
+  const handleInquirySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const custName = name || "Valued Customer";
-    const custPhone = phone || "";
-    showNotice(
-      "Inquiry Submitted!",
-      `Thank you ${custName}. Your message has been routed to our ${category.toUpperCase()} team. We will call/WhatsApp you at ${custPhone} within 2 hours.`
-    );
-    // Reset
-    setName("");
-    setPhone("");
-    setEmail("");
-    setTargetDate("");
-    setSuburb("");
-    setMessage("");
+    if (!name.trim()) {
+      setSubmitError("Please provide your name.");
+      return;
+    }
+    if (!phone.trim()) {
+      setSubmitError("Please provide a valid phone or WhatsApp number.");
+      return;
+    }
+
+    setSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      const res = await fetch("http://localhost:5050/api/public/inquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer_name: name.trim(),
+          customer_phone: phone.trim(),
+          customer_email: email.trim() || undefined,
+          category,
+          target_date: targetDate || undefined,
+          suburb: suburb.trim() || undefined,
+          pax_count: pax ? Number(pax) : undefined,
+          message: message.trim() || undefined,
+        }),
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || "Failed to submit inquiry. Please try again.");
+      }
+
+      setSubmitSuccess({
+        ref_code: json.data?.ref_code || "AG-INQ-SUCCESS",
+        message: json.message || "Thank you! Your inquiry has been received.",
+        customer_name: name.trim(),
+      });
+
+      // Reset form fields
+      setName("");
+      setPhone("");
+      setEmail("");
+      setTargetDate("");
+      setSuburb("");
+      setMessage("");
+    } catch (err: any) {
+      setSubmitError(err.message || "An error occurred while sending your inquiry.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Inquiry Status Tracking Handler
+  const handleTrackInquiry = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanRef = trackRef.trim().toUpperCase();
+    if (!cleanRef) return;
+
+    setTrackingLoading(true);
+    setTrackError(null);
+    setTrackedInquiry(null);
+
+    try {
+      const res = await fetch(`http://localhost:5050/api/public/inquiries/track/${encodeURIComponent(cleanRef)}`);
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || `No inquiry found with code ${cleanRef}.`);
+      }
+      setTrackedInquiry(json.data);
+    } catch (err: any) {
+      setTrackError(err.message || "Unable to find inquiry reference.");
+    } finally {
+      setTrackingLoading(false);
+    }
   };
 
   // WhatsApp Direct inquiry trigger
   const sendWhatsAppDirectInquiry = () => {
-    const text = `Hi Ahas Gawwa, I'd like to make an inquiry:\n- Name: ${name}\n- Target Date: ${targetDate}\n- Guest Count: ${pax} Pax\n- Note: ${message}`;
+    const text = `Hi Ahas Gawwa, I'd like to make an inquiry:\n- Name: ${name || "Customer"}\n- Category: ${category}\n- Target Date: ${targetDate || "Flexible"}\n- Guest Count: ${pax} Pax\n- Note: ${message || "General inquiry"}`;
     window.open(
       `https://wa.me/94742013332?text=${encodeURIComponent(text)}`,
       "_blank"
@@ -422,168 +497,288 @@ export default function ContactPage() {
           </div>
 
           <div className="max-w-3xl mx-auto bg-white dark:bg-[#26201d] border border-amber-400 dark:border-amber-200/40 rounded-3xl p-6 sm:p-10 shadow-3xl portal-card-shadow">
-            <form onSubmit={handleInquirySubmit} className="space-y-5 text-xs sm:text-sm">
-              {/* Name & Phone */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                    Your Full Name <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <i className="fa-solid fa-user absolute left-3.5 top-3.5 text-slate-400"></i>
+            {submitSuccess ? (
+              <div className="text-center py-8 space-y-6 animate-in fade-in zoom-in-95 duration-500">
+                <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center text-3xl shadow-inner">
+                  <i className="fa-solid fa-circle-check"></i>
+                </div>
+                <div className="space-y-2">
+                  <span className="inline-block px-4 py-1.5 rounded-full bg-amber-500/10 text-[#E36727] text-xs font-mono font-bold tracking-widest border border-[#E36727]/30">
+                    REFERENCE: {submitSuccess.ref_code}
+                  </span>
+                  <h3 className="font-serif text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+                    Inquiry Received!
+                  </h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-300 max-w-lg mx-auto leading-relaxed">
+                    Thank you <strong className="text-slate-900 dark:text-white">{submitSuccess.customer_name}</strong>! Your inquiry has been routed to our event coordinators. We will contact you within 2 hours.
+                  </p>
+                </div>
+
+                <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
+                  <a
+                    href={`https://wa.me/94742013332?text=${encodeURIComponent(`Hi Ahas Gawwa, I have submitted inquiry ${submitSuccess.ref_code} regarding catering/dining. Looking forward to discussing details.`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 py-3.5 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold uppercase tracking-wider text-xs shadow-md transition-all flex items-center justify-center gap-2"
+                  >
+                    <i className="fa-brands fa-whatsapp text-base"></i> Chat on WhatsApp
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => setSubmitSuccess(null)}
+                    className="py-3.5 px-6 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs transition-colors"
+                  >
+                    Submit Another Inquiry
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleInquirySubmit} className="space-y-5 text-xs sm:text-sm">
+                {submitError && (
+                  <div className="p-3.5 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-xs font-medium flex items-center gap-2">
+                    <i className="fa-solid fa-circle-exclamation flex-shrink-0"></i>
+                    <span>{submitError}</span>
+                  </div>
+                )}
+
+                {/* Name & Phone */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                      Your Full Name <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <i className="fa-solid fa-user absolute left-3.5 top-3.5 text-slate-400"></i>
+                      <input
+                        type="text"
+                        required
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="e.g. Ruwan Wickramasinghe"
+                        className="w-full bg-slate-100 dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-xl pl-10 pr-3 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-[#E36727] font-medium"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                      Phone / WhatsApp Number <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <i className="fa-solid fa-phone absolute left-3.5 top-3.5 text-slate-400"></i>
+                      <input
+                        type="tel"
+                        required
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="e.g. 077 123 4567"
+                        className="w-full bg-slate-100 dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-xl pl-10 pr-3 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-[#E36727] font-medium"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Email & Category */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                      E-mail Address
+                    </label>
+                    <div className="relative">
+                      <i className="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400"></i>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="e.g. ruwan@example.lk"
+                        className="w-full bg-slate-100 dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-xl pl-10 pr-3 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-[#E36727] font-medium"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                      Inquiry Category <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <i className="fa-solid fa-layer-group absolute left-3.5 top-3.5 text-slate-400 z-10"></i>
+                      <select
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                        className="w-full bg-slate-100 dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-xl pl-10 pr-3 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-[#E36727] font-medium cursor-pointer"
+                      >
+                        <option value="CATERING" className="bg-white dark:bg-[#1a1614] text-slate-900 dark:text-white">
+                          Catering Service Quote (Wedding, Dana, Corporate)
+                        </option>
+                        <option value="RESTAURANT" className="bg-white dark:bg-[#1a1614] text-slate-900 dark:text-white">
+                          Restaurant Dining Table Reservation
+                        </option>
+                        <option value="TAKEAWAY" className="bg-white dark:bg-[#1a1614] text-slate-900 dark:text-white">
+                          Takeaway / Express Meal Order
+                        </option>
+                        <option value="DELIVERY" className="bg-white dark:bg-[#1a1614] text-slate-900 dark:text-white">
+                          Direct Food Delivery Inquiry
+                        </option>
+                        <option value="GENERAL" className="bg-white dark:bg-[#1a1614] text-slate-900 dark:text-white">
+                          General Inquiry / Feedback
+                        </option>
+                        <option value="OTHER" className="bg-white dark:bg-[#1a1614] text-slate-900 dark:text-white">
+                          Other Special Event Requests
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Date, Suburb & Pax */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                      Target Date
+                    </label>
+                    <input
+                      type="date"
+                      value={targetDate}
+                      onChange={(e) => setTargetDate(e.target.value)}
+                      className="w-full bg-slate-100 dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-900 dark:text-white focus:outline-none focus:border-[#E36727] font-medium"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                      Location / Suburb
+                    </label>
                     <input
                       type="text"
-                      required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="e.g. Ruwan Wickramasinghe"
-                      className="w-full bg-slate-100 dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-xl pl-10 pr-3 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-[#E36727] font-medium"
+                      value={suburb}
+                      onChange={(e) => setSuburb(e.target.value)}
+                      placeholder="e.g. Rajagiriya"
+                      className="w-full bg-slate-100 dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-900 dark:text-white focus:outline-none focus:border-[#E36727] font-medium"
                     />
                   </div>
-                </div>
 
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                    Phone / WhatsApp Number <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <i className="fa-solid fa-phone absolute left-3.5 top-3.5 text-slate-400"></i>
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                      Guest Count (Pax)
+                    </label>
                     <input
-                      type="tel"
-                      required
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="e.g. 077 123 4567"
-                      className="w-full bg-slate-100 dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-xl pl-10 pr-3 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-[#E36727] font-medium"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Email & Category */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                    E-mail Address
-                  </label>
-                  <div className="relative">
-                    <i className="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400"></i>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="e.g. ruwan@example.lk"
-                      className="w-full bg-slate-100 dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-xl pl-10 pr-3 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-[#E36727] font-medium"
+                      type="number"
+                      min="5"
+                      max="2000"
+                      value={pax}
+                      onChange={(e) => setPax(parseInt(e.target.value) || 10)}
+                      className="w-full bg-slate-100 dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-900 dark:text-white focus:outline-none focus:border-[#E36727] font-medium"
                     />
                   </div>
                 </div>
 
+                {/* Message */}
                 <div>
                   <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                    Inquiry Category <span className="text-red-500">*</span>
+                    Message / Special Dietary & Event Requirements
                   </label>
-                  <div className="relative">
-                    <i className="fa-solid fa-layer-group absolute left-3.5 top-3.5 text-slate-400 z-10"></i>
-                    <select
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value)}
-                      className="w-full bg-slate-100 dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-xl pl-10 pr-3 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-[#E36727] font-medium cursor-pointer"
-                    >
-                      <option value="catering" className="bg-white dark:bg-[#1a1614] text-slate-900 dark:text-white">
-                        Catering Service Quote (Wedding, Dana, Corporate)
-                      </option>
-                      <option value="restaurant" className="bg-white dark:bg-[#1a1614] text-slate-900 dark:text-white">
-                        Restaurant Dining Table Reservation
-                      </option>
-                      <option value="takeaway" className="bg-white dark:bg-[#1a1614] text-slate-900 dark:text-white">
-                        Takeaway / Express Meal Order
-                      </option>
-                      <option value="general" className="bg-white dark:bg-[#1a1614] text-slate-900 dark:text-white">
-                        General Inquiry / Feedback
-                      </option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* Date, Suburb & Pax */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                    Target Date
-                  </label>
-                  <input
-                    type="date"
-                    value={targetDate}
-                    onChange={(e) => setTargetDate(e.target.value)}
-                    className="w-full bg-slate-100 dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-900 dark:text-white focus:outline-none focus:border-[#E36727] font-medium"
-                  />
+                  <textarea
+                    rows={4}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Specify any dietary restrictions (Pure Vegetarian, Halal, No Garlic/Onion for Dana), live station preferences, or special seating requests..."
+                    className="w-full bg-slate-100 dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-900 dark:text-white focus:outline-none focus:border-[#E36727] font-medium leading-relaxed"
+                  ></textarea>
                 </div>
 
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                    Location / Suburb
-                  </label>
-                  <input
-                    type="text"
-                    value={suburb}
-                    onChange={(e) => setSuburb(e.target.value)}
-                    placeholder="e.g. Rajagiriya"
-                    className="w-full bg-slate-100 dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-900 dark:text-white focus:outline-none focus:border-[#E36727] font-medium"
-                  />
+                {/* Form Actions */}
+                <div className="pt-2 flex flex-col sm:flex-row gap-3">
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="w-full sm:w-2/3 py-3.5 rounded-xl bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white font-extrabold uppercase tracking-wider text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 transform hover:scale-[1.01] active:scale-95 disabled:opacity-60"
+                  >
+                    {submitting ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Submitting Inquiry...
+                      </>
+                    ) : (
+                      <>
+                        <i className="fa-solid fa-paper-plane"></i> Submit Direct Inquiry
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={sendWhatsAppDirectInquiry}
+                    className="w-full sm:w-1/3 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold uppercase tracking-wider text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <i className="fa-brands fa-whatsapp text-sm"></i> WhatsApp Us
+                  </button>
                 </div>
 
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                    Guest Count (Pax)
-                  </label>
-                  <input
-                    type="number"
-                    min="10"
-                    max="2000"
-                    value={pax}
-                    onChange={(e) => setPax(parseInt(e.target.value) || 10)}
-                    className="w-full bg-slate-100 dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-900 dark:text-white focus:outline-none focus:border-[#E36727] font-medium"
-                  />
-                </div>
-              </div>
+                <p className="text-[10px] text-slate-400 text-center">
+                  * We respect your privacy. Your contact info will only be used to answer your event quote inquiry.
+                </p>
+              </form>
+            )}
+          </div>
 
-              {/* Message */}
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                  Message / Special Dietary & Event Requirements
-                </label>
-                <textarea
-                  rows={4}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Specify any dietary restrictions (Pure Vegetarian, Halal, No Garlic/Onion for Dana), live station preferences, or special seating requests..."
-                  className="w-full bg-slate-100 dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-900 dark:text-white focus:outline-none focus:border-[#E36727] font-medium leading-relaxed"
-                ></textarea>
-              </div>
-
-              {/* Form Actions */}
-              <div className="pt-2 flex flex-col sm:flex-row gap-3">
-                <button
-                  type="submit"
-                  className="w-full sm:w-2/3 py-3.5 rounded-xl bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white font-extrabold uppercase tracking-wider text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 transform hover:scale-[1.01] active:scale-95"
-                >
-                  <i className="fa-solid fa-paper-plane"></i> Submit Direct Inquiry
-                </button>
-
-                <button
-                  type="button"
-                  onClick={sendWhatsAppDirectInquiry}
-                  className="w-full sm:w-1/3 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold uppercase tracking-wider text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <i className="fa-brands fa-whatsapp text-sm"></i> WhatsApp Us
-                </button>
-              </div>
-
-              <p className="text-[10px] text-slate-400 text-center">
-                * We respect your privacy. Your contact info will only be used to answer your event quote inquiry.
-              </p>
+          {/* Inquiry Status Quick Tracker */}
+          <div className="max-w-xl mx-auto bg-white/70 dark:bg-[#26201d]/60 backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-sm">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-3 flex items-center gap-2">
+              <i className="fa-solid fa-magnifying-glass text-[#E36727]"></i>
+              Already Submitted? Check Inquiry Status
+            </h4>
+            <form onSubmit={handleTrackInquiry} className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Enter Reference (e.g. AG-INQ-104921)"
+                value={trackRef}
+                onChange={(e) => setTrackRef(e.target.value)}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-mono font-medium focus:outline-none focus:border-[#E36727]"
+              />
+              <button
+                type="submit"
+                disabled={trackingLoading || !trackRef.trim()}
+                className="px-5 py-2.5 bg-[#E36727] hover:bg-amber-600 text-white text-xs font-bold rounded-xl transition-all disabled:opacity-50 cursor-pointer"
+              >
+                {trackingLoading ? "Checking..." : "Track"}
+              </button>
             </form>
+
+            {trackError && (
+              <p className="text-xs text-red-500 mt-3 font-medium flex items-center gap-1.5">
+                <i className="fa-solid fa-circle-exclamation"></i> {trackError}
+              </p>
+            )}
+
+            {trackedInquiry && (
+              <div className="mt-4 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 space-y-2 animate-in fade-in duration-300">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs font-extrabold text-slate-900 dark:text-white">
+                    {trackedInquiry.ref_code}
+                  </span>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                    trackedInquiry.status === "RESOLVED"
+                      ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                      : trackedInquiry.status === "IN_PROGRESS"
+                      ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                      : "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+                  }`}>
+                    {trackedInquiry.status.replace("_", " ")}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-700 dark:text-slate-300">
+                  Customer: <strong>{trackedInquiry.customer_name}</strong> · Category: <strong>{trackedInquiry.category}</strong>
+                </p>
+                {trackedInquiry.target_date && (
+                  <p className="text-xs text-slate-500">
+                    Target Date: {trackedInquiry.target_date} {trackedInquiry.suburb ? `(${trackedInquiry.suburb})` : ""}
+                  </p>
+                )}
+                <p className="text-[10px] text-slate-400">
+                  Received on {new Date(trackedInquiry.created_at).toLocaleDateString("en-LK")}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </section>

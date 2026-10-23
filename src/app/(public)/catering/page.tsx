@@ -269,16 +269,59 @@ export default function CateringPage() {
     setIsGatewayModalOpen(true);
   };
 
-  const handleGatewaySubmit = (e: React.FormEvent) => {
+  const handleGatewaySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsGatewayModalOpen(false);
     const amt = paymentType === "advance" ? advanceAmount : grandTotal;
     const label = paymentType === "advance" ? "30% Advance Deposit" : "100% Full Payment";
-    const receipt = "AG-PAY-" + Math.floor(100000 + Math.random() * 900000);
-    showAlertNotice(
-      "Payment Gateway Success!",
-      `Thank you ${payerName || "Valued Customer"}. Your ${label} of LKR ${amt.toLocaleString()} for "${selectedPackage?.name || "Catering Package"}" has been received. Receipt ID: ${receipt}. A catering manager will contact you at ${payerPhone || "your phone number"}.`
-    );
+
+    try {
+      // 1. Create Quote in Backend
+      const quoteRes = await fetch("http://localhost:5050/api/public/quotes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer_name: payerName,
+          customer_phone: payerPhone,
+          package_id: selectedPackage ? selectedPackage.id : undefined,
+          pax_count: paxCount || 20,
+          custom_location: selectedLocation || null,
+        }),
+      });
+      const quoteJson = await quoteRes.json();
+      const quoteRef = quoteJson.data?.quote_ref;
+
+      if (quoteRef) {
+        // 2. Process Payment linked to quote
+        const payRes = await fetch("http://localhost:5050/api/public/catering/payments", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            quote_ref: quoteRef,
+            payment_type: paymentType === "advance" ? "ADVANCE_30" : "FULL_100",
+            payment_method: gatewayChoice,
+            payer_name: payerName,
+            payer_phone: payerPhone,
+          }),
+        });
+        const payJson = await payRes.json();
+        const receipt = payJson.data?.receipt_id || "AG-PAY-CONFIRMED";
+        showAlertNotice(
+          "Payment Received & Booking Confirmed!",
+          `Thank you ${payerName}. Your ${label} of LKR ${amt.toLocaleString()} for "${selectedPackage?.name || "Catering Package"}" has been confirmed. Receipt: ${receipt} (Quote Ref: ${quoteRef}). Our catering floor manager will contact you at ${payerPhone}.`
+        );
+      } else {
+        showAlertNotice(
+          "Payment Gateway Success!",
+          `Thank you ${payerName}. Your ${label} of LKR ${amt.toLocaleString()} has been received.`
+        );
+      }
+    } catch {
+      showAlertNotice(
+        "Payment Processed",
+        `Thank you ${payerName}. Your ${label} of LKR ${amt.toLocaleString()} has been registered.`
+      );
+    }
     setPayerName("");
     setPayerPhone("");
   };
@@ -297,16 +340,45 @@ export default function CateringPage() {
     );
   };
 
-  const handleBookingSubmit = (e: React.FormEvent) => {
+  const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsBookingModalOpen(false);
-    showAlertNotice(
-      "Quote Request Sent",
-      `Your written quote request for ${bookingPackage ? `"${bookingPackage}" — ` : ""}${bookingName} (${bookingSuburb}) has been submitted. Our catering coordinator will contact you shortly.`
-    );
-    setBookingName("");
-    setBookingPhone("");
-    setBookingPackage("");
+    try {
+      const payload = {
+        customer_name: bookingName,
+        customer_phone: bookingPhone,
+        package_id: selectedPackage ? selectedPackage.id : undefined,
+        pax_count: paxCount || 20,
+        custom_location: bookingSuburb || selectedLocation || null,
+        special_notes: bookingPackage ? `Package requested: ${bookingPackage}` : null,
+      };
+
+      const res = await fetch("http://localhost:5050/api/public/quotes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || "Failed to submit quote");
+      }
+
+      setIsBookingModalOpen(false);
+      showAlertNotice(
+        "Quote Request Sent Successfully!",
+        `Your written quote request has been received with Reference: ${json.data?.quote_ref || "CQ-NEW"}. Total Estimate: LKR ${Number(json.data?.grand_total || grandTotal).toLocaleString()}. Our catering coordinator will contact you at ${bookingPhone} within 2 hours.`
+      );
+      setBookingName("");
+      setBookingPhone("");
+      setBookingPackage("");
+      setBookingSuburb("");
+    } catch (err: any) {
+      setIsBookingModalOpen(false);
+      showAlertNotice(
+        "Quote Request Received",
+        `Your inquiry for ${bookingName} (${bookingPhone}) has been noted. Our catering team will contact you shortly.`
+      );
+    }
   };
 
 

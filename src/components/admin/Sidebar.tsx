@@ -4,10 +4,12 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "@/components/ThemeProvider";
+import { apiGet } from "@/lib/apiClient";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [newInquiriesCount, setNewInquiriesCount] = useState<number>(0);
   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
@@ -21,7 +23,16 @@ export default function Sidebar() {
         setUserRole("ADMIN"); // fallback
       }
     }
-  }, []);
+
+    // Fetch dashboard stats for badges
+    apiGet("/admin/dashboard/stats")
+      .then((res) => {
+        if (res?.data?.inquiries?.new !== undefined) {
+          setNewInquiriesCount(res.data.inquiries.new);
+        }
+      })
+      .catch(() => {});
+  }, [pathname]);
 
   const navItems = [
     { name: "Overview", path: "/dashboard", icon: "fa-chart-pie", roles: ["ADMIN", "SUPER_ADMIN"] },
@@ -80,10 +91,14 @@ export default function Sidebar() {
                   isActive ? "text-[#E36727]" : "text-slate-500"
                 }`}
               ></i>
-              {item.name}
-              {isActive && (
+              <span className="truncate">{item.name}</span>
+              {item.name === "Inquiries" && newInquiriesCount > 0 ? (
+                <span className="ml-auto px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-500 text-white shadow-sm">
+                  {newInquiriesCount}
+                </span>
+              ) : isActive ? (
                 <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#E36727] shadow-[0_0_8px_#E36727]"></div>
-              )}
+              ) : null}
             </Link>
           );
         })}

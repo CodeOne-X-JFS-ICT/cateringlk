@@ -50,7 +50,24 @@ function ProductsTab() {
   const [editing, setEditing] = useState<any | null>(null);
   const [toggling, setToggling] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState({ name: "", description: "", price: "", category_id: "", portion_label: "", image_url: "", is_available: true });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [form, setForm] = useState({
+    name: "",
+    description: "",
+    price: "",
+    category_id: "",
+    portion_label: "",
+    image_url: "",
+    is_available: true,
+    sync_all_portions: true,
+  });
+
+  // Dedicated Description Edit Modal state
+  const [descModalProduct, setDescModalProduct] = useState<any | null>(null);
+  const [descText, setDescText] = useState("");
+  const [syncAllPortions, setSyncAllPortions] = useState(true);
+  const [descSaving, setDescSaving] = useState(false);
+  const [descSuccess, setDescSuccess] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -68,21 +85,89 @@ function ProductsTab() {
 
   const openCreate = () => {
     setEditing(null);
-    setForm({ name: "", description: "", price: "", category_id: "", portion_label: "", image_url: "", is_available: true });
+    setForm({
+      name: "",
+      description: "",
+      price: "",
+      category_id: "",
+      portion_label: "",
+      image_url: "",
+      is_available: true,
+      sync_all_portions: true,
+    });
     setShowModal(true);
   };
 
   const openEdit = (p: any) => {
     setEditing(p);
-    setForm({ name: p.name, description: p.description || "", price: p.price, category_id: p.category_id, portion_label: p.portion_label || "", image_url: p.image_url || "", is_available: p.is_available });
+    setForm({
+      name: p.name,
+      description: p.description || "",
+      price: p.price,
+      category_id: p.category_id,
+      portion_label: p.portion_label || "",
+      image_url: p.image_url || "",
+      is_available: p.is_available,
+      sync_all_portions: true,
+    });
     setShowModal(true);
+  };
+
+  const openDescModal = (p: any) => {
+    setDescModalProduct(p);
+    setDescText(p.description || "");
+    setSyncAllPortions(true);
+    setDescSuccess(null);
+  };
+
+  const handleDescSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!descModalProduct) return;
+    setDescSaving(true);
+    try {
+      const newDesc = descText.trim();
+      await apiPut(`/admin/products/${descModalProduct.id}`, {
+        description: newDesc,
+        sync_all_portions: syncAllPortions,
+      });
+
+      // Update in local FE state immediately
+      setProducts((prev) =>
+        prev.map((item) => {
+          if (syncAllPortions) {
+            if (item.name === descModalProduct.name && item.category_id === descModalProduct.category_id) {
+              return { ...item, description: newDesc };
+            }
+          } else if (item.id === descModalProduct.id) {
+            return { ...item, description: newDesc };
+          }
+          return item;
+        })
+      );
+
+      setDescSuccess("Description updated in database!");
+      setTimeout(() => {
+        setDescModalProduct(null);
+        setDescSuccess(null);
+      }, 700);
+      fetchData();
+    } catch (e: any) {
+      alert(e.message || "Failed to update description");
+    } finally {
+      setDescSaving(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const payload = { ...form, price: parseFloat(form.price), category_id: parseInt(form.category_id) };
+      const payload = {
+        ...form,
+        description: form.description.trim(),
+        price: parseFloat(form.price),
+        category_id: parseInt(form.category_id),
+      };
       if (editing) await apiPut(`/admin/products/${editing.id}`, payload);
       else await apiPost("/admin/products", payload);
       setShowModal(false);
@@ -100,42 +185,116 @@ function ProductsTab() {
 
   if (loading) return <div className="flex justify-center py-24"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#E36727]"></div></div>;
 
+  const filteredProducts = products.filter((p) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      p.name?.toLowerCase().includes(q) ||
+      p.description?.toLowerCase().includes(q) ||
+      p.portion_label?.toLowerCase().includes(q)
+    );
+  });
+
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
-        <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2.5 bg-[#E36727] hover:bg-amber-600 text-white rounded-xl font-bold text-sm transition-all shadow-md cursor-pointer transform hover:scale-105 active:scale-95">
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center">
+        {/* Search input */}
+        <div className="relative flex-1 max-w-md">
+          <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search products by name, portion or description..."
+            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:border-[#E36727] text-slate-800 dark:text-slate-200 placeholder:text-slate-400"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs cursor-pointer"
+            >
+              <i className="fa-solid fa-xmark"></i>
+            </button>
+          )}
+        </div>
+
+        <button onClick={openCreate} className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#E36727] hover:bg-amber-600 text-white rounded-xl font-bold text-sm transition-all shadow-md cursor-pointer transform hover:scale-105 active:scale-95 shrink-0">
           <i className="fa-solid fa-plus"></i> Add Product
         </button>
       </div>
 
       {/* Products by Category */}
       {categories.map((cat) => {
-        const catProducts = products.filter((p) => p.category_id === cat.id);
+        const catProducts = filteredProducts.filter((p) => p.category_id === cat.id);
         if (catProducts.length === 0) return null;
         return (
           <div key={cat.id} className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-              <h3 className="font-bold text-slate-900 dark:text-white">{cat.name}</h3>
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
+              <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <span>{cat.emoji || "🍽️"}</span>
+                <span>{cat.name}</span>
+                <span className="text-xs font-normal text-slate-400">({catProducts.length})</span>
+              </h3>
             </div>
             <div className="divide-y divide-slate-100 dark:divide-slate-800">
               {catProducts.map((p) => (
-                <div key={p.id} className="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                  {p.image_url && <img src={p.image_url} alt={p.name} className="w-12 h-12 rounded-xl object-cover flex-shrink-0 bg-slate-100" />}
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-slate-900 dark:text-white">{p.name}</p>
-                    <p className="text-xs text-slate-400 truncate">{p.portion_label}</p>
+                <div key={p.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-4 hover:bg-slate-50/70 dark:hover:bg-slate-800/30 transition-colors">
+                  <div className="flex items-start gap-3.5 flex-1 min-w-0">
+                    {p.image_url ? (
+                      <img src={p.image_url} alt={p.name} className="w-12 h-12 rounded-xl object-cover flex-shrink-0 bg-slate-100 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-[#E36727] flex items-center justify-center flex-shrink-0 text-base font-bold">
+                        <i className="fa-solid fa-bowl-food"></i>
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-bold text-slate-900 dark:text-white text-sm">{p.name}</p>
+                        {p.portion_label && (
+                          <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-amber-500/10 text-[#E36727] border border-amber-500/20">
+                            {p.portion_label}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-1 leading-relaxed">
+                        {p.description ? (
+                          p.description
+                        ) : (
+                          <span className="text-slate-400 dark:text-slate-500 italic">No description set</span>
+                        )}
+                      </p>
+                    </div>
                   </div>
-                  <p className="font-extrabold text-[#E36727]">Rs. {Number(p.price).toLocaleString()}</p>
-                  <button
-                    disabled={toggling === p.id}
-                    onClick={() => toggleAvailable(p)}
-                    className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${p.is_available ? "text-emerald-600 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/20" : "text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900/20"}`}
-                  >
-                    {toggling === p.id ? "..." : p.is_available ? "In Stock" : "Out of Stock"}
-                  </button>
-                  <button onClick={() => openEdit(p)} className="text-xs font-bold text-slate-400 hover:text-[#E36727] transition-colors cursor-pointer">
-                    <i className="fa-solid fa-pen-to-square"></i>
-                  </button>
+
+                  <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800/60">
+                    <p className="font-extrabold text-[#E36727] text-sm whitespace-nowrap">Rs. {Number(p.price).toLocaleString()}</p>
+                    
+                    {/* Option to change description */}
+                    <button
+                      type="button"
+                      onClick={() => openDescModal(p)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-[#E36727] bg-[#E36727]/10 hover:bg-[#E36727]/20 border border-[#E36727]/25 transition-all cursor-pointer whitespace-nowrap active:scale-95"
+                      title="Change description"
+                    >
+                      <i className="fa-solid fa-align-left text-xs"></i>
+                      <span>Description</span>
+                    </button>
+
+                    <button
+                      disabled={toggling === p.id}
+                      onClick={() => toggleAvailable(p)}
+                      className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-colors cursor-pointer whitespace-nowrap ${p.is_available ? "text-emerald-600 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/20" : "text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900/20"}`}
+                    >
+                      {toggling === p.id ? "..." : p.is_available ? "In Stock" : "Out of Stock"}
+                    </button>
+                    <button
+                      onClick={() => openEdit(p)}
+                      title="Edit Product Details"
+                      className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold text-slate-400 hover:text-[#E36727] hover:bg-amber-500/10 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
+                    >
+                      <i className="fa-solid fa-pen-to-square"></i>
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -143,6 +302,102 @@ function ProductsTab() {
         );
       })}
 
+      {/* Dedicated Change Description Modal */}
+      <Modal
+        isOpen={!!descModalProduct}
+        onClose={() => setDescModalProduct(null)}
+        title="Change Product Description"
+      >
+        {descModalProduct && (
+          <form onSubmit={handleDescSave} className="space-y-4">
+            <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+              {descModalProduct.image_url ? (
+                <img
+                  src={descModalProduct.image_url}
+                  alt={descModalProduct.name}
+                  className="w-12 h-12 rounded-xl object-cover"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-[#E36727] flex items-center justify-center text-lg font-bold">
+                  <i className="fa-solid fa-burger"></i>
+                </div>
+              )}
+              <div className="min-w-0 flex-1">
+                <h4 className="font-bold text-slate-900 dark:text-white truncate">
+                  {descModalProduct.name}
+                </h4>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    Portion: <strong className="text-slate-700 dark:text-slate-300">{descModalProduct.portion_label || "Regular"}</strong>
+                  </span>
+                  <span className="text-xs text-[#E36727] font-bold">
+                    Rs. {Number(descModalProduct.price).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                Product Description
+              </label>
+              <textarea
+                rows={4}
+                value={descText}
+                onChange={(e) => setDescText(e.target.value)}
+                placeholder="Enter delicious description, key ingredients, preparation style, or inclusions..."
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:border-[#E36727] transition-colors resize-none leading-relaxed text-slate-900 dark:text-white placeholder:text-slate-400"
+              />
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">
+                This description is displayed on both the takeaway menu page and the customer ordering catalog.
+              </p>
+            </div>
+
+            <div className="p-3 rounded-xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40">
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={syncAllPortions}
+                  onChange={(e) => setSyncAllPortions(e.target.checked)}
+                  className="mt-0.5 rounded text-[#E36727] focus:ring-[#E36727] w-4 h-4 cursor-pointer"
+                />
+                <div className="text-xs text-slate-700 dark:text-slate-300">
+                  <span className="font-bold">Sync across all portions of &quot;{descModalProduct.name}&quot;</span>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    Automatically update Regular, Double, Large, and other portion sizes of this dish in the database.
+                  </p>
+                </div>
+              </label>
+            </div>
+
+            {descSuccess && (
+              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center gap-2">
+                <i className="fa-solid fa-circle-check"></i>
+                {descSuccess}
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setDescModalProduct(null)}
+                className="flex-1 py-3 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={descSaving}
+                className="flex-1 py-3 bg-[#E36727] hover:bg-amber-600 text-white font-extrabold rounded-xl transition-all disabled:opacity-60 cursor-pointer shadow-md"
+              >
+                {descSaving ? "Saving to Database..." : "Update Description"}
+              </button>
+            </div>
+          </form>
+        )}
+      </Modal>
+
+      {/* Main Add / Edit Product Modal */}
       <Modal isOpen={showModal} onClose={() => setShowModal(false)} title={editing ? "Edit Product" : "Add Product"}>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -155,6 +410,16 @@ function ProductsTab() {
               <option value="">Select category</option>
               {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">Description</label>
+            <textarea
+              rows={3}
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:border-[#E36727] transition-colors resize-none text-slate-900 dark:text-white placeholder:text-slate-400"
+              placeholder="e.g. Chicken Mixed, Chicken Piece, Egg, Chopsuey, Gravy, Ketchup and Chili Paste"
+            />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -170,6 +435,24 @@ function ProductsTab() {
             <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">Image URL</label>
             <input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:border-[#E36727] transition-colors" placeholder="https://..." />
           </div>
+          {editing && (
+            <div className="p-3 rounded-xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40">
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.sync_all_portions}
+                  onChange={(e) => setForm({ ...form, sync_all_portions: e.target.checked })}
+                  className="mt-0.5 rounded text-[#E36727] focus:ring-[#E36727] w-4 h-4 cursor-pointer"
+                />
+                <div className="text-xs text-slate-700 dark:text-slate-300">
+                  <span className="font-bold">Sync description across all portions of &quot;{form.name || "this item"}&quot;</span>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    Update all portion sizes of this dish with the new description in the database.
+                  </p>
+                </div>
+              </label>
+            </div>
+          )}
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-3 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer">Cancel</button>
             <button type="submit" disabled={submitting} className="flex-1 py-3 bg-[#E36727] hover:bg-amber-600 text-white font-extrabold rounded-xl transition-all disabled:opacity-60 cursor-pointer">

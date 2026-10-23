@@ -1,15 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useOrder } from "@/context/OrderContext";
 import MapPinPicker from "@/components/MapPinPicker";
 
-const PAYMENT_OPTIONS = [
-  { label: "Cash on Delivery / Collection", code: "COD", icon: "fa-money-bill-wave" },
-  { label: "Card on Collection / POS", code: "CARD_POS", icon: "fa-credit-card" },
-  { label: "WhatsApp Direct Order", code: "WHATSAPP", icon: "fa-brands fa-whatsapp" },
+const TAKEAWAY_PAYMENT_OPTIONS = [
+  { label: "Cash on Collection", code: "Cash on Collection", icon: "fa-solid fa-money-bill-wave" },
+  { label: "Card on Collection", code: "Card on Collection", icon: "fa-solid fa-credit-card" },
+];
+
+const DELIVERY_PAYMENT_OPTIONS = [
+  { label: "Cash on Delivery", code: "Cash on Delivery", icon: "fa-solid fa-money-bill-wave" },
+  { label: "Online Transactions", code: "Online Transactions", icon: "fa-solid fa-globe" },
 ];
 
 export default function CheckoutPage() {
@@ -29,7 +33,28 @@ export default function CheckoutPage() {
   const [timeSlot, setTimeSlot] = useState("ASAP (30-40 mins)");
   const [address, setAddress] = useState("");
   const [specialInstructions, setSpecialInstructions] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("COD");
+  const paymentOptions =
+    orderType === "takeaway" ? TAKEAWAY_PAYMENT_OPTIONS : DELIVERY_PAYMENT_OPTIONS;
+
+  const [paymentMethod, setPaymentMethod] = useState(
+    orderType === "takeaway" ? "Cash on Collection" : "Cash on Delivery"
+  );
+
+  useEffect(() => {
+    if (orderType === "takeaway") {
+      setPaymentMethod((prev) =>
+        prev === "Cash on Collection" || prev === "Card on Collection"
+          ? prev
+          : "Cash on Collection"
+      );
+    } else {
+      setPaymentMethod((prev) =>
+        prev === "Cash on Delivery" || prev === "Online Transactions"
+          ? prev
+          : "Cash on Delivery"
+      );
+    }
+  }, [orderType]);
 
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -105,15 +130,6 @@ export default function CheckoutPage() {
       setReceiptDetails(details);
       setIsReceiptOpen(true);
       clearCart();
-
-      // WhatsApp Dispatch if selected
-      if (paymentMethod === "WHATSAPP") {
-        const text = `Hi Catering by Ahas Gawwa, I placed an Order (${ref}):\n- Customer: ${name} (${phone})\n- Mode: ${orderType.toUpperCase()} (${verifiedLocation})\n- Time: ${timeSlot}\n- Total: LKR ${parseFloat(orderData.grand_total).toLocaleString()}`;
-        window.open(
-          `https://wa.me/94742013332?text=${encodeURIComponent(text)}`,
-          "_blank"
-        );
-      }
     } catch (err: any) {
       console.error("Order placement error:", err);
       setErrorMsg(err.message || "An unexpected error occurred while placing your order.");
@@ -267,11 +283,11 @@ export default function CheckoutPage() {
                 <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-2">
                   Select Payment Method
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                  {PAYMENT_OPTIONS.map((opt) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {paymentOptions.map((opt) => (
                     <label
                       key={opt.code}
-                      className={`flex items-center gap-2 p-3 rounded-xl border cursor-pointer transition-all ${
+                      className={`flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${
                         paymentMethod === opt.code
                           ? "border-[#E36727] bg-[#E36727]/10 ring-1 ring-[#E36727]"
                           : "border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#26201d] hover:border-slate-300"
@@ -285,6 +301,7 @@ export default function CheckoutPage() {
                         onChange={() => setPaymentMethod(opt.code)}
                         className="accent-[#E36727]"
                       />
+                      <i className={`${opt.icon} text-amber-500 text-sm`}></i>
                       <span className="font-bold text-slate-800 dark:text-slate-200 text-xs">
                         {opt.label}
                       </span>
