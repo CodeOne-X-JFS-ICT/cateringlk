@@ -173,7 +173,7 @@ export default function Home() {
           </div>
 
           {/* Stats Bar */}
-          <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-8 border-t border-slate-200 dark:border-white/10">
+          <div className="mt-14 grid grid-cols-2 md:grid-cols-3 gap-4 max-w-4xl mx-auto pt-8 border-t border-slate-200 dark:border-white/10">
             <div className="p-3 text-center">
               <div className="font-serif text-3xl font-extrabold text-[#E36727]">
                 3+
@@ -188,7 +188,7 @@ export default function Home() {
                 4.9 ★
               </div>
               <div className="text-[11px] text-slate-500 dark:text-slate-400 uppercase font-bold mt-1">
-                70 Google reviews
+                70+ Google reviews
               </div>
             </div>
             <div className="p-3 text-center">
@@ -196,7 +196,7 @@ export default function Home() {
                 100%
               </div>
               <div className="text-[11px] text-slate-500 dark:text-slate-400 uppercase font-bold mt-1">
-                PHI Hygiene Rated
+                PHI Hygiene Standard
               </div>
             </div>
           </div>
@@ -383,10 +383,10 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-12">
             <div>
               <span className="text-[#E36727] text-xs uppercase font-extrabold tracking-widest bg-[#E36727]/10 px-3.5 py-1.5 rounded-full border border-[#E36727]/20 inline-block">
-                Clients&apos; Stories
+                Customers&apos; Feedbacks
               </span>
               <h2 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white mt-3">
-                Client Words & Experience...
+                Customers Words & Experience...
               </h2>
             </div>
 

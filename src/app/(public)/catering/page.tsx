@@ -512,10 +512,10 @@ export default function CateringPage() {
           </div>
 
           {/* Stats Grid */}
-          <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-8 border-t border-slate-200 dark:border-white/10">
+          <div className="mt-12 grid grid-cols-2 md:grid-cols-3 gap-4 max-w-4xl mx-auto pt-8 border-t border-slate-200 dark:border-white/10">
             <div className="p-3 text-center">
               <div className="font-serif text-3xl font-extrabold text-black dark:text-[#E36727]">
-                12+
+                3+
               </div>
               <div className="text-[11px] text-slate-700 dark:text-slate-400 uppercase font-bold mt-1">
                 Years Catering Heritage
@@ -523,18 +523,10 @@ export default function CateringPage() {
             </div>
             <div className="p-3 text-center">
               <div className="font-serif text-3xl font-extrabold text-black dark:text-[#E36727]">
-                1,500+
-              </div>
-              <div className="text-[11px] text-slate-700 dark:text-slate-400 uppercase font-bold mt-1">
-                Banquets & Events Served
-              </div>
-            </div>
-            <div className="p-3 text-center">
-              <div className="font-serif text-3xl font-extrabold text-black dark:text-[#E36727]">
                 4.9 ★
               </div>
               <div className="text-[11px] text-slate-700 dark:text-slate-400 uppercase font-bold mt-1">
-                500+ Verified Reviews
+                70+ Google Reviews
               </div>
             </div>
             <div className="p-3 text-center">
@@ -542,7 +534,7 @@ export default function CateringPage() {
                 100%
               </div>
               <div className="text-[11px] text-slate-700 dark:text-slate-400 uppercase font-bold mt-1">
-                PHI Hygiene Certified
+                PHI Hygiene Standards
               </div>
             </div>
           </div>
@@ -623,8 +615,8 @@ export default function CateringPage() {
                           type="button"
                           onClick={() => setEstimatorCategory(tab.key)}
                           className={`px-2.5 py-1 rounded-xl text-[10px] font-bold cursor-pointer transition-all ${estimatorCategory === tab.key
-                              ? "bg-[#E36727] text-white shadow-xs"
-                              : "bg-white dark:bg-[#26201d] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:border-amber-400"
+                            ? "bg-[#E36727] text-white shadow-xs"
+                            : "bg-white dark:bg-[#26201d] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:border-amber-400"
                             }`}
                         >
                           {tab.label}
@@ -654,16 +646,16 @@ export default function CateringPage() {
                             key={pkg.id}
                             onClick={() => setSelectedMenuId(pkg.id)}
                             className={`p-3.5 rounded-2xl border cursor-pointer transition-all text-left flex flex-col justify-between ${isSelected
-                                ? "border-[#E36727] bg-[#E36727]/10 ring-2 ring-[#E36727]/30 shadow-md"
-                                : "border-slate-200 dark:border-white/10 bg-white dark:bg-[#26201d] hover:border-amber-400"
+                              ? "border-[#E36727] bg-[#E36727]/10 ring-2 ring-[#E36727]/30 shadow-md"
+                              : "border-slate-200 dark:border-white/10 bg-white dark:bg-[#26201d] hover:border-amber-400"
                               }`}
                           >
                             <div>
                               <div className="flex justify-between items-start gap-1 mb-1.5">
                                 <span
                                   className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full ${isSelected
-                                      ? "bg-[#E36727] text-white"
-                                      : "bg-amber-500/15 text-amber-600 dark:text-amber-400"
+                                    ? "bg-[#E36727] text-white"
+                                    : "bg-amber-500/15 text-amber-600 dark:text-amber-400"
                                     }`}
                                 >
                                   {pkg.badge}
@@ -1054,8 +1046,8 @@ export default function CateringPage() {
                     key={tab.key}
                     onClick={() => setCateringCategoryTab(tab.key)}
                     className={`px-4 py-3 rounded-2xl text-xs font-bold cursor-pointer transition-all flex items-center gap-2 shrink-0 ${cateringCategoryTab === tab.key
-                        ? "bg-[#E36727] text-white shadow-md scale-[1.01]"
-                        : "bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:bg-[#E36727]/10"
+                      ? "bg-[#E36727] text-white shadow-md scale-[1.01]"
+                      : "bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:bg-[#E36727]/10"
                       }`}
                   >
                     {tab.icon && <i className={`fa-solid ${tab.icon} text-xs`}></i>}
@@ -1607,8 +1599,8 @@ export default function CateringPage() {
                     type="button"
                     onClick={() => setGatewayChoice("card")}
                     className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer ${gatewayChoice === "card"
-                        ? "border-emerald-500 bg-emerald-500/10 text-emerald-500"
-                        : "border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300"
+                      ? "border-emerald-500 bg-emerald-500/10 text-emerald-500"
+                      : "border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300"
                       }`}
                   >
                     <i className="fa-solid fa-credit-card mr-1"></i> Visa / Master
@@ -1617,8 +1609,8 @@ export default function CateringPage() {
                     type="button"
                     onClick={() => setGatewayChoice("ipg")}
                     className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer ${gatewayChoice === "ipg"
-                        ? "border-emerald-500 bg-emerald-500/10 text-emerald-500"
-                        : "border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300"
+                      ? "border-emerald-500 bg-emerald-500/10 text-emerald-500"
+                      : "border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300"
                       }`}
                   >
                     <i className="fa-solid fa-building-columns mr-1"></i> IPG Banking
