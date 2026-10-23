@@ -27,6 +27,10 @@ interface OrderContextType {
   setIsLocationVerified: (verified: boolean) => void;
   deliveryZoneId: number | null;
   setDeliveryZoneId: (id: number | null) => void;
+  deliveryCoords: { lat: number; lng: number } | null;
+  setDeliveryCoords: (coords: { lat: number; lng: number } | null) => void;
+  distanceKm: number | null;
+  setDistanceKm: (dist: number | null) => void;
   deliveryFee: number;
   setDeliveryFee: (fee: number) => void;
   cart: CartItem[];
@@ -55,6 +59,8 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
   );
   const [isLocationVerified, setIsLocationVerified] = useState<boolean>(false);
   const [deliveryZoneId, setDeliveryZoneId] = useState<number | null>(null);
+  const [deliveryCoords, setDeliveryCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [distanceKm, setDistanceKm] = useState<number | null>(null);
   const [deliveryFee, setDeliveryFee] = useState<number>(0);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartDrawerOpen, setIsCartDrawerOpen] = useState<boolean>(false);
@@ -87,6 +93,14 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       if (savedFee) {
         setDeliveryFee(parseFloat(savedFee));
       }
+      const savedCoords = localStorage.getItem("ahasgawwa_delivery_coords");
+      if (savedCoords) {
+        setDeliveryCoords(JSON.parse(savedCoords));
+      }
+      const savedDist = localStorage.getItem("ahasgawwa_distance_km");
+      if (savedDist) {
+        setDistanceKm(parseFloat(savedDist));
+      }
       const savedVerified = localStorage.getItem("ahasgawwa_location_verified");
       if (savedVerified) {
         setIsLocationVerified(savedVerified === "true");
@@ -107,12 +121,22 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       } else {
         localStorage.removeItem("ahasgawwa_zone_id");
       }
+      if (deliveryCoords) {
+        localStorage.setItem("ahasgawwa_delivery_coords", JSON.stringify(deliveryCoords));
+      } else {
+        localStorage.removeItem("ahasgawwa_delivery_coords");
+      }
+      if (distanceKm !== null && distanceKm !== undefined) {
+        localStorage.setItem("ahasgawwa_distance_km", distanceKm.toString());
+      } else {
+        localStorage.removeItem("ahasgawwa_distance_km");
+      }
       localStorage.setItem("ahasgawwa_delivery_fee", deliveryFee.toString());
       localStorage.setItem("ahasgawwa_location_verified", isLocationVerified.toString());
     } catch {
       // Ignore storage errors
     }
-  }, [cart, orderType, verifiedLocation, deliveryZoneId, deliveryFee, isLocationVerified]);
+  }, [cart, orderType, verifiedLocation, deliveryZoneId, deliveryCoords, distanceKm, deliveryFee, isLocationVerified]);
 
   const addToCart = (product: Product) => {
     setCart((prev) => {
@@ -169,6 +193,10 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
         setIsLocationVerified,
         deliveryZoneId,
         setDeliveryZoneId,
+        deliveryCoords,
+        setDeliveryCoords,
+        distanceKm,
+        setDistanceKm,
         deliveryFee,
         setDeliveryFee,
         cart,

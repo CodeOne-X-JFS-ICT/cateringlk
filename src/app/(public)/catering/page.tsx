@@ -251,11 +251,11 @@ export default function CateringPage() {
   const baseRate = selectedPackage ? Number(selectedPackage.price_per_pax) : 0;
   const isServiceChargeApplicable = selectedPackage
     ? selectedPackage.name.includes("Menu 02") ||
-      selectedPackage.name.includes("Menu 03") ||
-      selectedPackage.name.includes("Menu 04") ||
-      selectedPackage.name.includes("Menu 05") ||
-      selectedPackage.badge === "Dana - Guest" ||
-      selectedPackage.name.toLowerCase().includes("guest")
+    selectedPackage.name.includes("Menu 03") ||
+    selectedPackage.name.includes("Menu 04") ||
+    selectedPackage.name.includes("Menu 05") ||
+    selectedPackage.badge === "Dana - Guest" ||
+    selectedPackage.name.toLowerCase().includes("guest")
     : false;
 
   const foodSubtotal = baseRate * paxCount;
@@ -329,11 +329,9 @@ export default function CateringPage() {
   // WhatsApp Quote Link
   const sendWhatsAppQuote = () => {
     if (!selectedPackage) return;
-    const text = `Hi Ahas Gawwa Catering, I calculated an estimated quote:\n- Location: ${
-      selectedLocation || "Not Specified"
-    }\n- Selected Menu: ${selectedPackage.name} (Rs. ${baseRate.toLocaleString()}/plate)\n- Guests: ${paxCount} Pax\n- Food Subtotal: LKR ${foodSubtotal.toLocaleString()}${
-      serviceChargeAmount > 0 ? `\n- 10% Service Charge: LKR ${serviceChargeAmount.toLocaleString()}` : ""
-    }\n- Grand Estimated Budget: LKR ${grandTotal.toLocaleString()}`;
+    const text = `Hi Ahas Gawwa Catering, I calculated an estimated quote:\n- Location: ${selectedLocation || "Not Specified"
+      }\n- Selected Menu: ${selectedPackage.name} (Rs. ${baseRate.toLocaleString()}/plate)\n- Guests: ${paxCount} Pax\n- Food Subtotal: LKR ${foodSubtotal.toLocaleString()}${serviceChargeAmount > 0 ? `\n- 10% Service Charge: LKR ${serviceChargeAmount.toLocaleString()}` : ""
+      }\n- Grand Estimated Budget: LKR ${grandTotal.toLocaleString()}`;
     window.open(
       `https://wa.me/94742013332?text=${encodeURIComponent(text)}`,
       "_blank"
@@ -434,8 +432,8 @@ export default function CateringPage() {
                     {locations.length > 0
                       ? "Select City / Suburb"
                       : cateringError
-                      ? "Locations unavailable"
-                      : "Loading locations..."}
+                        ? "Locations unavailable"
+                        : "Loading locations..."}
                   </option>
                   {locations.map((loc) => (
                     <option key={loc} value={loc} className="bg-[#FFFBF8] dark:bg-[#1a1614] text-slate-900 dark:text-white">
@@ -597,316 +595,313 @@ export default function CateringPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Controls Column (Left) */}
-            <div className="lg:col-span-7 bg-[#FBEAD9] dark:bg-[#1a1614] border border-amber-200 dark:border-white/10 rounded-3xl p-6 sm:p-8 space-y-6 shadow-lg">
-              {/* 1. Select Menu */}
-              <div>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-                  <label className="text-xs font-bold text-amber-500 uppercase tracking-wider">
-                    1. Select Menu
-                  </label>
-                  {/* Category Filter Pills */}
-                  <div className="flex flex-wrap gap-1.5">
-                    {[
-                      { key: "all", label: "All Menus" },
-                      ...(cateringCategories.length > 0
-                        ? cateringCategories.map((c) => ({
+              {/* Controls Column (Left) */}
+              <div className="lg:col-span-7 bg-[#FBEAD9] dark:bg-[#1a1614] border border-amber-200 dark:border-white/10 rounded-3xl p-6 sm:p-8 space-y-6 shadow-lg">
+                {/* 1. Select Menu */}
+                <div>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                    <label className="text-xs font-bold text-amber-500 uppercase tracking-wider">
+                      1. Select Menu
+                    </label>
+                    {/* Category Filter Pills */}
+                    <div className="flex flex-wrap gap-1.5">
+                      {[
+                        { key: "all", label: "All Menus" },
+                        ...(cateringCategories.length > 0
+                          ? cateringCategories.map((c) => ({
                             key: c.slug || String(c.id),
                             label: c.name,
                           }))
-                        : [
+                          : [
                             { key: "bana", label: "Bana / Pirith" },
                             { key: "dana_monk", label: "Monk Dana" },
                             { key: "dana_guest", label: "Guest Dana" },
                           ]),
-                    ].map((tab) => (
-                      <button
-                        key={tab.key}
-                        type="button"
-                        onClick={() => setEstimatorCategory(tab.key)}
-                        className={`px-2.5 py-1 rounded-xl text-[10px] font-bold cursor-pointer transition-all ${
-                          estimatorCategory === tab.key
-                            ? "bg-[#E36727] text-white shadow-xs"
-                            : "bg-white dark:bg-[#26201d] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:border-amber-400"
-                        }`}
-                      >
-                        {tab.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Menu Selection Cards Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[460px] overflow-y-auto pr-1">
-                  {packages
-                    .filter((pkg) => {
-                      if (estimatorCategory === "all") return true;
-                      return matchPackageCategory(pkg, estimatorCategory);
-                    })
-                    .map((pkg) => {
-                      const isSelected = selectedMenuId === pkg.id;
-                      const hasSC =
-                        pkg.name.includes("Menu 02") ||
-                        pkg.name.includes("Menu 03") ||
-                        pkg.name.includes("Menu 04") ||
-                        pkg.name.includes("Menu 05") ||
-                        pkg.badge === "Dana - Guest";
-
-                      return (
-                        <div
-                          key={pkg.id}
-                          onClick={() => setSelectedMenuId(pkg.id)}
-                          className={`p-3.5 rounded-2xl border cursor-pointer transition-all text-left flex flex-col justify-between ${
-                            isSelected
-                              ? "border-[#E36727] bg-[#E36727]/10 ring-2 ring-[#E36727]/30 shadow-md"
-                              : "border-slate-200 dark:border-white/10 bg-white dark:bg-[#26201d] hover:border-amber-400"
-                          }`}
+                      ].map((tab) => (
+                        <button
+                          key={tab.key}
+                          type="button"
+                          onClick={() => setEstimatorCategory(tab.key)}
+                          className={`px-2.5 py-1 rounded-xl text-[10px] font-bold cursor-pointer transition-all ${estimatorCategory === tab.key
+                              ? "bg-[#E36727] text-white shadow-xs"
+                              : "bg-white dark:bg-[#26201d] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:border-amber-400"
+                            }`}
                         >
-                          <div>
-                            <div className="flex justify-between items-start gap-1 mb-1.5">
-                              <span
-                                className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full ${
-                                  isSelected
-                                    ? "bg-[#E36727] text-white"
-                                    : "bg-amber-500/15 text-amber-600 dark:text-amber-400"
-                                }`}
-                              >
-                                {pkg.badge}
-                              </span>
-                              <span className="font-serif font-extrabold text-xs text-[#E36727]">
-                                Rs. {Number(pkg.price_per_pax).toLocaleString()}/=
-                              </span>
+                          {tab.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Menu Selection Cards Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[460px] overflow-y-auto pr-1">
+                    {packages
+                      .filter((pkg) => {
+                        if (estimatorCategory === "all") return true;
+                        return matchPackageCategory(pkg, estimatorCategory);
+                      })
+                      .map((pkg) => {
+                        const isSelected = selectedMenuId === pkg.id;
+                        const hasSC =
+                          pkg.name.includes("Menu 02") ||
+                          pkg.name.includes("Menu 03") ||
+                          pkg.name.includes("Menu 04") ||
+                          pkg.name.includes("Menu 05") ||
+                          pkg.badge === "Dana - Guest";
+
+                        return (
+                          <div
+                            key={pkg.id}
+                            onClick={() => setSelectedMenuId(pkg.id)}
+                            className={`p-3.5 rounded-2xl border cursor-pointer transition-all text-left flex flex-col justify-between ${isSelected
+                                ? "border-[#E36727] bg-[#E36727]/10 ring-2 ring-[#E36727]/30 shadow-md"
+                                : "border-slate-200 dark:border-white/10 bg-white dark:bg-[#26201d] hover:border-amber-400"
+                              }`}
+                          >
+                            <div>
+                              <div className="flex justify-between items-start gap-1 mb-1.5">
+                                <span
+                                  className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full ${isSelected
+                                      ? "bg-[#E36727] text-white"
+                                      : "bg-amber-500/15 text-amber-600 dark:text-amber-400"
+                                    }`}
+                                >
+                                  {pkg.badge}
+                                </span>
+                                <span className="font-serif font-extrabold text-xs text-[#E36727]">
+                                  Rs. {Number(pkg.price_per_pax).toLocaleString()}/=
+                                </span>
+                              </div>
+
+                              <h4 className="font-bold text-xs text-slate-900 dark:text-white leading-snug">
+                                {pkg.name}
+                              </h4>
+
+                              <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-2 mt-1 leading-snug">
+                                {pkg.description}
+                              </p>
                             </div>
 
-                            <h4 className="font-bold text-xs text-slate-900 dark:text-white leading-snug">
-                              {pkg.name}
-                            </h4>
-
-                            <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-2 mt-1 leading-snug">
-                              {pkg.description}
-                            </p>
+                            <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[10px]">
+                              <span className="text-slate-400 font-semibold">Min: {pkg.min_pax} Pax</span>
+                              {hasSC && (
+                                <span className="text-amber-600 dark:text-amber-400 font-bold text-[9px]">
+                                  +10% SC
+                                </span>
+                              )}
+                            </div>
                           </div>
+                        );
+                      })}
+                  </div>
+                </div>
 
-                          <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[10px]">
-                            <span className="text-slate-400 font-semibold">Min: {pkg.min_pax} Pax</span>
-                            {hasSC && (
-                              <span className="text-amber-600 dark:text-amber-400 font-bold text-[9px]">
-                                +10% SC
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
+                {/* 2. Guest Count Slider */}
+                <div className="pt-2 border-t border-slate-200 dark:border-white/10">
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-xs font-bold text-amber-500 uppercase tracking-wider">
+                      2. Number of Guests (Pax)
+                    </label>
+                    <span className="text-2xl font-serif font-extrabold text-[#E36727]">
+                      {paxCount} Pax
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={selectedPackage.min_pax || 20}
+                    max="1000"
+                    step="5"
+                    value={paxCount}
+                    onChange={(e) =>
+                      setPaxCount(parseInt(e.target.value) || selectedPackage.min_pax || 20)
+                    }
+                    className="w-full h-2.5 bg-slate-200 dark:bg-[#26201d] rounded-lg accent-[#E36727] cursor-pointer"
+                  />
+                  <div className="flex justify-between text-[10px] text-slate-500 dark:text-slate-400 font-bold mt-1">
+                    <span>{selectedPackage.min_pax || 20} Pax (Min)</span>
+                    <span>100 Pax</span>
+                    <span>250 Pax</span>
+                    <span>500+ Pax</span>
+                  </div>
                 </div>
               </div>
 
-              {/* 2. Guest Count Slider */}
-              <div className="pt-2 border-t border-slate-200 dark:border-white/10">
-                <div className="flex justify-between items-center mb-1.5">
-                  <label className="text-xs font-bold text-amber-500 uppercase tracking-wider">
-                    2. Number of Guests (Pax)
-                  </label>
-                  <span className="text-2xl font-serif font-extrabold text-[#E36727]">
-                    {paxCount} Pax
+              {/* Live Summary Column (Right Sticky) */}
+              <div className="lg:col-span-5 bg-[#FFFBF8] dark:bg-[#1a1614] border border-amber-500/40 rounded-3xl p-6 sm:p-8 shadow-xl sticky top-28 space-y-5 portal-card-shadow">
+                <div className="font-serif font-bold text-lg text-slate-900 dark:text-white pb-3 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
+                  <span>Estimated Quote Summary</span>
+                  <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/30">
+                    Instant Estimate
                   </span>
-                </div>
-                <input
-                  type="range"
-                  min={selectedPackage.min_pax || 20}
-                  max="1000"
-                  step="5"
-                  value={paxCount}
-                  onChange={(e) =>
-                    setPaxCount(parseInt(e.target.value) || selectedPackage.min_pax || 20)
-                  }
-                  className="w-full h-2.5 bg-slate-200 dark:bg-[#26201d] rounded-lg accent-[#E36727] cursor-pointer"
-                />
-                <div className="flex justify-between text-[10px] text-slate-500 dark:text-slate-400 font-bold mt-1">
-                  <span>{selectedPackage.min_pax || 20} Pax (Min)</span>
-                  <span>100 Pax</span>
-                  <span>250 Pax</span>
-                  <span>500+ Pax</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Live Summary Column (Right Sticky) */}
-            <div className="lg:col-span-5 bg-[#FFFBF8] dark:bg-[#1a1614] border border-amber-500/40 rounded-3xl p-6 sm:p-8 shadow-xl sticky top-28 space-y-5 portal-card-shadow">
-              <div className="font-serif font-bold text-lg text-slate-900 dark:text-white pb-3 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
-                <span>Estimated Quote Summary</span>
-                <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/30">
-                  Instant Estimate
-                </span>
-              </div>
-
-              <div className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
-                <div className="flex justify-between">
-                  <span>Selected Location:</span>
-                  <span className="font-bold text-slate-900 dark:text-white">
-                    {selectedLocation || "Not Selected"}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Selected Menu:</span>
-                  <span
-                    className="font-bold text-[#E36727] text-right max-w-[210px] truncate"
-                    title={selectedPackage.name}
-                  >
-                    {selectedPackage.name}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Rate Per Plate:</span>
-                  <span className="font-bold text-slate-900 dark:text-white">
-                    LKR {baseRate.toLocaleString()} / plate
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Guest Count:</span>
-                  <span className="font-bold text-slate-900 dark:text-white">
-                    {paxCount} Guests
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Food Subtotal:</span>
-                  <span className="font-bold text-slate-900 dark:text-white">
-                    LKR {foodSubtotal.toLocaleString()}
-                  </span>
-                </div>
-                {isServiceChargeApplicable ? (
-                  <div className="flex justify-between text-amber-600 dark:text-amber-400">
-                    <span>10% Service Charge:</span>
-                    <span className="font-bold">
-                      +LKR {serviceChargeAmount.toLocaleString()}
-                    </span>
-                  </div>
-                ) : (
-                  <div className="flex justify-between text-emerald-600 dark:text-emerald-400 text-[11px]">
-                    <span>Service Charge:</span>
-                    <span className="font-bold">Included</span>
-                  </div>
-                )}
-                <div className="pt-2 border-t border-slate-200 dark:border-white/10 flex justify-between text-sm">
-                  <span className="font-bold text-slate-900 dark:text-white">
-                    Effective Rate / Pax:
-                  </span>
-                  <span className="font-bold text-[#E36727]">
-                    LKR {Math.round(grandTotal / paxCount).toLocaleString()} / plate
-                  </span>
-                </div>
-              </div>
-
-              {/* Selected Menu Inclusions Pill Box */}
-              <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-[11px] space-y-2">
-                <div>
-                  <div className="font-bold text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
-                    <i className="fa-solid fa-utensils text-xs"></i>
-                    <span>Included in {selectedPackage.badge}:</span>
-                  </div>
-                  <p className="text-slate-600 dark:text-slate-300 text-[10px] leading-relaxed line-clamp-3 mt-0.5">
-                    {selectedPackage.inclusions_text}
-                  </p>
-                </div>
-                {selectedPackage.dessert_text && (
-                  <div className="pt-1.5 border-t border-amber-500/20 flex items-start gap-1.5">
-                    <span className="font-bold text-amber-700 dark:text-amber-300 text-[10px] uppercase tracking-wider shrink-0 flex items-center gap-1">
-                      <i className="fa-solid fa-ice-cream text-[10px]"></i>
-                      <span>Dessert:</span>
-                    </span>
-                    <span className="text-slate-700 dark:text-slate-300 text-[10px] font-medium leading-snug">
-                      {selectedPackage.dessert_text}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <div className="p-5 rounded-2xl bg-white dark:bg-[#0f0d0c] border border-amber-500/40 text-center space-y-2 shadow-xs">
-                <div className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
-                  Estimated Total Investment
-                </div>
-                <div className="text-3xl sm:text-4xl font-serif font-extrabold gold-gradient-text">
-                  LKR {grandTotal.toLocaleString()}
                 </div>
 
-                {/* 30% Advance & Balance Breakdown */}
-                <div className="pt-2 border-t border-slate-200 dark:border-white/10 grid grid-cols-2 gap-2 text-[11px] text-left">
-                  <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
-                    <span className="block text-[9px] uppercase font-bold text-amber-600 dark:text-amber-400">
-                      30% Advance Deposit
-                    </span>
-                    <span className="font-extrabold text-slate-900 dark:text-white">
-                      LKR {advanceAmount.toLocaleString()}
+                <div className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
+                  <div className="flex justify-between">
+                    <span>Selected Location:</span>
+                    <span className="font-bold text-slate-900 dark:text-white">
+                      {selectedLocation || "Not Selected"}
                     </span>
                   </div>
-                  <div className="p-2 rounded-xl bg-slate-100 dark:bg-[#26201d] border border-slate-200 dark:border-white/10">
-                    <span className="block text-[9px] uppercase font-bold text-slate-500">
-                      70% Balance Due
+                  <div className="flex justify-between">
+                    <span>Selected Menu:</span>
+                    <span
+                      className="font-bold text-[#E36727] text-right max-w-[210px] truncate"
+                      title={selectedPackage.name}
+                    >
+                      {selectedPackage.name}
                     </span>
-                    <span className="font-bold text-slate-700 dark:text-slate-300">
-                      LKR {balanceAmount.toLocaleString()}
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Rate Per Plate:</span>
+                    <span className="font-bold text-slate-900 dark:text-white">
+                      LKR {baseRate.toLocaleString()} / plate
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Guest Count:</span>
+                    <span className="font-bold text-slate-900 dark:text-white">
+                      {paxCount} Guests
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Food Subtotal:</span>
+                    <span className="font-bold text-slate-900 dark:text-white">
+                      LKR {foodSubtotal.toLocaleString()}
+                    </span>
+                  </div>
+                  {isServiceChargeApplicable ? (
+                    <div className="flex justify-between text-amber-600 dark:text-amber-400">
+                      <span>10% Service Charge:</span>
+                      <span className="font-bold">
+                        +LKR {serviceChargeAmount.toLocaleString()}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between text-emerald-600 dark:text-emerald-400 text-[11px]">
+                      <span>Service Charge:</span>
+                      <span className="font-bold">Included</span>
+                    </div>
+                  )}
+                  <div className="pt-2 border-t border-slate-200 dark:border-white/10 flex justify-between text-sm">
+                    <span className="font-bold text-slate-900 dark:text-white">
+                      Effective Rate / Pax:
+                    </span>
+                    <span className="font-bold text-[#E36727]">
+                      LKR {Math.round(grandTotal / paxCount).toLocaleString()} / plate
                     </span>
                   </div>
                 </div>
 
-                <div className="text-[10px] text-slate-500 italic pt-1">
-                  Includes plateware, glassware, cutlery, buffet tables & experienced servers
+                {/* Selected Menu Inclusions Pill Box */}
+                <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-[11px] space-y-2">
+                  <div>
+                    <div className="font-bold text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+                      <i className="fa-solid fa-utensils text-xs"></i>
+                      <span>Included in {selectedPackage.badge}:</span>
+                    </div>
+                    <p className="text-slate-600 dark:text-slate-300 text-[10px] leading-relaxed line-clamp-3 mt-0.5">
+                      {selectedPackage.inclusions_text}
+                    </p>
+                  </div>
+                  {selectedPackage.dessert_text && (
+                    <div className="pt-1.5 border-t border-amber-500/20 flex items-start gap-1.5">
+                      <span className="font-bold text-amber-700 dark:text-amber-300 text-[10px] uppercase tracking-wider shrink-0 flex items-center gap-1">
+                        <i className="fa-solid fa-ice-cream text-[10px]"></i>
+                        <span>Dessert:</span>
+                      </span>
+                      <span className="text-slate-700 dark:text-slate-300 text-[10px] font-medium leading-snug">
+                        {selectedPackage.dessert_text}
+                      </span>
+                    </div>
+                  )}
                 </div>
-              </div>
 
-              {/* PAYMENT GATEWAY & QUOTE ACTIONS */}
-              <div className="space-y-2.5">
-                {/* Option 1: 30% Advance Payment via Gateway */}
+                <div className="p-5 rounded-2xl bg-white dark:bg-[#0f0d0c] border border-amber-500/40 text-center space-y-2 shadow-xs">
+                  <div className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
+                    Estimated Total Investment
+                  </div>
+                  <div className="text-3xl sm:text-4xl font-serif font-extrabold gold-gradient-text">
+                    LKR {grandTotal.toLocaleString()}
+                  </div>
+
+                  {/* 30% Advance & Balance Breakdown */}
+                  <div className="pt-2 border-t border-slate-200 dark:border-white/10 grid grid-cols-2 gap-2 text-[11px] text-left">
+                    <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                      <span className="block text-[9px] uppercase font-bold text-amber-600 dark:text-amber-400">
+                        30% Advance Deposit
+                      </span>
+                      <span className="font-extrabold text-slate-900 dark:text-white">
+                        LKR {advanceAmount.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-slate-100 dark:bg-[#26201d] border border-slate-200 dark:border-white/10">
+                      <span className="block text-[9px] uppercase font-bold text-slate-500">
+                        70% Balance Due
+                      </span>
+                      <span className="font-bold text-slate-700 dark:text-slate-300">
+                        LKR {balanceAmount.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="text-[10px] text-slate-500 italic pt-1">
+                    Includes plateware, glassware, cutlery, buffet tables & experienced servers
+                  </div>
+                </div>
+
+                {/* PAYMENT GATEWAY & QUOTE ACTIONS */}
+                <div className="space-y-2.5">
+                  {/* Option 1: 30% Advance Payment via Gateway 
                 <button
                   onClick={() => openPaymentGateway("advance")}
                   className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white text-xs font-extrabold uppercase tracking-wider rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer transform hover:scale-[1.01] active:scale-95"
                 >
                   <i className="fa-solid fa-credit-card text-sm"></i>
                   <span>Pay 30% Advance (LKR {advanceAmount.toLocaleString()})</span>
-                </button>
+                </button>*/}
 
-                {/* Option 2: Full Payment via Gateway */}
+                  {/* Option 2: Full Payment via Gateway 
                 <button
                   onClick={() => openPaymentGateway("full")}
                   className="w-full py-3.5 bg-slate-900 dark:bg-[#26201d] hover:bg-[#E36727] dark:hover:bg-[#E36727] text-white border border-amber-500/40 text-xs font-extrabold uppercase tracking-wider rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer transform hover:scale-[1.01] active:scale-95"
                 >
                   <i className="fa-solid fa-lock text-amber-400"></i>
                   <span>Pay Full Amount (LKR {grandTotal.toLocaleString()})</span>
-                </button>
+                </button>*/}
 
-                {/* Option 3: Request Official Written Quote */}
-                <button
-                  onClick={() => {
-                    setBookingPackage(selectedPackage.name);
-                    setIsBookingModalOpen(true);
-                  }}
-                  className="w-full py-3 bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white text-xs font-extrabold uppercase tracking-wider rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <i className="fa-solid fa-paper-plane"></i> Request Official Written Quote
-                </button>
+                  {/* Option 3: Request Official Written Quote */}
+                  <button
+                    onClick={() => {
+                      setBookingPackage(selectedPackage.name);
+                      setIsBookingModalOpen(true);
+                    }}
+                    className="w-full py-3 bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white text-xs font-extrabold uppercase tracking-wider rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <i className="fa-solid fa-paper-plane"></i> Request Official Written Quote
+                  </button>
 
-                {/* Option 4: WhatsApp Quote */}
-                <button
-                  onClick={sendWhatsAppQuote}
-                  className="w-full py-3 bg-slate-100 dark:bg-[#26201d] hover:bg-slate-200 dark:hover:bg-white/10 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-white/10 text-xs font-extrabold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
-                >
-                  <i className="fa-brands fa-whatsapp text-emerald-500 text-sm"></i> Lock Quote on WhatsApp
-                </button>
+                  {/* Option 4: WhatsApp Quote */}
+                  <button
+                    onClick={sendWhatsAppQuote}
+                    className="w-full py-3 bg-slate-100 dark:bg-[#26201d] hover:bg-slate-200 dark:hover:bg-white/10 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-white/10 text-xs font-extrabold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  >
+                    <i className="fa-brands fa-whatsapp text-emerald-500 text-sm"></i> Lock Quote on WhatsApp
+                  </button>
 
-                {/* Option 5: Contact Call Center for Menu Customization */}
-                <a
-                  href="tel:+94742013332"
-                  className="w-full py-3 bg-amber-500/10 hover:bg-amber-500/20 text-[#E36727] dark:text-amber-400 border border-amber-500/30 text-xs font-extrabold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer text-center block"
-                >
-                  <i className="fa-solid fa-headset text-sm"></i> Call Desk for Menu Customization
-                </a>
+                  {/* Option 5: Contact Call Center for Menu Customization */}
+                  <a
+                    href="tel:+94742013332"
+                    className="w-full py-3 bg-amber-500/10 hover:bg-amber-500/20 text-[#E36727] dark:text-amber-400 border border-amber-500/30 text-xs font-extrabold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer text-center block"
+                  >
+                    <i className="fa-solid fa-headset text-sm"></i> Call Desk for Menu Customization
+                  </a>
+                </div>
+
+                <p className="text-[10px] text-slate-400 text-center leading-relaxed">
+                  * Secure SSL encrypted online payment gateway supporting Visa, Mastercard, AMEX & Sri Lanka IPG.
+                </p>
               </div>
-
-              <p className="text-[10px] text-slate-400 text-center leading-relaxed">
-                * Secure SSL encrypted online payment gateway supporting Visa, Mastercard, AMEX & Sri Lanka IPG.
-              </p>
             </div>
-          </div>
           )}
 
           {/* CALL CENTER & MENU CUSTOMIZATION BANNER UNDER ESTIMATOR */}
@@ -1018,321 +1013,319 @@ export default function CateringPage() {
           ) : (
             <>
               {/* Complimentary Amenities Banner */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 border border-amber-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div className="flex items-start sm:items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#E36727] text-white flex items-center justify-center text-lg shrink-0 shadow-sm">
-                <i className="fa-solid fa-gift"></i>
-              </div>
-              <div className="text-xs">
-                <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                  <span>Free Of Charge Inclusions:</span>
-                  <span className="text-[10px] bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-extrabold px-2 py-0.5 rounded-full uppercase">All Menus Included</span>
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 border border-amber-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="flex items-start sm:items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#E36727] text-white flex items-center justify-center text-lg shrink-0 shadow-sm">
+                    <i className="fa-solid fa-gift"></i>
+                  </div>
+                  <div className="text-xs">
+                    <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                      <span>Free Of Charge Inclusions:</span>
+                      <span className="text-[10px] bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-extrabold px-2 py-0.5 rounded-full uppercase">All Menus Included</span>
+                    </div>
+                    <div className="text-slate-600 dark:text-slate-300 text-[11px] mt-0.5">
+                      Plateware, Glassware, Stainless Cutlery, Trays, Water Dispensers, Sinks, Buffet Tables & Uniformed Staff under personal supervision.
+                    </div>
+                  </div>
                 </div>
-                <div className="text-slate-600 dark:text-slate-300 text-[11px] mt-0.5">
-                  Plateware, Glassware, Stainless Cutlery, Trays, Water Dispensers, Sinks, Buffet Tables & Uniformed Staff under personal supervision.
+                <div className="text-[10px] text-slate-500 dark:text-slate-400 bg-white/70 dark:bg-black/30 px-3 py-2 rounded-xl border border-amber-500/20 shrink-0">
+                  <span className="font-bold text-amber-600 dark:text-amber-400">150+ Guests Special:</span> Hut, Tables & Chairs free of charge.
                 </div>
               </div>
-            </div>
-            <div className="text-[10px] text-slate-500 dark:text-slate-400 bg-white/70 dark:bg-black/30 px-3 py-2 rounded-xl border border-amber-500/20 shrink-0">
-              <span className="font-bold text-amber-600 dark:text-amber-400">150+ Guests Special:</span> Hut, Tables & Chairs free of charge.
-            </div>
-          </div>
 
-          {/* Main Category Tabs */}
-          <div className="flex overflow-x-auto gap-2 pb-2 no-scrollbar border-b border-slate-200 dark:border-white/10">
-            {[
-              ...(cateringCategories.length > 0
-                ? cateringCategories.map((c) => ({
-                    key: c.slug || String(c.id),
-                    label: `${c.icon && !c.icon.startsWith("fa-") ? c.icon + " " : ""}${c.name}${c.subtitle ? ` (${c.subtitle})` : ""}`,
-                    icon: c.icon && c.icon.startsWith("fa-") ? c.icon : undefined,
-                    count: packages.filter((p) => matchPackageCategory(p, c.slug || c.name)).length,
-                  }))
-                : [
-                    { key: "bana", label: "🪷 Bana / Pirith Dinner (Menus 01-06)", icon: undefined, count: packages.filter((p) => p.badge.includes("Bana") || p.badge.includes("Feast")).length },
-                    { key: "dana_monk", label: "☸️ Alms Giving — For Monks", icon: undefined, count: packages.filter((p) => p.badge === "Dana - Monk").length },
-                    { key: "dana_guest", label: "👥 Alms Giving — For Guests", icon: undefined, count: packages.filter((p) => p.badge === "Dana - Guest").length },
-                  ]),
-              { key: "addons", label: "🍓 Additional Charge Items & Free Services.", icon: undefined, count: addons.length },
-            ].map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setCateringCategoryTab(tab.key)}
-                className={`px-4 py-3 rounded-2xl text-xs font-bold cursor-pointer transition-all flex items-center gap-2 shrink-0 ${
-                  cateringCategoryTab === tab.key
-                    ? "bg-[#E36727] text-white shadow-md scale-[1.01]"
-                    : "bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:bg-[#E36727]/10"
-                }`}
-              >
-                {tab.icon && <i className={`fa-solid ${tab.icon} text-xs`}></i>}
-                <span>{tab.label}</span>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold ${
-                  cateringCategoryTab === tab.key ? "bg-white/20 text-white" : "bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-400"
-                }`}>
-                  {tab.count}
-                </span>
-              </button>
-            ))}
-          </div>
-
-          {/* Dynamic Package Category View */}
-          {cateringCategoryTab !== "addons" && (() => {
-            const currentCat = cateringCategories.find(
-              (c) => c.slug === cateringCategoryTab || String(c.id) === cateringCategoryTab || c.name.toLowerCase() === cateringCategoryTab.toLowerCase()
-            );
-            const categoryPackages = packages.filter((p) => matchPackageCategory(p, cateringCategoryTab));
-            const isMonk = cateringCategoryTab === "dana_monk" || (currentCat && currentCat.name.includes("Monk"));
-            const isGuest = cateringCategoryTab === "dana_guest" || (currentCat && currentCat.name.includes("Guest"));
-
-            return (
-              <div className="space-y-6">
-                {/* Specific Category Banners */}
-                {isMonk && (
-                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 flex items-center gap-3">
-                    <i className="fa-solid fa-hands-praying text-amber-500 text-lg shrink-0"></i>
-                    <div>
-                      <strong>Reverent Dana Protocol:</strong> All monk courses are prepared with highest standards of cleanliness and purity. Includes special Vegetable Courses Plate (4 Boiled Vegetables, 1 Veraniya Miris, 1 Tempered Garlic) and dedicated Buddha Pooja arrangements.
-                    </div>
-                  </div>
-                )}
-
-                {isGuest && (
-                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 flex items-center gap-3">
-                    <i className="fa-solid fa-users text-amber-500 text-lg shrink-0"></i>
-                    <div>
-                      <strong>Normal Guest Lunch Menus:</strong> Companion menus for relatives, upasakas, and devotees attending the alms giving. Note: 10% Service Charge applies to guest catering orders.
-                    </div>
-                  </div>
-                )}
-
-                {!isMonk && !isGuest && currentCat?.description && (
-                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 flex items-center gap-3">
-                    <i className={`fa-solid ${currentCat.icon || "fa-champagne-glasses"} text-amber-500 text-lg shrink-0`}></i>
-                    <div>
-                      <strong>{currentCat.name}:</strong> {currentCat.description}
-                    </div>
-                  </div>
-                )}
-
-                {categoryPackages.length === 0 ? (
-                  <div className="py-16 text-center bg-white dark:bg-[#26201d] rounded-3xl border border-amber-200 dark:border-white/10 p-8 shadow-xs">
-                    <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-500/10 text-[#E36727] flex items-center justify-center text-2xl mb-3">
-                      <i className={`fa-solid ${currentCat?.icon || "fa-utensils"}`}></i>
-                    </div>
-                    <h4 className="font-serif font-bold text-lg text-slate-900 dark:text-white mb-1">
-                      {currentCat?.name || "Category"} Packages
-                    </h4>
-                    <p className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto mb-4">
-                      Preset catering packages for this category will be available soon, or we can tailor an exclusive customized package for your event today.
-                    </p>
-                    <a
-                      href={`https://wa.me/94742013332?text=${encodeURIComponent(
-                        `Hi Ahas Gawwa, I am looking for custom catering options for "${currentCat?.name || cateringCategoryTab}". Please share menu choices and pricing.`
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#E36727] hover:bg-amber-600 text-white text-xs font-bold rounded-xl shadow-md cursor-pointer transition-all"
-                    >
-                      <i className="fa-brands fa-whatsapp text-sm"></i>
-                      <span>Inquire Custom {currentCat?.name || "Catering"} on WhatsApp</span>
-                    </a>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {categoryPackages.map((pkg) => {
-                      const hasServiceCharge =
-                        pkg.name.includes("Menu 02") ||
-                        pkg.name.includes("Menu 03") ||
-                        pkg.name.includes("Menu 04") ||
-                        pkg.name.includes("Menu 05") ||
-                        pkg.badge === "Dana - Guest";
-                      const inclusions = pkg.inclusions_text
-                        ? pkg.inclusions_text.split(",").map((s) => s.trim()).filter(Boolean)
-                        : [];
-
-                      return (
-                        <div
-                          key={pkg.id}
-                          className="rounded-3xl bg-white dark:bg-[#26201d] border border-amber-200 dark:border-white/10 hover:border-[#E36727] transition-all p-6 flex flex-col justify-between shadow-xs portal-card-shadow group"
-                        >
-                          <div className="space-y-4">
-                            <div className="flex justify-between items-start gap-2">
-                              <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                                {pkg.badge}
-                              </span>
-                              {hasServiceCharge && (
-                                <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-[#1a1614] px-2 py-0.5 rounded border border-amber-500/30">
-                                  +10% Service Charge
-                                </span>
-                              )}
-                            </div>
-
-                            <div>
-                              <h3 className="font-serif font-bold text-xl text-slate-900 dark:text-white group-hover:text-[#E36727] transition-colors">
-                                {pkg.name}
-                              </h3>
-                              <div className="mt-2 flex items-baseline gap-2">
-                                <span className="font-serif text-3xl font-extrabold text-[#E36727]">
-                                  Rs. {Number(pkg.price_per_pax).toLocaleString()}/=
-                                </span>
-                                <span className="text-xs text-slate-500 font-bold">Per Plate</span>
-                              </div>
-                              <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                                {pkg.description}
-                              </p>
-                            </div>
-
-                            {/* Inclusions List */}
-                            <div className="pt-3 border-t border-slate-100 dark:border-white/10 space-y-2">
-                              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">
-                                Menu Courses & Inclusions ({inclusions.length} items):
-                              </span>
-                              <div className="grid grid-cols-1 gap-1.5 max-h-72 overflow-y-auto pr-1">
-                                {inclusions.map((item, idx) => (
-                                  <div
-                                    key={idx}
-                                    className="text-xs text-slate-700 dark:text-slate-300 flex items-start gap-2"
-                                  >
-                                    <i className="fa-solid fa-circle-check text-emerald-500 text-[10px] mt-1 shrink-0"></i>
-                                    <span className="leading-snug">{item}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-
-                            {/* Dessert Section */}
-                            {pkg.dessert_text && (
-                              <div className="pt-3 border-t border-amber-500/20 dark:border-white/10 space-y-2 bg-amber-500/10 dark:bg-amber-500/10 p-3 rounded-2xl border border-amber-500/30">
-                                <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
-                                  <i className="fa-solid fa-ice-cream text-xs text-[#E36727]"></i>
-                                  <span>Dessert</span>
-                                </span>
-                                <div className="grid grid-cols-1 gap-1.5">
-                                  {pkg.dessert_text
-                                    .split(",")
-                                    .map((dessert, dIdx) => (
-                                      <div
-                                        key={dIdx}
-                                        className="text-xs font-semibold text-slate-800 dark:text-slate-100 flex items-start gap-2"
-                                      >
-                                        <i className="fa-solid fa-spoon text-[#E36727] text-[10px] mt-1 shrink-0"></i>
-                                        <span className="leading-snug">{dessert.trim()}</span>
-                                      </div>
-                                    ))}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Card Actions */}
-                          <div className="pt-5 mt-4 border-t border-slate-100 dark:border-white/10 space-y-2">
-                            <button
-                              onClick={() => {
-                                setBookingPackage(pkg.name);
-                                setIsBookingModalOpen(true);
-                              }}
-                              className="w-full py-2.5 bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
-                            >
-                              <i className="fa-solid fa-calendar-check"></i>
-                              <span>Select & Request Quote</span>
-                            </button>
-                            <a
-                              href={`https://wa.me/94742013332?text=${encodeURIComponent(
-                                `Hi Ahas Gawwa, I am interested in booking "${pkg.name}" (Rs. ${Number(
-                                  pkg.price_per_pax
-                                ).toLocaleString()}/plate). Please share available dates and custom options.`
-                              )}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="w-full py-2 bg-slate-100 dark:bg-[#1a1614] hover:bg-emerald-500/10 hover:text-emerald-500 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer border border-slate-200 dark:border-white/10"
-                            >
-                              <i className="fa-brands fa-whatsapp text-emerald-500"></i>
-                              <span>Inquire via WhatsApp</span>
-                            </a>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          })()}
-
-          {/* TAB 4: ADD-ONS & SERVICE POLICIES */}
-          {cateringCategoryTab === "addons" && (
-            <div className="space-y-8">
-              <div>
-                <h3 className="font-serif text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                  Additional Charge Items & Free Services.
-                </h3>
-                <p className="text-xs text-slate-600 dark:text-slate-400">
-                  Special paper-plate wraps, sweet arrangements, fruit platters, and complimentary event services.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {addons.map((addon) => (
-                  <div
-                    key={addon.id}
-                    className="p-6 rounded-3xl bg-white dark:bg-[#26201d] border border-amber-200 dark:border-white/10 hover:border-[#E36727] transition-all space-y-4 portal-card-shadow"
+              {/* Main Category Tabs */}
+              <div className="flex overflow-x-auto gap-2 pb-2 no-scrollbar border-b border-slate-200 dark:border-white/10">
+                {[
+                  ...(cateringCategories.length > 0
+                    ? cateringCategories.map((c) => ({
+                      key: c.slug || String(c.id),
+                      label: `${c.icon && !c.icon.startsWith("fa-") ? c.icon + " " : ""}${c.name}${c.subtitle ? ` (${c.subtitle})` : ""}`,
+                      icon: c.icon && c.icon.startsWith("fa-") ? c.icon : undefined,
+                      count: packages.filter((p) => matchPackageCategory(p, c.slug || c.name)).length,
+                    }))
+                    : [
+                      { key: "bana", label: "🪷 Bana / Pirith Dinner (Menus 01-06)", icon: undefined, count: packages.filter((p) => p.badge.includes("Bana") || p.badge.includes("Feast")).length },
+                      { key: "dana_monk", label: "☸️ Alms Giving — For Monks", icon: undefined, count: packages.filter((p) => p.badge === "Dana - Monk").length },
+                      { key: "dana_guest", label: "👥 Alms Giving — For Guests", icon: undefined, count: packages.filter((p) => p.badge === "Dana - Guest").length },
+                    ]),
+                  { key: "addons", label: "🍓 Additional Charge Items & Free Services.", icon: undefined, count: addons.length },
+                ].map((tab) => (
+                  <button
+                    key={tab.key}
+                    onClick={() => setCateringCategoryTab(tab.key)}
+                    className={`px-4 py-3 rounded-2xl text-xs font-bold cursor-pointer transition-all flex items-center gap-2 shrink-0 ${cateringCategoryTab === tab.key
+                        ? "bg-[#E36727] text-white shadow-md scale-[1.01]"
+                        : "bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:bg-[#E36727]/10"
+                      }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="w-12 h-12 rounded-2xl bg-[#E36727]/10 text-[#E36727] flex items-center justify-center text-xl">
-                        <i className={`fa-solid ${addon.icon}`}></i>
-                      </div>
-                      <span className="font-serif text-2xl font-extrabold text-[#E36727]">
-                        Rs. {Number(addon.price_per_pax).toLocaleString()}/=
-                      </span>
-                    </div>
-
-                    <div>
-                      <h4 className="font-bold text-base text-slate-900 dark:text-white">
-                        {addon.name}
-                      </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                        {addon.description}
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={() => {
-                        setBookingPackage(`Add-on: ${addon.name}`);
-                        setIsBookingModalOpen(true);
-                      }}
-                      className="w-full py-2 bg-slate-100 dark:bg-[#1a1614] hover:bg-[#E36727] hover:text-white text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl transition-all cursor-pointer"
-                    >
-                      Inquire / Add to Order
-                    </button>
-                  </div>
+                    {tab.icon && <i className={`fa-solid ${tab.icon} text-xs`}></i>}
+                    <span>{tab.label}</span>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold ${cateringCategoryTab === tab.key ? "bg-white/20 text-white" : "bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-400"
+                      }`}>
+                      {tab.count}
+                    </span>
+                  </button>
                 ))}
               </div>
 
-              {/* Complimentary Policies Details (Rendered Dynamically from Backend) */}
-              <div className="p-6 rounded-3xl bg-[#FBEAD9] dark:bg-[#1a1614] border border-amber-500/30 space-y-4">
-                <h4 className="font-serif font-bold text-xl text-slate-900 dark:text-white flex items-center gap-2">
-                  <i className="fa-solid fa-circle-info text-[#E36727]"></i>
-                  <span>{serviceTerms.section_title || "Important Service Terms & Logistics Policies"}</span>
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-700 dark:text-slate-300">
-                  {serviceTerms.policies.map((policy) => (
-                    <div
-                      key={policy.id || policy.title}
-                      className="p-4 rounded-2xl bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 space-y-2 shadow-xs"
-                    >
-                      <span className="font-bold text-slate-900 dark:text-white block flex items-center gap-1.5">
-                        <i className={`fa-solid ${policy.icon || "fa-circle-check"} text-[#E36727]`}></i>{" "}
-                        {policy.title}
-                      </span>
-                      <p className="leading-relaxed whitespace-pre-line">
-                        {policy.description}
-                      </p>
+              {/* Dynamic Package Category View */}
+              {cateringCategoryTab !== "addons" && (() => {
+                const currentCat = cateringCategories.find(
+                  (c) => c.slug === cateringCategoryTab || String(c.id) === cateringCategoryTab || c.name.toLowerCase() === cateringCategoryTab.toLowerCase()
+                );
+                const categoryPackages = packages.filter((p) => matchPackageCategory(p, cateringCategoryTab));
+                const isMonk = cateringCategoryTab === "dana_monk" || (currentCat && currentCat.name.includes("Monk"));
+                const isGuest = cateringCategoryTab === "dana_guest" || (currentCat && currentCat.name.includes("Guest"));
+
+                return (
+                  <div className="space-y-6">
+                    {/* Specific Category Banners */}
+                    {isMonk && (
+                      <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 flex items-center gap-3">
+                        <i className="fa-solid fa-hands-praying text-amber-500 text-lg shrink-0"></i>
+                        <div>
+                          <strong>Reverent Dana Protocol:</strong> All monk courses are prepared with highest standards of cleanliness and purity. Includes special Vegetable Courses Plate (4 Boiled Vegetables, 1 Veraniya Miris, 1 Tempered Garlic) and dedicated Buddha Pooja arrangements.
+                        </div>
+                      </div>
+                    )}
+
+                    {isGuest && (
+                      <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 flex items-center gap-3">
+                        <i className="fa-solid fa-users text-amber-500 text-lg shrink-0"></i>
+                        <div>
+                          <strong>Normal Guest Lunch Menus:</strong> Companion menus for relatives, upasakas, and devotees attending the alms giving. Note: 10% Service Charge applies to guest catering orders.
+                        </div>
+                      </div>
+                    )}
+
+                    {!isMonk && !isGuest && currentCat?.description && (
+                      <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 flex items-center gap-3">
+                        <i className={`fa-solid ${currentCat.icon || "fa-champagne-glasses"} text-amber-500 text-lg shrink-0`}></i>
+                        <div>
+                          <strong>{currentCat.name}:</strong> {currentCat.description}
+                        </div>
+                      </div>
+                    )}
+
+                    {categoryPackages.length === 0 ? (
+                      <div className="py-16 text-center bg-white dark:bg-[#26201d] rounded-3xl border border-amber-200 dark:border-white/10 p-8 shadow-xs">
+                        <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-500/10 text-[#E36727] flex items-center justify-center text-2xl mb-3">
+                          <i className={`fa-solid ${currentCat?.icon || "fa-utensils"}`}></i>
+                        </div>
+                        <h4 className="font-serif font-bold text-lg text-slate-900 dark:text-white mb-1">
+                          {currentCat?.name || "Category"} Packages
+                        </h4>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto mb-4">
+                          Preset catering packages for this category will be available soon, or we can tailor an exclusive customized package for your event today.
+                        </p>
+                        <a
+                          href={`https://wa.me/94742013332?text=${encodeURIComponent(
+                            `Hi Ahas Gawwa, I am looking for custom catering options for "${currentCat?.name || cateringCategoryTab}". Please share menu choices and pricing.`
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#E36727] hover:bg-amber-600 text-white text-xs font-bold rounded-xl shadow-md cursor-pointer transition-all"
+                        >
+                          <i className="fa-brands fa-whatsapp text-sm"></i>
+                          <span>Inquire Custom {currentCat?.name || "Catering"} on WhatsApp</span>
+                        </a>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {categoryPackages.map((pkg) => {
+                          const hasServiceCharge =
+                            pkg.name.includes("Menu 02") ||
+                            pkg.name.includes("Menu 03") ||
+                            pkg.name.includes("Menu 04") ||
+                            pkg.name.includes("Menu 05") ||
+                            pkg.badge === "Dana - Guest";
+                          const inclusions = pkg.inclusions_text
+                            ? pkg.inclusions_text.split(",").map((s) => s.trim()).filter(Boolean)
+                            : [];
+
+                          return (
+                            <div
+                              key={pkg.id}
+                              className="rounded-3xl bg-white dark:bg-[#26201d] border border-amber-200 dark:border-white/10 hover:border-[#E36727] transition-all p-6 flex flex-col justify-between shadow-xs portal-card-shadow group"
+                            >
+                              <div className="space-y-4">
+                                <div className="flex justify-between items-start gap-2">
+                                  <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                    {pkg.badge}
+                                  </span>
+                                  {hasServiceCharge && (
+                                    <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-[#1a1614] px-2 py-0.5 rounded border border-amber-500/30">
+                                      +10% Service Charge
+                                    </span>
+                                  )}
+                                </div>
+
+                                <div>
+                                  <h3 className="font-serif font-bold text-xl text-slate-900 dark:text-white group-hover:text-[#E36727] transition-colors">
+                                    {pkg.name}
+                                  </h3>
+                                  <div className="mt-2 flex items-baseline gap-2">
+                                    <span className="font-serif text-3xl font-extrabold text-[#E36727]">
+                                      Rs. {Number(pkg.price_per_pax).toLocaleString()}/=
+                                    </span>
+                                    <span className="text-xs text-slate-500 font-bold">Per Plate</span>
+                                  </div>
+                                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+                                    {pkg.description}
+                                  </p>
+                                </div>
+
+                                {/* Inclusions List */}
+                                <div className="pt-3 border-t border-slate-100 dark:border-white/10 space-y-2">
+                                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">
+                                    Menu Courses & Inclusions ({inclusions.length} items):
+                                  </span>
+                                  <div className="grid grid-cols-1 gap-1.5 max-h-72 overflow-y-auto pr-1">
+                                    {inclusions.map((item, idx) => (
+                                      <div
+                                        key={idx}
+                                        className="text-xs text-slate-700 dark:text-slate-300 flex items-start gap-2"
+                                      >
+                                        <i className="fa-solid fa-circle-check text-emerald-500 text-[10px] mt-1 shrink-0"></i>
+                                        <span className="leading-snug">{item}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+
+                                {/* Dessert Section */}
+                                {pkg.dessert_text && (
+                                  <div className="pt-3 border-t border-amber-500/20 dark:border-white/10 space-y-2 bg-amber-500/10 dark:bg-amber-500/10 p-3 rounded-2xl border border-amber-500/30">
+                                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+                                      <i className="fa-solid fa-ice-cream text-xs text-[#E36727]"></i>
+                                      <span>Dessert</span>
+                                    </span>
+                                    <div className="grid grid-cols-1 gap-1.5">
+                                      {pkg.dessert_text
+                                        .split(",")
+                                        .map((dessert, dIdx) => (
+                                          <div
+                                            key={dIdx}
+                                            className="text-xs font-semibold text-slate-800 dark:text-slate-100 flex items-start gap-2"
+                                          >
+                                            <i className="fa-solid fa-spoon text-[#E36727] text-[10px] mt-1 shrink-0"></i>
+                                            <span className="leading-snug">{dessert.trim()}</span>
+                                          </div>
+                                        ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Card Actions */}
+                              <div className="pt-5 mt-4 border-t border-slate-100 dark:border-white/10 space-y-2">
+                                <button
+                                  onClick={() => {
+                                    setBookingPackage(pkg.name);
+                                    setIsBookingModalOpen(true);
+                                  }}
+                                  className="w-full py-2.5 bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+                                >
+                                  <i className="fa-solid fa-calendar-check"></i>
+                                  <span>Select & Request Quote</span>
+                                </button>
+                                <a
+                                  href={`https://wa.me/94742013332?text=${encodeURIComponent(
+                                    `Hi Ahas Gawwa, I am interested in booking "${pkg.name}" (Rs. ${Number(
+                                      pkg.price_per_pax
+                                    ).toLocaleString()}/plate). Please share available dates and custom options.`
+                                  )}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="w-full py-2 bg-slate-100 dark:bg-[#1a1614] hover:bg-emerald-500/10 hover:text-emerald-500 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer border border-slate-200 dark:border-white/10"
+                                >
+                                  <i className="fa-brands fa-whatsapp text-emerald-500"></i>
+                                  <span>Inquire via WhatsApp</span>
+                                </a>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* TAB 4: ADD-ONS & SERVICE POLICIES */}
+              {cateringCategoryTab === "addons" && (
+                <div className="space-y-8">
+                  <div>
+                    <h3 className="font-serif text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                      Additional Charge Items & Free Services.
+                    </h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-400">
+                      Special paper-plate wraps, sweet arrangements, fruit platters, and complimentary event services.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {addons.map((addon) => (
+                      <div
+                        key={addon.id}
+                        className="p-6 rounded-3xl bg-white dark:bg-[#26201d] border border-amber-200 dark:border-white/10 hover:border-[#E36727] transition-all space-y-4 portal-card-shadow"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="w-12 h-12 rounded-2xl bg-[#E36727]/10 text-[#E36727] flex items-center justify-center text-xl">
+                            <i className={`fa-solid ${addon.icon}`}></i>
+                          </div>
+                          <span className="font-serif text-2xl font-extrabold text-[#E36727]">
+                            Rs. {Number(addon.price_per_pax).toLocaleString()}/=
+                          </span>
+                        </div>
+
+                        <div>
+                          <h4 className="font-bold text-base text-slate-900 dark:text-white">
+                            {addon.name}
+                          </h4>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                            {addon.description}
+                          </p>
+                        </div>
+
+                        <button
+                          onClick={() => {
+                            setBookingPackage(`Add-on: ${addon.name}`);
+                            setIsBookingModalOpen(true);
+                          }}
+                          className="w-full py-2 bg-slate-100 dark:bg-[#1a1614] hover:bg-[#E36727] hover:text-white text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl transition-all cursor-pointer"
+                        >
+                          Inquire / Add to Order
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Complimentary Policies Details (Rendered Dynamically from Backend) */}
+                  <div className="p-6 rounded-3xl bg-[#FBEAD9] dark:bg-[#1a1614] border border-amber-500/30 space-y-4">
+                    <h4 className="font-serif font-bold text-xl text-slate-900 dark:text-white flex items-center gap-2">
+                      <i className="fa-solid fa-circle-info text-[#E36727]"></i>
+                      <span>{serviceTerms.section_title || "Important Service Terms & Logistics Policies"}</span>
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-700 dark:text-slate-300">
+                      {serviceTerms.policies.map((policy) => (
+                        <div
+                          key={policy.id || policy.title}
+                          className="p-4 rounded-2xl bg-white dark:bg-[#26201d] border border-slate-200 dark:border-white/10 space-y-2 shadow-xs"
+                        >
+                          <span className="font-bold text-slate-900 dark:text-white block flex items-center gap-1.5">
+                            <i className={`fa-solid ${policy.icon || "fa-circle-check"} text-[#E36727]`}></i>{" "}
+                            {policy.title}
+                          </span>
+                          <p className="leading-relaxed whitespace-pre-line">
+                            {policy.description}
+                          </p>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
                 </div>
-              </div>
-            </div>
-          )}
+              )}
 
             </>
           )}
@@ -1613,22 +1606,20 @@ export default function CateringPage() {
                   <button
                     type="button"
                     onClick={() => setGatewayChoice("card")}
-                    className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer ${
-                      gatewayChoice === "card"
+                    className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer ${gatewayChoice === "card"
                         ? "border-emerald-500 bg-emerald-500/10 text-emerald-500"
                         : "border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300"
-                    }`}
+                      }`}
                   >
                     <i className="fa-solid fa-credit-card mr-1"></i> Visa / Master
                   </button>
                   <button
                     type="button"
                     onClick={() => setGatewayChoice("ipg")}
-                    className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer ${
-                      gatewayChoice === "ipg"
+                    className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer ${gatewayChoice === "ipg"
                         ? "border-emerald-500 bg-emerald-500/10 text-emerald-500"
                         : "border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300"
-                    }`}
+                      }`}
                   >
                     <i className="fa-solid fa-building-columns mr-1"></i> IPG Banking
                   </button>

@@ -22,6 +22,7 @@ export default function CheckoutPage() {
     cart,
     cartSubtotal,
     orderType,
+    setOrderType,
     verifiedLocation,
     deliveryZoneId,
     deliveryFee: contextDeliveryFee,
@@ -33,6 +34,10 @@ export default function CheckoutPage() {
   const [timeSlot, setTimeSlot] = useState("ASAP (30-40 mins)");
   const [address, setAddress] = useState("");
   const [specialInstructions, setSpecialInstructions] = useState("");
+  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [distanceFromHub, setDistanceFromHub] = useState<number | null>(null);
+  const [isOutOfRadius, setIsOutOfRadius] = useState<boolean>(false);
+
   const paymentOptions =
     orderType === "takeaway" ? TAKEAWAY_PAYMENT_OPTIONS : DELIVERY_PAYMENT_OPTIONS;
 
@@ -47,6 +52,10 @@ export default function CheckoutPage() {
           ? prev
           : "Cash on Collection"
       );
+      setIsOutOfRadius(false);
+      if (errorMsg === "You are in out of 6km radius, Delivery unavailable") {
+        setErrorMsg(null);
+      }
     } else {
       setPaymentMethod((prev) =>
         prev === "Cash on Delivery" || prev === "Online Transactions"
@@ -78,9 +87,15 @@ export default function CheckoutPage() {
     e.preventDefault();
     if (cart.length === 0) return;
 
-    if (orderType === "delivery" && !address.trim()) {
-      setErrorMsg("Please enter your complete delivery street address.");
-      return;
+    if (orderType === "delivery") {
+      if (isOutOfRadius) {
+        setErrorMsg("You are in out of 6km radius, Delivery unavailable");
+        return;
+      }
+      if (!address.trim()) {
+        setErrorMsg("Please enter your complete delivery street address.");
+        return;
+      }
     }
 
     setSubmitting(true);
@@ -94,6 +109,9 @@ export default function CheckoutPage() {
         delivery_address: orderType === "delivery" ? address.trim() : null,
         delivery_zone_id: orderType === "delivery" ? (deliveryZoneId || 1) : null,
         verified_location: verifiedLocation,
+        latitude: orderType === "delivery" ? userCoords?.lat : null,
+        longitude: orderType === "delivery" ? userCoords?.lng : null,
+        distance_km: orderType === "delivery" ? distanceFromHub : null,
         time_slot: timeSlot,
         payment_method: paymentMethod,
         special_instructions: specialInstructions.trim() || null,
@@ -189,6 +207,48 @@ export default function CheckoutPage() {
             </h2>
 
             <form onSubmit={handlePlaceOrder} className="space-y-4 text-xs">
+              {/* Order Fulfillment Mode Selector */}
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1.5">
+                  Order Type / Fulfillment Mode *
+                </label>
+                <div className="grid grid-cols-2 gap-2.5 p-1 bg-slate-100 dark:bg-[#26201d] rounded-2xl border border-slate-200 dark:border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOrderType("takeaway");
+                      setIsOutOfRadius(false);
+                      if (errorMsg === "You are in out of 6km radius, Delivery unavailable") {
+                        setErrorMsg(null);
+                      }
+                    }}
+                    className={`py-3 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                      orderType === "takeaway"
+                        ? "bg-white dark:bg-[#1a1614] text-[#E36727] shadow-sm border border-[#E36727]/30 ring-1 ring-[#E36727]/20"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                    }`}
+                  >
+                    <i className="fa-solid fa-bag-shopping"></i>
+                    <span>Takeaway Pick-up</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOrderType("delivery");
+                    }}
+                    className={`py-3 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                      orderType === "delivery"
+                        ? "bg-white dark:bg-[#1a1614] text-[#E36727] shadow-sm border border-[#E36727]/30 ring-1 ring-[#E36727]/20"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                    }`}
+                  >
+                    <i className="fa-solid fa-motorcycle"></i>
+                    <span>Doorstep Delivery (6km)</span>
+                  </button>
+                </div>
+              </div>
+
               <div>
                 <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
                   Full Name *
@@ -243,10 +303,45 @@ export default function CheckoutPage() {
                   {/* Interactive Map Pin Picker */}
                   <MapPinPicker
                     zoneName={verifiedLocation}
-                    onLocationSelect={(formattedAddr) => {
-                      setAddress(formattedAddr);
+                    initialLat={userCoords?.lat}
+                    initialLng={userCoords?.lng}
+                    onLocationSelect={(formattedAddr, lat, lng, mapsUrl, isEligible, dist) => {
+                      setUserCoords({ lat, lng });
+                      setDistanceFromHub(dist);
+                      setIsOutOfRadius(!isEligible);
+                      if (isEligible) {
+                        setAddress(formattedAddr);
+                        if (errorMsg === "You are in out of 6km radius, Delivery unavailable") {
+                          setErrorMsg(null);
+                        }
+                      } else {
+                        setErrorMsg("You are in out of 6km radius, Delivery unavailable");
+                      }
                     }}
                   />
+
+                  {/* Out of radius alert banner */}
+                  {isOutOfRadius && (
+                    <div className="p-3.5 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 text-xs font-semibold flex items-center justify-between gap-3 shadow-xs">
+                      <div className="flex items-center gap-2">
+                        <i className="fa-solid fa-triangle-exclamation text-base shrink-0"></i>
+                        <span>
+                          <strong>Notice:</strong> You are in out of 6km radius, Delivery unavailable ({distanceFromHub?.toFixed(1)} km from Catering Hub).
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOrderType("takeaway");
+                          setIsOutOfRadius(false);
+                          setErrorMsg(null);
+                        }}
+                        className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-[11px] font-bold cursor-pointer transition-all shrink-0 shadow-xs"
+                      >
+                        Switch to Takeaway
+                      </button>
+                    </div>
+                  )}
 
                   <div>
                     <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
@@ -312,9 +407,11 @@ export default function CheckoutPage() {
 
               <button
                 type="submit"
-                disabled={cart.length === 0 || submitting}
-                className={`w-full py-4 bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-xl transition-all cursor-pointer flex items-center justify-center gap-2 ${
-                  cart.length === 0 || submitting ? "opacity-60 pointer-events-none" : ""
+                disabled={cart.length === 0 || submitting || (orderType === "delivery" && isOutOfRadius)}
+                className={`w-full py-4 text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 ${
+                  cart.length === 0 || submitting || (orderType === "delivery" && isOutOfRadius)
+                    ? "bg-slate-400 dark:bg-slate-700 opacity-60 cursor-not-allowed pointer-events-none"
+                    : "bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] cursor-pointer"
                 }`}
               >
                 {submitting ? (
@@ -322,6 +419,8 @@ export default function CheckoutPage() {
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     <span>Placing Your Order in Database...</span>
                   </>
+                ) : orderType === "delivery" && isOutOfRadius ? (
+                  <span>Delivery Unavailable (Out of 6km Radius)</span>
                 ) : (
                   <span>Confirm & Place Order Now</span>
                 )}

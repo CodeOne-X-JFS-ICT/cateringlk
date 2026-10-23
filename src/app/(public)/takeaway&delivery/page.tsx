@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useOrder } from "@/context/OrderContext";
+import MapPinPicker, { calculateDistanceKm, MAX_DELIVERY_RADIUS_KM } from "@/components/MapPinPicker";
 
 interface DeliveryZoneData {
   id: number;
@@ -38,6 +39,10 @@ export default function RestaurantPage() {
     setVerifiedLocation,
     isLocationVerified,
     setIsLocationVerified,
+    deliveryCoords,
+    setDeliveryCoords,
+    distanceKm,
+    setDistanceKm,
     setDeliveryZoneId,
     setDeliveryFee,
   } = useOrder();
@@ -158,22 +163,34 @@ export default function RestaurantPage() {
         setIsLocationVerified(true);
         setDeliveryZoneId(data.id);
         setDeliveryFee(parseFloat(data.delivery_fee));
+        setDistanceKm(parseFloat(data.distance_km));
         setDeliveryResultMsg(
-          <span className="text-emerald-500 dark:text-emerald-400 font-bold">
-            <i className="fa-solid fa-circle-check mr-1"></i> Great News!{" "}
-            <strong>&quot;{data.city_name.toUpperCase()}&quot;</strong> is within our 6km express
-            delivery radius ({data.distance_km}km from Hub). Estimated delivery: {data.estimated_delivery_mins} mins. Delivery Fee: Rs. {Number(data.delivery_fee).toLocaleString()}.
-          </span>
+          <div className="flex items-start gap-2.5 text-emerald-600 dark:text-emerald-400 font-bold">
+            <i className="fa-solid fa-circle-check text-base mt-0.5 shrink-0"></i>
+            <div>
+              <div>
+                Great News! <strong>&quot;{data.city_name.toUpperCase()}&quot;</strong> is within our 6km express delivery radius ({data.distance_km}km from Hub).
+              </div>
+              <div className="text-[11px] font-normal text-slate-500 dark:text-slate-400 mt-0.5">
+                Estimated delivery: {data.estimated_delivery_mins} mins • Delivery Fee: Rs. {Number(data.delivery_fee).toLocaleString()}
+              </div>
+            </div>
+          </div>
         );
       } else {
         setIsLocationVerified(false);
         setDeliveryZoneId(null);
         setDeliveryFee(0);
         setDeliveryResultMsg(
-          <span className="text-[#E36727] font-bold">
-            <i className="fa-solid fa-triangle-exclamation mr-1"></i>{" "}
-            <strong>&quot;{query.toUpperCase()}&quot;</strong> is beyond our 6km express delivery limit. Please select Takeaway or call manager.
-          </span>
+          <div className="flex items-start gap-2.5 text-red-600 dark:text-red-400 font-bold">
+            <i className="fa-solid fa-circle-xmark text-base mt-0.5 shrink-0"></i>
+            <div>
+              <div className="uppercase tracking-wide">You are in out of 6km radius, Delivery unavailable</div>
+              <div className="text-[11px] font-normal text-slate-500 dark:text-slate-400 mt-0.5">
+                <strong>&quot;{query.toUpperCase()}&quot;</strong> is outside our 6km express delivery radius. Please select Takeaway Pick-up or choose a location within 6km.
+              </div>
+            </div>
+          </div>
         );
       }
     } catch {
@@ -188,34 +205,167 @@ export default function RestaurantPage() {
     }
   };
 
-  const useCurrentLocationSim = () => {
-    if (deliveryZones.length > 0) {
-      const defaultZone = deliveryZones[0];
-      setSelectedCity(defaultZone.city_name);
-      setInputCity("");
-      setVerifiedLocation(defaultZone.city_name);
-      setIsLocationVerified(true);
-      setDeliveryZoneId(defaultZone.id);
-      setDeliveryFee(parseFloat(defaultZone.delivery_fee as any));
+  /* MAP PIN LOCATION SELECTOR HANDLER */
+  const handleMapLocationSelect = async (
+    formattedAddr: string,
+    lat: number,
+    lng: number,
+    mapsUrl: string,
+    isEligible: boolean,
+    dist: number
+  ) => {
+    setDeliveryCoords({ lat, lng });
+    setDistanceKm(dist);
+
+    if (!isEligible) {
+      setIsLocationVerified(false);
+      setDeliveryZoneId(null);
+      setDeliveryFee(0);
       setDeliveryResultMsg(
-        <span className="text-emerald-500 dark:text-emerald-400 font-bold">
-          <i className="fa-solid fa-circle-check mr-1"></i> GPS Dropped:{" "}
-          <strong>&quot;{defaultZone.city_name.toUpperCase()} ({defaultZone.distance_km}KM FROM HUB)&quot;</strong> is inside 6km express delivery radius. Delivery Fee: Rs. {Number(defaultZone.delivery_fee).toLocaleString()}.
-        </span>
+        <div className="flex items-start gap-2.5 text-red-600 dark:text-red-400 font-bold">
+          <i className="fa-solid fa-circle-xmark text-base mt-0.5 shrink-0"></i>
+          <div>
+            <div className="uppercase tracking-wide">You are in out of 6km radius, Delivery unavailable</div>
+            <div className="text-[11px] font-normal text-slate-500 dark:text-slate-400 mt-0.5">
+              Pinned location is <strong>{dist.toFixed(2)} km</strong> from Handapangoda Hub (Limit: 6.0 km). Express delivery is unavailable. Please select Takeaway or pin within the dashed circle.
+            </div>
+          </div>
+        </div>
       );
-    } else {
-      setSelectedCity("Padukka");
-      setInputCity("");
-      setVerifiedLocation("Padukka");
+      return;
+    }
+
+    // Within 6km - check backend for nearest delivery zone and fee
+    setIsCheckingZone(true);
+    try {
+      const res = await fetch("http://localhost:5050/api/public/delivery-zones/check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lat, lng }),
+      });
+      const json = await res.json();
+      if (json.success && json.data?.eligible) {
+        const data = json.data;
+        const locName = data.city_name || "Handapangoda Hub Zone";
+        setVerifiedLocation(locName);
+        setIsLocationVerified(true);
+        setDeliveryZoneId(data.id || 1);
+        setDeliveryFee(parseFloat(data.delivery_fee || 250));
+        setDeliveryResultMsg(
+          <div className="flex items-start gap-2.5 text-emerald-600 dark:text-emerald-400 font-bold">
+            <i className="fa-solid fa-circle-check text-base mt-0.5 shrink-0"></i>
+            <div>
+              <div>
+                GPS Location Verified: <strong>&quot;{locName.toUpperCase()}&quot;</strong> is inside 6km delivery radius ({dist.toFixed(2)} km from Hub).
+              </div>
+              <div className="text-[11px] font-normal text-slate-500 dark:text-slate-400 mt-0.5">
+                Estimated delivery: {data.estimated_delivery_mins || 25} mins • Delivery Fee: Rs. {Number(data.delivery_fee).toLocaleString()} • Doorstep: {formattedAddr.split("(")[0]}
+              </div>
+            </div>
+          </div>
+        );
+      } else {
+        setIsLocationVerified(false);
+        setDeliveryZoneId(null);
+        setDeliveryFee(0);
+        setDeliveryResultMsg(
+          <div className="flex items-start gap-2.5 text-red-600 dark:text-red-400 font-bold">
+            <i className="fa-solid fa-circle-xmark text-base mt-0.5 shrink-0"></i>
+            <div>
+              <div className="uppercase tracking-wide">You are in out of 6km radius, Delivery unavailable</div>
+              <div className="text-[11px] font-normal text-slate-500 dark:text-slate-400 mt-0.5">
+                Location ({dist.toFixed(2)} km) is outside our 6km express delivery limit. Please select Takeaway instead.
+              </div>
+            </div>
+          </div>
+        );
+      }
+    } catch {
+      setVerifiedLocation("Handapangoda Hub Zone");
       setIsLocationVerified(true);
       setDeliveryFee(250);
       setDeliveryResultMsg(
-        <span className="text-emerald-500 dark:text-emerald-400 font-bold">
-          <i className="fa-solid fa-circle-check mr-1"></i> GPS Dropped:{" "}
-          <strong>&quot;PADUKKA (3.5KM FROM HUB)&quot;</strong> is inside 6km express delivery radius.
-        </span>
+        <div className="flex items-start gap-2.5 text-emerald-600 dark:text-emerald-400 font-bold">
+          <i className="fa-solid fa-circle-check text-base mt-0.5 shrink-0"></i>
+          <span>
+            GPS Location Verified ({dist.toFixed(2)} km from Hub): Inside 6km express delivery radius.
+          </span>
+        </div>
       );
+    } finally {
+      setIsCheckingZone(false);
     }
+  };
+
+  /* REAL BROWSER GPS AUTO-DETECTION */
+  const handleUseCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      showAlertNotice(
+        "Geolocation Not Supported",
+        "Geolocation is not supported by your browser. Please select your suburb from the list or pin on the map."
+      );
+      return;
+    }
+
+    setIsCheckingZone(true);
+    setDeliveryResultMsg(
+      <span className="text-amber-500 flex items-center gap-1.5 font-bold">
+        <span className="w-3 h-3 border-2 border-amber-500 border-t-transparent rounded-full animate-spin inline-block"></span>
+        Acquiring current GPS coordinates from your device...
+      </span>
+    );
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const dist = calculateDistanceKm(lat, lng);
+        setDeliveryCoords({ lat, lng });
+        setDistanceKm(dist);
+
+        if (dist > MAX_DELIVERY_RADIUS_KM) {
+          setIsLocationVerified(false);
+          setDeliveryZoneId(null);
+          setDeliveryFee(0);
+          setDeliveryResultMsg(
+            <div className="flex items-start gap-2.5 text-red-600 dark:text-red-400 font-bold">
+              <i className="fa-solid fa-circle-xmark text-base mt-0.5 shrink-0"></i>
+              <div>
+                <div className="uppercase tracking-wide">You are in out of 6km radius, Delivery unavailable</div>
+                <div className="text-[11px] font-normal text-slate-500 dark:text-slate-400 mt-0.5">
+                  Your device GPS location is <strong>{dist.toFixed(2)} km</strong> from Handapangoda Hub (Limit: 6.0 km). Express delivery is unavailable. Please select Takeaway Pick-up.
+                </div>
+              </div>
+            </div>
+          );
+          setIsCheckingZone(false);
+          return;
+        }
+
+        // Within 6km - reverse geocode & check backend
+        let cleanAddr = `GPS (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
+        try {
+          const revRes = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+            { headers: { "User-Agent": "AhasGawwaCateringDelivery/1.0" } }
+          );
+          const revJson = await revRes.json();
+          if (revJson.display_name) cleanAddr = revJson.display_name;
+        } catch {}
+
+        await handleMapLocationSelect(cleanAddr, lat, lng, "", true, dist);
+      },
+      (err) => {
+        console.warn("GPS error:", err);
+        setIsCheckingZone(false);
+        setDeliveryResultMsg(
+          <span className="text-amber-600 dark:text-amber-400 font-semibold">
+            <i className="fa-solid fa-triangle-exclamation mr-1"></i> Unable to access GPS. Please allow location permissions or pin directly on the map.
+          </span>
+        );
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
   };
 
   const startDeliveryOrder = () => {
@@ -528,9 +678,9 @@ export default function RestaurantPage() {
                   </div>
 
                   {/* Interactive Location Eligibility Checker & Map Simulation */}
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     {/* Search & Checker Inputs (Left) */}
-                    <div className="lg:col-span-6 bg-[#FBEAD9] dark:bg-[#1a1614] border border-amber-200 dark:border-amber-200/40 p-6 sm:p-8 rounded-3xl space-y-5 shadow-lg">
+                    <div className="lg:col-span-5 bg-[#FBEAD9] dark:bg-[#1a1614] border border-amber-200 dark:border-amber-200/40 p-6 sm:p-8 rounded-3xl space-y-5 shadow-lg">
                       <label className="block text-xs font-extrabold text-amber-500 uppercase tracking-wider">
                         Check Delivery Eligibility in Your Suburb
                       </label>
@@ -607,11 +757,12 @@ export default function RestaurantPage() {
                         {/* Use My Current Location Button */}
                         <button
                           type="button"
-                          onClick={useCurrentLocationSim}
+                          onClick={handleUseCurrentLocation}
+                          disabled={isCheckingZone}
                           className="w-full py-2.5 bg-slate-200 dark:bg-[#26201d] border border-slate-300 dark:border-white/10 hover:border-[#E36727] text-slate-800 dark:text-slate-200 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
                         >
-                          <i className="fa-solid fa-location-crosshairs text-[#E36727]"></i>
-                          <span>Use My Current GPS Location</span>
+                          <i className={`fa-solid fa-location-crosshairs text-[#E36727] ${isCheckingZone ? "animate-spin" : ""}`}></i>
+                          <span>{isCheckingZone ? "Detecting GPS Location..." : "Use My Current GPS Location"}</span>
                         </button>
                       </div>
 
@@ -628,35 +779,23 @@ export default function RestaurantPage() {
                         className={`w-full py-3.5 font-extrabold text-xs uppercase tracking-wider rounded-2xl transition-all shadow-md ${
                           isLocationVerified
                             ? "bg-[#E36727] hover:bg-amber-600 text-white cursor-pointer shadow-lg transform hover:scale-[1.01]"
-                            : "bg-slate-400 text-white cursor-not-allowed"
+                            : "bg-slate-400 text-white opacity-60 cursor-not-allowed"
                         }`}
                       >
                         {isLocationVerified
                           ? `Proceed to Order for Delivery (${verifiedLocation})`
-                          : "Verify Location to Unlock Order Now"}
+                          : "Delivery Unavailable (Verify Location to Unlock)"}
                       </button>
                     </div>
 
-                    {/* Map Graphic Simulation (Right) */}
-                    <div className="lg:col-span-6 bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-3xl p-4 shadow-xl">
-                      <div className="relative w-full h-80 rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 bg-slate-900">
-                        <iframe
-                          title="Catering by Ahas Gawwa Official Location Map"
-                          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63384.46628298207!2d80.14106971664121!3d6.826972822009899!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae3b3003f850aef%3A0x1a81112e03fc4530!2sCATERING%20by%20AHAS%20GAWWA!5e0!3m2!1sen!2slk!4v1786599526916!5m2!1sen!2slk"
-                          width="100%"
-                          height="100%"
-                          style={{ border: 0 }}
-                          allowFullScreen
-                          loading="lazy"
-                          referrerPolicy="strict-origin-when-cross-origin"
-                          className="w-full h-full filter contrast-105 opacity-80"
-                        ></iframe>
-
-                        <div className="absolute top-3 left-3 bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-amber-500/40 text-[11px] font-bold text-amber-400">
-                          <i className="fa-solid fa-bullseye text-[#E36727]"></i> 6km Express
-                          Delivery Zone
-                        </div>
-                      </div>
+                    {/* Interactive Map Canvas with 6km Radius (Right) */}
+                    <div className="lg:col-span-7 bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-3xl p-5 shadow-xl">
+                      <MapPinPicker
+                        zoneName={verifiedLocation}
+                        initialLat={deliveryCoords?.lat}
+                        initialLng={deliveryCoords?.lng}
+                        onLocationSelect={handleMapLocationSelect}
+                      />
                     </div>
                   </div>
                 </div>
