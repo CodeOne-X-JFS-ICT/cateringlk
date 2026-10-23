@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "./ThemeProvider";
 import { useOrder } from "@/context/OrderContext";
 
@@ -10,7 +10,32 @@ export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const { toggleCartDrawer, cartTotalCount, openInstantQuoteModal } = useOrder();
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const clickCountRef = useRef(0);
+  const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+    clickCountRef.current += 1;
+
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+    }
+
+    // 3 rapid clicks will redirect to the secret admin login portal
+    if (clickCountRef.current >= 3) {
+      e.preventDefault();
+      clickCountRef.current = 0;
+      router.push("/login");
+      return;
+    }
+
+    // Reset count if subsequent click doesn't occur within 800ms
+    clickTimeoutRef.current = setTimeout(() => {
+      clickCountRef.current = 0;
+    }, 800);
+  };
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -75,8 +100,12 @@ export default function Navbar() {
       {/* Main Navigation Bar */}
       <div className="bg-white/95 dark:bg-[#0f0d0c]/90 backdrop-blur-md border-b border-slate-200 dark:border-white/10 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          {/* Logo Section */}
-          <Link href="/" className="flex items-center gap-3 group">
+          {/* Logo Section (Triple-click opens admin login) */}
+          <Link
+            href="/"
+            onClick={handleLogoClick}
+            className="flex items-center gap-3 group select-none cursor-pointer"
+          >
             <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#E36727] via-amber-600 to-amber-700 p-1 shadow-lg shadow-[#E36727]/20 flex flex-col justify-center items-center text-center border border-amber-400/40 group-hover:scale-105 transition-transform duration-300">
               <span className="text-[7px] leading-tight font-serif uppercase tracking-widest text-amber-100 font-extrabold">
                 Catering
