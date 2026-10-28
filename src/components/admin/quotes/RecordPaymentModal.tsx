@@ -62,20 +62,20 @@ export default function RecordPaymentModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-3xl max-w-lg w-full shadow-2xl p-6 sm:p-7 space-y-5">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 rounded-2xl sm:rounded-3xl max-w-lg w-full max-h-[92vh] overflow-y-auto shadow-2xl p-4 sm:p-6 sm:p-7 space-y-4 sm:space-y-5">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-white/10">
           <div>
-            <h2 className="text-lg font-serif font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+            <h2 className="text-base sm:text-lg font-serif font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
               <i className="fa-solid fa-receipt text-emerald-600"></i> Record Catering Payment
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Log cash deposit or bank transfer receipt for <span className="font-mono font-bold text-slate-700 dark:text-slate-300">{quote.quote_ref}</span>
+              Log deposit or transfer for <span className="font-mono font-bold text-slate-700 dark:text-slate-300">{quote.quote_ref}</span>
             </p>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white flex items-center justify-center cursor-pointer"
+            className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white flex items-center justify-center cursor-pointer shrink-0"
           >
             ✕
           </button>
@@ -88,35 +88,35 @@ export default function RecordPaymentModal({
         )}
 
         {/* Financial Snapshot */}
-        <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-white/10 grid grid-cols-3 gap-2 text-center text-xs">
+        <div className="p-3 sm:p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-white/10 grid grid-cols-3 gap-2 text-center text-xs">
           <div>
-            <span className="text-slate-400 block text-[10px] font-bold uppercase">Total Quote</span>
-            <span className="font-extrabold text-slate-900 dark:text-white">Rs. {grandTotal.toLocaleString()}</span>
+            <span className="text-slate-400 block text-[9px] sm:text-[10px] font-bold uppercase truncate">Total Quote</span>
+            <span className="font-extrabold text-slate-900 dark:text-white text-xs sm:text-sm">Rs. {grandTotal.toLocaleString()}</span>
           </div>
           <div>
-            <span className="text-slate-400 block text-[10px] font-bold uppercase">Paid to Date</span>
-            <span className="font-extrabold text-emerald-600">Rs. {totalPaid.toLocaleString()}</span>
+            <span className="text-slate-400 block text-[9px] sm:text-[10px] font-bold uppercase truncate">Paid to Date</span>
+            <span className="font-extrabold text-emerald-600 text-xs sm:text-sm">Rs. {totalPaid.toLocaleString()}</span>
           </div>
           <div>
-            <span className="text-slate-400 block text-[10px] font-bold uppercase">Remaining</span>
-            <span className="font-extrabold text-[#E36727]">Rs. {balanceRemaining.toLocaleString()}</span>
+            <span className="text-slate-400 block text-[9px] sm:text-[10px] font-bold uppercase truncate">Remaining</span>
+            <span className="font-extrabold text-[#E36727] text-xs sm:text-sm">Rs. {balanceRemaining.toLocaleString()}</span>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+        <form onSubmit={handleSubmit} className="space-y-3.5 sm:space-y-4 text-xs">
           {/* Quick presets */}
           <div>
-            <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1.5">
+            <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1.5 text-[10px]">
               Select Preset Amount
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => {
                   setAmount(advanceAmount);
                   setPaymentType("ADVANCE_30");
                 }}
-                className={`py-2 px-3 rounded-xl border text-center font-bold transition-all cursor-pointer ${
+                className={`py-2 px-3 rounded-xl border text-center font-bold transition-all cursor-pointer text-xs ${
                   amount === advanceAmount
                     ? "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                     : "border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
@@ -130,7 +130,7 @@ export default function RecordPaymentModal({
                   setAmount(balanceRemaining);
                   setPaymentType("FULL_100");
                 }}
-                className={`py-2 px-3 rounded-xl border text-center font-bold transition-all cursor-pointer ${
+                className={`py-2 px-3 rounded-xl border text-center font-bold transition-all cursor-pointer text-xs ${
                   amount === balanceRemaining
                     ? "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                     : "border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
@@ -142,7 +142,7 @@ export default function RecordPaymentModal({
           </div>
 
           <div>
-            <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
+            <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1 text-[10px]">
               Payment Amount (LKR) *
             </label>
             <input
@@ -155,9 +155,9 @@ export default function RecordPaymentModal({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
             <div>
-              <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
+              <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1 text-[10px]">
                 Payment Method *
               </label>
               <select
@@ -173,7 +173,7 @@ export default function RecordPaymentModal({
               </select>
             </div>
             <div>
-              <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
+              <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1 text-[10px]">
                 Payment Type
               </label>
               <select
@@ -188,21 +188,21 @@ export default function RecordPaymentModal({
           </div>
 
           <div>
-            <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
+            <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1 text-[10px]">
               Bank Slip Ref / Cheque No / Notes
             </label>
             <input
               type="text"
-              placeholder="e.g. BOC Ref: 981244 or Cash handed over at office"
+              placeholder="e.g. BOC Ref: 981244 or Cash handed over"
               value={gatewayRef}
               onChange={(e) => setGatewayRef(e.target.value)}
               className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800 font-medium"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
             <div>
-              <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">Payer Name</label>
+              <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1 text-[10px]">Payer Name</label>
               <input
                 type="text"
                 value={payerName}
@@ -211,7 +211,7 @@ export default function RecordPaymentModal({
               />
             </div>
             <div>
-              <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">Payer Phone</label>
+              <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1 text-[10px]">Payer Phone</label>
               <input
                 type="tel"
                 value={payerPhone}
@@ -221,19 +221,19 @@ export default function RecordPaymentModal({
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-white/10">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 pt-3 border-t border-slate-100 dark:border-white/10">
             <button
               type="button"
               onClick={onClose}
               disabled={submitting}
-              className="px-4 py-2 rounded-xl border border-slate-200 dark:border-white/10 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              className="py-2 px-4 rounded-xl border border-slate-200 dark:border-white/10 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer text-center"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting || amount <= 0}
-              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl shadow-md cursor-pointer transition-all disabled:opacity-50 flex items-center gap-2"
+              className="py-2.5 px-5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl shadow-md cursor-pointer transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-center"
             >
               <i className="fa-solid fa-check"></i>
               <span>{submitting ? "Recording..." : `Confirm Payment (Rs. ${amount.toLocaleString()})`}</span>

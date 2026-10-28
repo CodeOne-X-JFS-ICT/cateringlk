@@ -76,161 +76,218 @@ export default function UsersPage() {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
+    <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-500 font-sans">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl font-serif font-extrabold text-slate-900 dark:text-white">Team Management</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Manage staff accounts and access levels.</p>
+          <h1 className="text-xl sm:text-2xl font-serif font-extrabold text-slate-900 dark:text-white">
+            Team Management
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Manage staff accounts and access levels.
+          </p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-[#E36727] hover:bg-amber-600 text-white rounded-xl font-bold text-sm transition-all shadow-md hover:shadow-lg cursor-pointer transform hover:scale-105 active:scale-95"
+          className="w-full sm:w-auto justify-center flex items-center gap-2 px-4 py-2.5 bg-[#E36727] hover:bg-amber-600 text-white rounded-xl font-bold text-xs sm:text-sm transition-all shadow-md hover:shadow-lg cursor-pointer transform hover:scale-[1.02] active:scale-[0.98]"
         >
           <i className="fa-solid fa-plus"></i> Add Staff Member
         </button>
       </div>
 
-      {/* Table */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+      {/* Table / Cards Container */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
         {loading ? (
-          <div className="flex items-center justify-center py-24">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#E36727]"></div>
+          <div className="flex items-center justify-center py-20 sm:py-24">
+            <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-b-2 border-[#E36727]"></div>
           </div>
         ) : error ? (
-          <div className="py-24 text-center text-slate-500">{error}</div>
+          <div className="py-20 sm:py-24 text-center text-rose-500 font-medium px-4 text-sm">{error}</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                  <th className="text-left px-6 py-4 font-bold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">Staff Member</th>
-                  <th className="text-left px-6 py-4 font-bold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">Role</th>
-                  <th className="text-left px-6 py-4 font-bold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">Status</th>
-                  <th className="text-left px-6 py-4 font-bold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">Last Login</th>
-                  <th className="text-left px-6 py-4 font-bold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">Joined</th>
-                  <th className="px-6 py-4"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {users.map((user) => (
-                  <tr key={user.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#E36727]/80 to-amber-600/80 flex items-center justify-center text-white font-extrabold text-xs flex-shrink-0">
-                          {user.full_name.slice(0, 2).toUpperCase()}
-                        </div>
-                        <div>
-                          <p className="font-bold text-slate-900 dark:text-white">{user.full_name}</p>
-                          <p className="text-xs text-slate-400">{user.email}</p>
-                        </div>
+          <>
+            {/* 1. Mobile Cards (< 640px) */}
+            <div className="block sm:hidden divide-y divide-slate-100 dark:divide-slate-800">
+              {users.map((user) => (
+                <div key={user.id} className="p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#E36727]/80 to-amber-600/80 flex items-center justify-center text-white font-extrabold text-xs shrink-0">
+                        {user.full_name.slice(0, 2).toUpperCase()}
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`text-xs font-extrabold px-2.5 py-1 rounded-full ${user.role === "SUPER_ADMIN" ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"}`}>
+                      <div className="min-w-0">
+                        <p className="font-bold text-sm text-slate-900 dark:text-white truncate">
+                          {user.full_name}
+                        </p>
+                        <p className="text-xs text-slate-400 truncate">
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+                    <StatusBadge status={user.is_active} />
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 dark:border-slate-800/60">
+                    <div>
+                      <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${user.role === "SUPER_ADMIN" ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"}`}>
                         {user.role === "SUPER_ADMIN" ? "Super Admin" : "Store Admin"}
                       </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <StatusBadge status={user.is_active} />
-                    </td>
-                    <td className="px-6 py-4 text-slate-500 text-xs">
-                      {user.last_login ? new Date(user.last_login).toLocaleDateString("en-LK") : "Never"}
-                    </td>
-                    <td className="px-6 py-4 text-slate-500 text-xs">
-                      {new Date(user.created_at).toLocaleDateString("en-LK")}
-                    </td>
-                    <td className="px-6 py-4">
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-slate-400">
+                        Joined {new Date(user.created_at).toLocaleDateString("en-LK")}
+                      </span>
                       {user.role !== "SUPER_ADMIN" && (
                         <button
                           disabled={toggling === user.id}
                           onClick={() => toggleActive(user)}
-                          className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${user.is_active
-                            ? "text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-                            : "text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+                          className={`text-xs font-bold px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${user.is_active
+                            ? "text-red-600 bg-red-50 dark:bg-red-900/20"
+                            : "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20"
                           } disabled:opacity-50`}
                         >
                           {toggling === user.id ? "..." : user.is_active ? "Deactivate" : "Activate"}
                         </button>
                       )}
-                    </td>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* 2. Desktop Table (>= 640px) */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+                    <th className="text-left px-5 lg:px-6 py-3.5 font-bold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">Staff Member</th>
+                    <th className="text-left px-5 lg:px-6 py-3.5 font-bold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">Role</th>
+                    <th className="text-left px-5 lg:px-6 py-3.5 font-bold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">Status</th>
+                    <th className="text-left px-5 lg:px-6 py-3.5 font-bold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">Last Login</th>
+                    <th className="text-left px-5 lg:px-6 py-3.5 font-bold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">Joined</th>
+                    <th className="px-5 lg:px-6 py-3.5"></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  {users.map((user) => (
+                    <tr key={user.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                      <td className="px-5 lg:px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#E36727]/80 to-amber-600/80 flex items-center justify-center text-white font-extrabold text-xs flex-shrink-0">
+                            {user.full_name.slice(0, 2).toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="font-bold text-slate-900 dark:text-white">{user.full_name}</p>
+                            <p className="text-xs text-slate-400">{user.email}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-5 lg:px-6 py-4">
+                        <span className={`text-xs font-extrabold px-2.5 py-1 rounded-full ${user.role === "SUPER_ADMIN" ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"}`}>
+                          {user.role === "SUPER_ADMIN" ? "Super Admin" : "Store Admin"}
+                        </span>
+                      </td>
+                      <td className="px-5 lg:px-6 py-4">
+                        <StatusBadge status={user.is_active} />
+                      </td>
+                      <td className="px-5 lg:px-6 py-4 text-slate-500 text-xs">
+                        {user.last_login ? new Date(user.last_login).toLocaleDateString("en-LK") : "Never"}
+                      </td>
+                      <td className="px-5 lg:px-6 py-4 text-slate-500 text-xs">
+                        {new Date(user.created_at).toLocaleDateString("en-LK")}
+                      </td>
+                      <td className="px-5 lg:px-6 py-4 text-right">
+                        {user.role !== "SUPER_ADMIN" && (
+                          <button
+                            disabled={toggling === user.id}
+                            onClick={() => toggleActive(user)}
+                            className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${user.is_active
+                              ? "text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                              : "text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+                            } disabled:opacity-50`}
+                          >
+                            {toggling === user.id ? "..." : user.is_active ? "Deactivate" : "Activate"}
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 
       {/* Add Staff Modal */}
       <Modal isOpen={showModal} onClose={() => { setShowModal(false); setFormError(null); }} title="Add Staff Member">
-        <form onSubmit={handleCreate} className="space-y-5">
+        <form onSubmit={handleCreate} className="space-y-4 sm:space-y-5">
           {formError && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl text-sm">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 text-red-600 dark:text-red-400 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm">
               <i className="fa-solid fa-circle-exclamation mr-2"></i>{formError}
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Full Name</label>
+            <label className="block text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">Full Name</label>
             <input
               required
               type="text"
               placeholder="e.g. Dulani Perera"
               value={form.full_name}
               onChange={(e) => setForm({ ...form, full_name: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:border-[#E36727] transition-colors"
+              className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs sm:text-sm focus:outline-none focus:border-[#E36727] transition-colors"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Email Address</label>
+            <label className="block text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">Email Address</label>
             <input
               required
               type="email"
               placeholder="e.g. dulani@catering.lk"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:border-[#E36727] transition-colors"
+              className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs sm:text-sm focus:outline-none focus:border-[#E36727] transition-colors"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Temporary Password</label>
+            <label className="block text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">Temporary Password</label>
             <input
               required
               type="password"
               placeholder="Minimum 8 characters"
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:border-[#E36727] transition-colors"
+              className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs sm:text-sm focus:outline-none focus:border-[#E36727] transition-colors"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Role</label>
+            <label className="block text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">Role</label>
             <select
               value={form.role}
               onChange={(e) => setForm({ ...form, role: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:border-[#E36727] transition-colors cursor-pointer"
+              className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs sm:text-sm focus:outline-none focus:border-[#E36727] transition-colors cursor-pointer"
             >
               <option value="ADMIN">Store Admin — Day-to-day operations</option>
               <option value="SUPER_ADMIN">Super Admin — Full access</option>
             </select>
           </div>
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:gap-3 pt-2">
             <button
               type="button"
               onClick={() => setShowModal(false)}
-              className="flex-1 py-3 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              className="flex-1 py-2.5 sm:py-3 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer text-center text-xs sm:text-sm"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 py-3 bg-[#E36727] hover:bg-amber-600 text-white font-extrabold rounded-xl transition-all disabled:opacity-60 cursor-pointer"
+              className="flex-1 py-2.5 sm:py-3 bg-[#E36727] hover:bg-amber-600 text-white font-extrabold rounded-xl transition-all disabled:opacity-60 cursor-pointer text-center text-xs sm:text-sm"
             >
               {submitting ? "Creating..." : "Create Account"}
             </button>

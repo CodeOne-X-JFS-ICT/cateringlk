@@ -203,87 +203,87 @@ export default function InquiriesPage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl font-serif font-extrabold text-slate-900 dark:text-white flex items-center gap-2.5">
+          <h1 className="text-xl sm:text-2xl font-serif font-extrabold text-slate-900 dark:text-white flex items-center gap-2 sm:gap-2.5">
             <i className="fa-solid fa-inbox text-[#E36727]"></i>
             Customer Inquiries
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
             Review incoming event queries, direct messages, and WhatsApp inquiries.
           </p>
         </div>
         <button
           onClick={() => fetchInquiries()}
-          className="self-start sm:self-auto px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-[#E36727] text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-sm"
+          className="self-start sm:self-auto px-3.5 sm:px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-[#E36727] text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-xs"
         >
           <i className="fa-solid fa-rotate text-xs"></i> Refresh
         </button>
       </div>
 
       {/* Metrics Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         <div
           onClick={() => { setStatusFilter(""); setPage(1); }}
-          className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+          className={`p-3 sm:p-4 rounded-2xl border transition-all cursor-pointer ${
             statusFilter === "" ? "border-[#E36727] shadow-md bg-amber-50/50 dark:bg-amber-950/20" : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300"
           }`}
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">All Inquiries</span>
-            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center text-xs">
+          <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+            <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider truncate">All Inquiries</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center text-xs shrink-0">
               <i className="fa-solid fa-envelope-open-text"></i>
             </div>
           </div>
-          <p className="text-2xl font-extrabold text-slate-900 dark:text-white">{metrics.total}</p>
+          <p className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">{metrics.total}</p>
         </div>
 
         <div
           onClick={() => { setStatusFilter("NEW"); setPage(1); }}
-          className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+          className={`p-3 sm:p-4 rounded-2xl border transition-all cursor-pointer ${
             statusFilter === "NEW" ? "border-blue-500 shadow-md bg-blue-50/50 dark:bg-blue-950/20" : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300"
           }`}
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+          <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+            <span className="text-[10px] sm:text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider flex items-center gap-1.5 truncate">
+              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-500 animate-pulse"></span>
               New / Unread
             </span>
-            <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs shrink-0">
               <i className="fa-solid fa-bell"></i>
             </div>
           </div>
-          <p className="text-2xl font-extrabold text-blue-600 dark:text-blue-400">{metrics.new}</p>
+          <p className="text-xl sm:text-2xl font-extrabold text-blue-600 dark:text-blue-400">{metrics.new}</p>
         </div>
 
         <div
           onClick={() => { setStatusFilter("IN_PROGRESS"); setPage(1); }}
-          className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+          className={`p-3 sm:p-4 rounded-2xl border transition-all cursor-pointer ${
             statusFilter === "IN_PROGRESS" ? "border-amber-500 shadow-md bg-amber-50/50 dark:bg-amber-950/20" : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300"
           }`}
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">In Progress</span>
-            <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xs">
+          <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+            <span className="text-[10px] sm:text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider truncate">In Progress</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xs shrink-0">
               <i className="fa-solid fa-hourglass-half"></i>
             </div>
           </div>
-          <p className="text-2xl font-extrabold text-amber-600 dark:text-amber-400">{metrics.in_progress}</p>
+          <p className="text-xl sm:text-2xl font-extrabold text-amber-600 dark:text-amber-400">{metrics.in_progress}</p>
         </div>
 
         <div
           onClick={() => { setStatusFilter("RESOLVED"); setPage(1); }}
-          className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+          className={`p-3 sm:p-4 rounded-2xl border transition-all cursor-pointer ${
             statusFilter === "RESOLVED" ? "border-emerald-500 shadow-md bg-emerald-50/50 dark:bg-emerald-950/20" : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300"
           }`}
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Resolved</span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs">
+          <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+            <span className="text-[10px] sm:text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider truncate">Resolved</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs shrink-0">
               <i className="fa-solid fa-circle-check"></i>
             </div>
           </div>
-          <p className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">{metrics.resolved}</p>
+          <p className="text-xl sm:text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">{metrics.resolved}</p>
         </div>
       </div>
 
@@ -352,18 +352,18 @@ export default function InquiriesPage() {
       </div>
 
       {/* Inquiries Feed */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-24 gap-3">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#E36727]"></div>
+          <div className="flex flex-col items-center justify-center py-20 sm:py-24 gap-3">
+            <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-b-2 border-[#E36727]"></div>
             <p className="text-xs text-slate-400 font-medium">Loading inquiries...</p>
           </div>
         ) : error ? (
-          <div className="py-24 text-center text-red-500 font-medium">{error}</div>
+          <div className="py-20 sm:py-24 text-center text-red-500 font-medium px-4 text-sm">{error}</div>
         ) : inquiries.length === 0 ? (
-          <div className="py-24 text-center space-y-2">
-            <i className="fa-solid fa-inbox text-5xl text-slate-300 dark:text-slate-700 mb-2 block"></i>
-            <p className="text-slate-700 dark:text-slate-300 font-bold">No inquiries found</p>
+          <div className="py-20 sm:py-24 text-center space-y-2 px-4">
+            <i className="fa-solid fa-inbox text-4xl sm:text-5xl text-slate-300 dark:text-slate-700 mb-2 block"></i>
+            <p className="text-slate-700 dark:text-slate-300 font-bold text-sm">No inquiries found</p>
             <p className="text-xs text-slate-400 max-w-sm mx-auto">
               There are no customer inquiries matching the selected filters or search terms.
             </p>
@@ -378,27 +378,27 @@ export default function InquiriesPage() {
                 <button
                   key={inq.id}
                   onClick={() => openDetail(inq)}
-                  className="w-full text-left px-6 py-4.5 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group flex items-start gap-4 cursor-pointer"
+                  className="w-full text-left px-4 sm:px-6 py-3.5 sm:py-4.5 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group flex items-start gap-3 sm:gap-4 cursor-pointer"
                 >
                   {/* Category Avatar */}
-                  <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm ${catConfig.bg} ${catConfig.text}`}>
-                    <i className={`fa-solid ${catConfig.icon} text-base`}></i>
+                  <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 mt-0.5 shadow-xs ${catConfig.bg} ${catConfig.text}`}>
+                    <i className={`fa-solid ${catConfig.icon} text-sm sm:text-base`}></i>
                   </div>
 
                   {/* Main Info */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-1.5">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-1">
                       <div className="flex items-center gap-2 truncate">
-                        <span className={`font-bold text-sm truncate ${inq.status === "NEW" ? "text-slate-900 dark:text-white font-extrabold" : "text-slate-700 dark:text-slate-300"}`}>
+                        <span className={`font-bold text-xs sm:text-sm truncate ${inq.status === "NEW" ? "text-slate-900 dark:text-white font-extrabold" : "text-slate-700 dark:text-slate-300"}`}>
                           {inq.customer_name}
                         </span>
-                        <span className="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500">
+                        <span className="text-[10px] uppercase font-extrabold px-1.5 sm:px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 shrink-0">
                           {inq.category}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
+                      <div className="flex items-center gap-2 shrink-0">
                         <StatusBadge status={inq.status} />
-                        <span className="text-xs text-slate-400 font-mono">
+                        <span className="text-[11px] text-slate-400 font-mono">
                           {new Date(inq.created_at).toLocaleDateString("en-LK")}
                         </span>
                       </div>
@@ -544,7 +544,7 @@ export default function InquiriesPage() {
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">
                 Quick Actions
               </span>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {/* WhatsApp button */}
                 <a
                   href={`https://wa.me/${cleanPhone(selected.customer_phone)}?text=${encodeURIComponent(
@@ -552,7 +552,7 @@ export default function InquiriesPage() {
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
+                  className="p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all"
                 >
                   <i className="fa-brands fa-whatsapp text-sm"></i> WhatsApp
                 </a>
@@ -560,7 +560,7 @@ export default function InquiriesPage() {
                 {/* Call button */}
                 <a
                   href={`tel:${selected.customer_phone}`}
-                  className="p-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
+                  className="p-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all"
                 >
                   <i className="fa-solid fa-phone text-xs"></i> Call Customer
                 </a>
@@ -571,7 +571,7 @@ export default function InquiriesPage() {
                     href={`mailto:${selected.customer_email}?subject=${encodeURIComponent(
                       `Catering by Ahas Gawwa — Inquiry ${selected.ref_code}`
                     )}`}
-                    className="p-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
+                    className="p-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all"
                   >
                     <i className="fa-solid fa-envelope text-xs"></i> Email
                   </a>
@@ -584,7 +584,7 @@ export default function InquiriesPage() {
                 {/* Convert to Catering Quote button */}
                 <button
                   onClick={convertToQuote}
-                  className="p-2.5 rounded-xl bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
+                  className="p-2.5 rounded-xl bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
                 >
                   <i className="fa-solid fa-file-invoice-dollar text-xs"></i> Create Quote
                 </button>
@@ -596,7 +596,7 @@ export default function InquiriesPage() {
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">
                 Customer Information
               </span>
-              <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 text-xs">
                 <div>
                   <span className="text-slate-400 block mb-0.5">Customer Name</span>
                   <p className="font-bold text-slate-900 dark:text-white">{selected.customer_name}</p>
@@ -730,11 +730,11 @@ export default function InquiriesPage() {
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs focus:outline-none focus:border-[#E36727] transition-colors resize-none"
               />
 
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <button
                   disabled={sending || !replyText.trim()}
                   onClick={sendReply}
-                  className="flex-1 py-3 bg-[#E36727] hover:bg-amber-600 text-white font-extrabold text-xs rounded-xl transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
+                  className="flex-1 py-2.5 sm:py-3 bg-[#E36727] hover:bg-amber-600 text-white font-extrabold text-xs rounded-xl transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
                 >
                   <i className="fa-solid fa-paper-plane text-xs"></i>
                   {sending ? "Recording..." : "Record Reply"}
@@ -744,7 +744,7 @@ export default function InquiriesPage() {
                   <button
                     disabled={sending}
                     onClick={() => updateStatus("RESOLVED")}
-                    className="px-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-all disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
+                    className="py-2.5 sm:py-3 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <i className="fa-solid fa-check text-xs"></i> Mark Resolved
                   </button>

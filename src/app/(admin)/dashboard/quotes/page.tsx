@@ -138,21 +138,21 @@ export default function QuotesPage() {
   const totalPages = Math.ceil(total / LIMIT);
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500 font-sans">
+    <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-500 font-sans">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl font-serif font-extrabold text-slate-900 dark:text-white flex items-center gap-2.5">
+          <h1 className="text-xl sm:text-2xl font-serif font-extrabold text-slate-900 dark:text-white flex items-center gap-2 sm:gap-2.5">
             <i className="fa-solid fa-file-invoice-dollar text-[#E36727]"></i> Catering Quotes & Inquiries
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
             Manage catering leads, pricing proposals, advance deposits, and event bookings.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="px-4 py-2.5 bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-600 hover:to-[#E36727] text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-md cursor-pointer transition-all flex items-center gap-2 transform hover:scale-[1.02]"
+            className="w-full sm:w-auto justify-center px-4 py-2.5 bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-600 hover:to-[#E36727] text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-md cursor-pointer transition-all flex items-center gap-2 transform hover:scale-[1.02]"
           >
             <i className="fa-solid fa-plus"></i>
             <span>Create New Quote</span>
@@ -162,59 +162,59 @@ export default function QuotesPage() {
 
       {/* KPI Stat Cards */}
       {stats && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pending Review</p>
-              <p className="text-2xl font-serif font-extrabold text-amber-500 mt-0.5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+          <div className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between">
+            <div className="min-w-0">
+              <p className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">Pending Review</p>
+              <p className="text-xl sm:text-2xl font-serif font-extrabold text-amber-500 mt-0.5">
                 {stats.counts?.pending || 0}
               </p>
-              <span className="text-[10px] text-slate-400">Requires contact within 2h</span>
+              <span className="text-[9px] sm:text-[10px] text-slate-400 truncate block">Action required</span>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-lg">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-sm sm:text-lg shrink-0">
               <i className="fa-solid fa-clock"></i>
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">In Negotiation</p>
-              <p className="text-2xl font-serif font-extrabold text-indigo-500 mt-0.5">
+          <div className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between">
+            <div className="min-w-0">
+              <p className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">In Negotiation</p>
+              <p className="text-xl sm:text-2xl font-serif font-extrabold text-indigo-500 mt-0.5">
                 {(stats.counts?.contacted || 0) + (stats.counts?.quoted || 0)}
               </p>
-              <span className="text-[10px] text-slate-400">
-                {stats.counts?.quoted || 0} formal quotes sent
+              <span className="text-[9px] sm:text-[10px] text-slate-400 truncate block">
+                {stats.counts?.quoted || 0} proposals sent
               </span>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-lg">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-sm sm:text-lg shrink-0">
               <i className="fa-solid fa-comments-dollar"></i>
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Confirmed Bookings</p>
-              <p className="text-2xl font-serif font-extrabold text-emerald-500 mt-0.5">
+          <div className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between">
+            <div className="min-w-0">
+              <p className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">Confirmed</p>
+              <p className="text-xl sm:text-2xl font-serif font-extrabold text-emerald-500 mt-0.5">
                 {stats.counts?.confirmed || 0}
               </p>
-              <span className="text-[10px] text-emerald-600 font-semibold">
-                Rs. {Number(stats.financials?.advances_collected || 0).toLocaleString()} advance paid
+              <span className="text-[9px] sm:text-[10px] text-emerald-600 font-semibold truncate block">
+                Rs. {Number(stats.financials?.advances_collected || 0).toLocaleString()} paid
               </span>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-lg">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-sm sm:text-lg shrink-0">
               <i className="fa-solid fa-calendar-check"></i>
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pipeline Value</p>
-              <p className="text-xl sm:text-2xl font-serif font-extrabold text-[#E36727] mt-0.5">
+          <div className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between">
+            <div className="min-w-0">
+              <p className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">Pipeline</p>
+              <p className="text-base sm:text-xl font-serif font-extrabold text-[#E36727] mt-0.5 truncate">
                 Rs. {Number(stats.financials?.pipeline_value || 0).toLocaleString()}
               </p>
-              <span className="text-[10px] text-slate-400">{stats.counts?.total || 0} total quotations</span>
+              <span className="text-[9px] sm:text-[10px] text-slate-400 truncate block">{stats.counts?.total || 0} quotes</span>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-[#E36727]/10 text-[#E36727] flex items-center justify-center text-lg">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[#E36727]/10 text-[#E36727] flex items-center justify-center text-sm sm:text-lg shrink-0">
               <i className="fa-solid fa-chart-line"></i>
             </div>
           </div>
@@ -222,9 +222,9 @@ export default function QuotesPage() {
       )}
 
       {/* Filter Tabs & Search Bar */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 space-y-3">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-3 sm:p-4 space-y-3 shadow-xs">
         {/* Status Tabs */}
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 border-b border-slate-100 dark:border-slate-800">
           {QUOTE_STATUS_TABS.map((tab) => {
             const isActive = statusFilter === tab.id;
             return (
@@ -234,9 +234,9 @@ export default function QuotesPage() {
                   setStatusFilter(tab.id);
                   setPage(1);
                 }}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                   isActive
-                    ? "bg-[#E36727] text-white shadow-sm"
+                    ? "bg-[#E36727] text-white shadow-xs"
                     : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
                 }`}
               >
@@ -248,122 +248,90 @@ export default function QuotesPage() {
 
         {/* Search Input */}
         <div className="relative">
-          <i className="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+          <i className="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
           <input
             type="text"
-            placeholder="Search quotes by reference (e.g. CQ-2026), customer name, or phone number..."
+            placeholder="Search by ref (CQ-...), customer name, or phone..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
               setPage(1);
             }}
-            className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs sm:text-sm focus:outline-none focus:border-[#E36727] transition-colors"
+            className="w-full pl-8 sm:pl-9 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs sm:text-sm focus:outline-none focus:border-[#E36727] transition-colors"
           />
         </div>
       </div>
 
-      {/* Quotes Table */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+      {/* Quotes Content: Mobile Cards + Desktop Table */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
         {loading ? (
-          <div className="flex items-center justify-center py-24">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#E36727]"></div>
+          <div className="flex items-center justify-center py-20 sm:py-24">
+            <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-b-2 border-[#E36727]"></div>
           </div>
         ) : error ? (
-          <div className="py-24 text-center text-rose-500 font-semibold">{error}</div>
+          <div className="py-20 sm:py-24 text-center text-rose-500 font-semibold px-4 text-sm">{error}</div>
         ) : quotes.length === 0 ? (
-          <div className="py-24 text-center">
-            <i className="fa-solid fa-file-invoice text-4xl text-slate-300 mb-3 block"></i>
-            <p className="text-slate-500 font-medium text-sm">No catering quotes found.</p>
+          <div className="py-20 sm:py-24 text-center px-4">
+            <i className="fa-solid fa-file-invoice text-3xl sm:text-4xl text-slate-300 dark:text-slate-700 mb-3 block"></i>
+            <p className="text-slate-500 font-medium text-xs sm:text-sm">No catering quotes found.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                  <th className="text-left px-5 py-3.5 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px]">
-                    Quote Ref
-                  </th>
-                  <th className="text-left px-5 py-3.5 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px]">
-                    Customer
-                  </th>
-                  <th className="text-left px-5 py-3.5 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px]">
-                    Menu / Occasion
-                  </th>
-                  <th className="text-left px-5 py-3.5 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px]">
-                    Event Date
-                  </th>
-                  <th className="text-center px-5 py-3.5 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px]">
-                    Pax
-                  </th>
-                  <th className="text-left px-5 py-3.5 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px]">
-                    Estimate & Deposit
-                  </th>
-                  <th className="text-left px-5 py-3.5 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px]">
-                    Status
-                  </th>
-                  <th className="px-5 py-3.5 text-right font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px]">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {quotes.map((quote) => (
-                  <tr
-                    key={quote.id}
-                    className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group cursor-pointer"
-                    onClick={() => openDetail(quote)}
-                  >
-                    <td className="px-5 py-3.5">
-                      <span className="font-mono font-extrabold text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">
-                        {quote.quote_ref}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <div className="font-bold text-slate-900 dark:text-white">{quote.customer_name}</div>
-                      <div className="text-[11px] text-slate-400">{quote.customer_phone}</div>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <div className="font-semibold text-slate-800 dark:text-slate-200">
-                        {quote.package?.name || quote.tier?.name || "Banquet Package"}
-                      </div>
-                      <div className="text-[11px] text-slate-400">{quote.eventType?.name || "Event"}</div>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <div className="font-medium text-slate-800 dark:text-slate-200">
-                        {quote.event_date
-                          ? new Date(quote.event_date).toLocaleDateString("en-LK", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            })
-                          : "TBD"}
-                      </div>
-                      <div className="text-[10px] text-slate-400">{quote.event_time_slot || "Slot TBD"}</div>
-                    </td>
-                    <td className="px-5 py-3.5 text-center font-extrabold text-slate-900 dark:text-white">
-                      {quote.pax_count}
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <div className="font-extrabold text-slate-900 dark:text-white">
-                        Rs. {Number(quote.grand_total || 0).toLocaleString()}
-                      </div>
-                      <div className="mt-0.5">
-                        <StatusBadge status={quote.payment_status || "UNPAID"} />
-                      </div>
-                    </td>
-                    <td className="px-5 py-3.5">
+          <>
+            {/* 1. Mobile Cards View (< 640px) */}
+            <div className="block sm:hidden divide-y divide-slate-100 dark:divide-slate-800">
+              {quotes.map((quote) => (
+                <div
+                  key={quote.id}
+                  onClick={() => openDetail(quote)}
+                  className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors cursor-pointer space-y-2.5"
+                >
+                  {/* Top row: Ref + Badges */}
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono font-bold text-xs bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white px-2 py-0.5 rounded-md">
+                      {quote.quote_ref}
+                    </span>
+                    <div className="flex items-center gap-1.5">
                       <StatusBadge status={quote.status} />
-                    </td>
-                    <td
-                      className="px-5 py-3.5 text-right space-x-1"
-                      onClick={(e) => e.stopPropagation()}
-                    >
+                      <StatusBadge status={quote.payment_status || "UNPAID"} />
+                    </div>
+                  </div>
+
+                  {/* Customer & Event info */}
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="min-w-0">
+                      <p className="font-bold text-sm text-slate-900 dark:text-white truncate">
+                        {quote.customer_name}
+                      </p>
+                      <p className="text-xs text-slate-400">
+                        {quote.customer_phone}
+                      </p>
+                      <p className="text-xs text-slate-700 dark:text-slate-300 font-medium mt-1">
+                        {quote.package?.name || quote.tier?.name || "Banquet Menu"}
+                      </p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="font-extrabold text-sm text-[#E36727]">
+                        Rs. {Number(quote.grand_total || 0).toLocaleString()}
+                      </p>
+                      <span className="text-[11px] font-bold text-slate-500 block">
+                        {quote.pax_count} Pax
+                      </span>
+                      <span className="text-[10px] text-slate-400 block mt-0.5">
+                        {quote.event_date ? new Date(quote.event_date).toLocaleDateString("en-LK", { month: "short", day: "numeric" }) : "TBD"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Bottom Action bar */}
+                  <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-800/60" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center gap-2">
                       <button
-                        title="Quick WhatsApp"
+                        title="WhatsApp Customer"
                         onClick={() => openWhatsAppQuote(quote)}
-                        className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors cursor-pointer"
+                        className="px-2.5 py-1 rounded-lg text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 text-xs font-bold flex items-center gap-1 cursor-pointer"
                       >
-                        <i className="fa-brands fa-whatsapp text-sm"></i>
+                        <i className="fa-brands fa-whatsapp"></i>
+                        <span>WhatsApp</span>
                       </button>
                       <button
                         title="Print Quote Slip"
@@ -371,27 +339,141 @@ export default function QuotesPage() {
                           setModalQuote(quote);
                           setIsPrintModalOpen(true);
                         }}
-                        className="p-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                        className="px-2.5 py-1 rounded-lg text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 text-xs font-bold flex items-center gap-1 cursor-pointer"
                       >
-                        <i className="fa-solid fa-print text-sm"></i>
+                        <i className="fa-solid fa-print"></i>
+                        <span>Slip</span>
                       </button>
-                      <button
-                        onClick={() => openDetail(quote)}
-                        className="px-2.5 py-1 text-xs font-bold text-[#E36727] hover:underline cursor-pointer"
-                      >
-                        Review
-                      </button>
-                    </td>
+                    </div>
+                    <button
+                      onClick={() => openDetail(quote)}
+                      className="text-xs font-bold text-[#E36727] hover:underline cursor-pointer"
+                    >
+                      Review →
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* 2. Desktop Table View (>= 640px) */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+                    <th className="text-left px-5 py-3.5 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px]">
+                      Quote Ref
+                    </th>
+                    <th className="text-left px-5 py-3.5 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px]">
+                      Customer
+                    </th>
+                    <th className="text-left px-5 py-3.5 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px]">
+                      Menu / Occasion
+                    </th>
+                    <th className="text-left px-5 py-3.5 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px]">
+                      Event Date
+                    </th>
+                    <th className="text-center px-5 py-3.5 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px]">
+                      Pax
+                    </th>
+                    <th className="text-left px-5 py-3.5 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px]">
+                      Estimate & Deposit
+                    </th>
+                    <th className="text-left px-5 py-3.5 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px]">
+                      Status
+                    </th>
+                    <th className="px-5 py-3.5 text-right font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px]">
+                      Actions
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  {quotes.map((quote) => (
+                    <tr
+                      key={quote.id}
+                      className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group cursor-pointer"
+                      onClick={() => openDetail(quote)}
+                    >
+                      <td className="px-5 py-3.5">
+                        <span className="font-mono font-extrabold text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">
+                          {quote.quote_ref}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <div className="font-bold text-slate-900 dark:text-white">{quote.customer_name}</div>
+                        <div className="text-[11px] text-slate-400">{quote.customer_phone}</div>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <div className="font-semibold text-slate-800 dark:text-slate-200">
+                          {quote.package?.name || quote.tier?.name || "Banquet Package"}
+                        </div>
+                        <div className="text-[11px] text-slate-400">{quote.eventType?.name || "Event"}</div>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <div className="font-medium text-slate-800 dark:text-slate-200">
+                          {quote.event_date
+                            ? new Date(quote.event_date).toLocaleDateString("en-LK", {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              })
+                            : "TBD"}
+                        </div>
+                        <div className="text-[10px] text-slate-400">{quote.event_time_slot || "Slot TBD"}</div>
+                      </td>
+                      <td className="px-5 py-3.5 text-center font-extrabold text-slate-900 dark:text-white">
+                        {quote.pax_count}
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <div className="font-extrabold text-slate-900 dark:text-white">
+                          Rs. {Number(quote.grand_total || 0).toLocaleString()}
+                        </div>
+                        <div className="mt-0.5">
+                          <StatusBadge status={quote.payment_status || "UNPAID"} />
+                        </div>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <StatusBadge status={quote.status} />
+                      </td>
+                      <td
+                        className="px-5 py-3.5 text-right space-x-1"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <button
+                          title="Quick WhatsApp"
+                          onClick={() => openWhatsAppQuote(quote)}
+                          className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors cursor-pointer"
+                        >
+                          <i className="fa-brands fa-whatsapp text-sm"></i>
+                        </button>
+                        <button
+                          title="Print Quote Slip"
+                          onClick={() => {
+                            setModalQuote(quote);
+                            setIsPrintModalOpen(true);
+                          }}
+                          className="p-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                        >
+                          <i className="fa-solid fa-print text-sm"></i>
+                        </button>
+                        <button
+                          onClick={() => openDetail(quote)}
+                          className="px-2.5 py-1 text-xs font-bold text-[#E36727] hover:underline cursor-pointer"
+                        >
+                          Review
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 dark:border-slate-800">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 py-3.5 border-t border-slate-100 dark:border-slate-800">
             <p className="text-xs text-slate-400">
               Page {page} of {totalPages} ({total} quotes)
             </p>
@@ -423,21 +505,21 @@ export default function QuotesPage() {
           </div>
         ) : (
           selected && (
-            <div className="space-y-6 text-xs font-sans">
+            <div className="space-y-5 text-xs font-sans">
               {/* Header Box */}
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-start justify-between">
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-start justify-between gap-2">
                 <div>
                   <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-0.5">
                     Quotation Reference
                   </span>
-                  <p className="font-mono font-extrabold text-base text-slate-900 dark:text-white">
+                  <p className="font-mono font-extrabold text-base sm:text-lg text-slate-900 dark:text-white">
                     {selected.quote_ref}
                   </p>
-                  <p className="text-[11px] text-slate-400 mt-1">
+                  <p className="text-[11px] text-slate-400 mt-0.5">
                     Submitted: {new Date(selected.created_at).toLocaleString("en-LK")}
                   </p>
                 </div>
-                <div className="flex flex-col items-end gap-1.5">
+                <div className="flex flex-col items-end gap-1.5 shrink-0">
                   <StatusBadge status={selected.status} />
                   <StatusBadge status={selected.payment_status || "UNPAID"} />
                 </div>
@@ -445,7 +527,7 @@ export default function QuotesPage() {
 
               {/* Status Transition Stepper */}
               <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">
                   Update Lead Status
                 </span>
                 <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
@@ -456,9 +538,9 @@ export default function QuotesPage() {
                         key={st}
                         disabled={updating}
                         onClick={() => updateQuoteStatus(st)}
-                        className={`py-2 px-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider text-center transition-all cursor-pointer ${
+                        className={`py-2 px-1 rounded-xl text-[10px] font-bold uppercase tracking-wider text-center transition-all cursor-pointer ${
                           isCurrent
-                            ? "bg-[#E36727] text-white shadow-sm"
+                            ? "bg-[#E36727] text-white shadow-xs"
                             : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                         }`}
                       >
@@ -470,12 +552,12 @@ export default function QuotesPage() {
               </div>
 
               {/* Customer Box */}
-              <div className="bg-slate-50 dark:bg-slate-800 rounded-2xl p-4 space-y-2 border border-slate-200 dark:border-slate-700">
+              <div className="bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-4 space-y-2 border border-slate-200 dark:border-slate-700">
                 <div className="flex items-center justify-between">
                   <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                     Customer Information
                   </h3>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1.5 sm:gap-2">
                     <a
                       href={`tel:${selected.customer_phone}`}
                       className="px-2 py-1 rounded-lg bg-emerald-500/10 text-emerald-600 text-[11px] font-bold hover:bg-emerald-500/20"
@@ -498,11 +580,11 @@ export default function QuotesPage() {
               </div>
 
               {/* Event Logistics */}
-              <div className="bg-slate-50 dark:bg-slate-800 rounded-2xl p-4 space-y-2.5 border border-slate-200 dark:border-slate-700">
+              <div className="bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-4 space-y-2.5 border border-slate-200 dark:border-slate-700">
                 <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   Event Particulars
                 </h3>
-                <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                   <div>
                     <span className="text-slate-400 block text-[10px]">Occasion</span>
                     <span className="font-bold text-slate-900 dark:text-white">
@@ -531,7 +613,7 @@ export default function QuotesPage() {
                       {selected.event_time_slot || "Slot TBD"}
                     </span>
                   </div>
-                  <div className="col-span-2">
+                  <div className="col-span-1 sm:col-span-2">
                     <span className="text-slate-400 block text-[10px]">Venue / Location</span>
                     <span className="font-bold text-slate-900 dark:text-white">
                       {selected.custom_location || selected.location?.city_name || "Client Specified Venue"}
@@ -545,7 +627,7 @@ export default function QuotesPage() {
                 <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   Menu & Inclusions
                 </h3>
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-1.5">
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1.5">
                   <div className="flex justify-between font-bold">
                     <span className="text-slate-900 dark:text-white">
                       {selected.package?.name || selected.tier?.name || "Banquet Menu"}
@@ -581,7 +663,7 @@ export default function QuotesPage() {
               </div>
 
               {/* Comprehensive Financial Ledger */}
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-2">
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2">
                 <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
                   Financial Ledger
                 </h3>
@@ -699,7 +781,7 @@ export default function QuotesPage() {
               </div>
 
               {/* Bottom Quick Tools */}
-              <div className="flex gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
+              <div className="flex flex-col sm:flex-row gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
                 <button
                   onClick={() => {
                     setModalQuote(selected);

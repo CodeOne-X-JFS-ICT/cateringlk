@@ -12,21 +12,21 @@ export default function MenuPage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div>
-        <h1 className="text-2xl font-serif font-extrabold text-slate-900 dark:text-white">Menu Catalog</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400">Manage takeaway products and catering options.</p>
+        <h1 className="text-xl sm:text-2xl font-serif font-extrabold text-slate-900 dark:text-white">Menu Catalog</h1>
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Manage takeaway products and catering options.</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-1.5 w-fit">
+      <div className="flex items-center gap-1.5 sm:gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-1.5 overflow-x-auto no-scrollbar max-w-full w-full sm:w-fit">
         {([
           { key: "products", label: "Takeaway Menu", icon: "fa-burger" },
           { key: "tiers", label: "Catering Tiers (Menus)", icon: "fa-layer-group" },
-          { key: "addons", label: "Additional Charge Items & Free Services", icon: "fa-plate-wheat" },
+          { key: "addons", label: "Additional Charge Items & Policies", icon: "fa-plate-wheat" },
         ] as { key: ActiveTab; label: string; icon: string }[]).map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${activeTab === tab.key ? "bg-[#E36727] text-white shadow-md" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"}`}
+            className={`flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 ${activeTab === tab.key ? "bg-[#E36727] text-white shadow-md" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"}`}
           >
             <i className={`fa-solid ${tab.icon} text-xs`}></i>
             {tab.label}
@@ -228,9 +228,9 @@ function ProductsTab() {
         const catProducts = filteredProducts.filter((p) => p.category_id === cat.id);
         if (catProducts.length === 0) return null;
         return (
-          <div key={cat.id} className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
-              <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <div key={cat.id} className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+            <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
+              <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2 text-sm sm:text-base">
                 <span>{cat.emoji || "🍽️"}</span>
                 <span>{cat.name}</span>
                 <span className="text-xs font-normal text-slate-400">({catProducts.length})</span>
@@ -238,25 +238,25 @@ function ProductsTab() {
             </div>
             <div className="divide-y divide-slate-100 dark:divide-slate-800">
               {catProducts.map((p) => (
-                <div key={p.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-4 hover:bg-slate-50/70 dark:hover:bg-slate-800/30 transition-colors">
-                  <div className="flex items-start gap-3.5 flex-1 min-w-0">
+                <div key={p.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 px-4 sm:px-6 py-3.5 sm:py-4 hover:bg-slate-50/70 dark:hover:bg-slate-800/30 transition-colors">
+                  <div className="flex items-start gap-3 sm:gap-3.5 flex-1 min-w-0">
                     {p.image_url ? (
-                      <img src={p.image_url} alt={p.name} className="w-12 h-12 rounded-xl object-cover flex-shrink-0 bg-slate-100 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60" />
+                      <img src={p.image_url} alt={p.name} className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl object-cover flex-shrink-0 bg-slate-100 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60" />
                     ) : (
-                      <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-[#E36727] flex items-center justify-center flex-shrink-0 text-base font-bold">
+                      <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-amber-500/10 text-[#E36727] flex items-center justify-center flex-shrink-0 text-sm sm:text-base font-bold">
                         <i className="fa-solid fa-bowl-food"></i>
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="font-bold text-slate-900 dark:text-white text-sm">{p.name}</p>
+                      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                        <p className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">{p.name}</p>
                         {p.portion_label && (
                           <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-amber-500/10 text-[#E36727] border border-amber-500/20">
                             {p.portion_label}
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-1 leading-relaxed">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-0.5 sm:mt-1 leading-relaxed">
                         {p.description ? (
                           p.description
                         ) : (
@@ -266,14 +266,14 @@ function ProductsTab() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800/60">
-                    <p className="font-extrabold text-[#E36727] text-sm whitespace-nowrap">Rs. {Number(p.price).toLocaleString()}</p>
+                  <div className="flex flex-wrap sm:flex-nowrap items-center justify-between sm:justify-end gap-2 sm:gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800/60">
+                    <p className="font-extrabold text-[#E36727] text-xs sm:text-sm whitespace-nowrap">Rs. {Number(p.price).toLocaleString()}</p>
                     
                     {/* Option to change description */}
                     <button
                       type="button"
                       onClick={() => openDescModal(p)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-[#E36727] bg-[#E36727]/10 hover:bg-[#E36727]/20 border border-[#E36727]/25 transition-all cursor-pointer whitespace-nowrap active:scale-95"
+                      className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold text-[#E36727] bg-[#E36727]/10 hover:bg-[#E36727]/20 border border-[#E36727]/25 transition-all cursor-pointer whitespace-nowrap active:scale-95"
                       title="Change description"
                     >
                       <i className="fa-solid fa-align-left text-xs"></i>
@@ -283,14 +283,14 @@ function ProductsTab() {
                     <button
                       disabled={toggling === p.id}
                       onClick={() => toggleAvailable(p)}
-                      className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-colors cursor-pointer whitespace-nowrap ${p.is_available ? "text-emerald-600 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/20" : "text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900/20"}`}
+                      className={`text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-xl transition-colors cursor-pointer whitespace-nowrap ${p.is_available ? "text-emerald-600 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/20" : "text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900/20"}`}
                     >
                       {toggling === p.id ? "..." : p.is_available ? "In Stock" : "Out of Stock"}
                     </button>
                     <button
                       onClick={() => openEdit(p)}
                       title="Edit Product Details"
-                      className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold text-slate-400 hover:text-[#E36727] hover:bg-amber-500/10 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
+                      className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold text-slate-400 hover:text-[#E36727] hover:bg-amber-500/10 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer shrink-0"
                     >
                       <i className="fa-solid fa-pen-to-square"></i>
                     </button>
@@ -1802,22 +1802,26 @@ function AddonsTab() {
                 <p className="text-slate-500 text-xs">No additional charge items found.</p>
               </div>
             ) : addons.map((addon) => (
-              <div key={addon.id} className="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                <div className="w-10 h-10 rounded-xl bg-[#E36727]/10 text-[#E36727] flex items-center justify-center flex-shrink-0">
-                  <i className={`fa-solid ${addon.icon || "fa-plate-wheat"}`}></i>
+              <div key={addon.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 px-4 sm:px-6 py-3.5 sm:py-4 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#E36727]/10 text-[#E36727] flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <i className={`fa-solid ${addon.icon || "fa-plate-wheat"} text-sm sm:text-base`}></i>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">{addon.name}</p>
+                    <p className="text-xs text-slate-400 mt-0.5">{addon.description}</p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="font-bold text-slate-900 dark:text-white">{addon.name}</p>
-                  <p className="text-xs text-slate-400">{addon.description}</p>
-                </div>
-                <p className="font-extrabold text-[#E36727]">+Rs. {Number(addon.price_per_pax).toLocaleString()}/pax</p>
-                <div className="flex items-center gap-1 ml-2">
-                  <button onClick={() => openEdit(addon)} className="text-xs font-bold text-slate-400 hover:text-[#E36727] transition-colors cursor-pointer p-2 rounded-lg hover:bg-amber-500/10" title="Edit Item">
-                    <i className="fa-solid fa-pen-to-square"></i>
-                  </button>
-                  <button onClick={() => handleDeleteAddon(addon.id, addon.name)} className="text-xs font-bold text-slate-400 hover:text-red-500 transition-colors cursor-pointer p-2 rounded-lg hover:bg-red-500/10" title="Remove Item">
-                    <i className="fa-solid fa-trash-can"></i>
-                  </button>
+                <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800/60">
+                  <p className="font-extrabold text-[#E36727] text-xs sm:text-sm whitespace-nowrap">+Rs. {Number(addon.price_per_pax).toLocaleString()}/pax</p>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button onClick={() => openEdit(addon)} className="text-xs font-bold text-slate-400 hover:text-[#E36727] transition-colors cursor-pointer p-1.5 sm:p-2 rounded-lg hover:bg-amber-500/10" title="Edit Item">
+                      <i className="fa-solid fa-pen-to-square"></i>
+                    </button>
+                    <button onClick={() => handleDeleteAddon(addon.id, addon.name)} className="text-xs font-bold text-slate-400 hover:text-red-500 transition-colors cursor-pointer p-1.5 sm:p-2 rounded-lg hover:bg-red-500/10" title="Remove Item">
+                      <i className="fa-solid fa-trash-can"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -1866,7 +1870,7 @@ function AddonsTab() {
             serviceTerms.policies.map((policy) => (
               <div
                 key={policy.id}
-                className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 space-y-3 shadow-xs hover:border-[#E36727]/60 transition-all flex flex-col justify-between"
+                className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 p-4 sm:p-6 space-y-3 shadow-xs hover:border-[#E36727]/60 transition-all flex flex-col justify-between"
               >
                 <div className="space-y-2">
                   <div className="flex items-start justify-between gap-2">
