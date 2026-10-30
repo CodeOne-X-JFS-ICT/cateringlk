@@ -8,9 +8,11 @@ export function middleware(request: NextRequest) {
     // Check for the admin token in cookies
     const token = request.cookies.get('admin_token');
 
-    // If there is no token, redirect immediately to the login page
+    // If there is no token, redirect to login page with preserved redirect query
     if (!token) {
       const loginUrl = new URL('/login', request.url);
+      const redirectTarget = request.nextUrl.pathname + request.nextUrl.search;
+      loginUrl.searchParams.set('redirect', redirectTarget);
       return NextResponse.redirect(loginUrl);
     }
   }

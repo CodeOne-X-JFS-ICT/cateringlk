@@ -31,6 +31,7 @@ export default function CheckoutPage() {
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [timeSlot, setTimeSlot] = useState("ASAP (30-40 mins)");
   const [address, setAddress] = useState("");
   const [specialInstructions, setSpecialInstructions] = useState("");
@@ -106,6 +107,7 @@ export default function CheckoutPage() {
         order_type: orderType.toUpperCase(),
         customer_name: name.trim(),
         customer_phone: phone.trim(),
+        customer_email: email.trim() || null,
         delivery_address: orderType === "delivery" ? address.trim() : null,
         delivery_zone_id: orderType === "delivery" ? (deliveryZoneId || 1) : null,
         verified_location: verifiedLocation,
@@ -259,6 +261,19 @@ export default function CheckoutPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Kasun Kalhara"
+                  className="w-full bg-slate-100 dark:bg-[#26201d] border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-900 dark:text-white font-medium focus:outline-none focus:border-[#E36727]"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
+                  Email Address <span className="text-[10px] text-slate-500 font-normal lowercase">(for order tracking & receipt)</span>
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="e.g. kasun@gmail.com"
                   className="w-full bg-slate-100 dark:bg-[#26201d] border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-900 dark:text-white font-medium focus:outline-none focus:border-[#E36727]"
                 />
               </div>

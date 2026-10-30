@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
-import { apiGet, apiPatch } from "@/lib/apiClient";
+import React, { useEffect, useState, useCallback, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { apiGet, apiPatch, apiPost } from "@/lib/apiClient";
 import StatusBadge from "@/components/admin/StatusBadge";
 import SlideOver from "@/components/admin/SlideOver";
 
@@ -41,7 +42,7 @@ const getNextStatus = (currentStatus: string, orderType: string): string | null 
   }
 };
 
-export default function OrdersPage() {
+function OrdersContent() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,6 +58,11 @@ export default function OrdersPage() {
   // Admin notes state inside SlideOver
   const [editingNotes, setEditingNotes] = useState("");
   const [savingNotes, setSavingNotes] = useState(false);
+  const searchParams = useSearchParams();
+  const refParam = searchParams.get("ref");
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [customerEmailInput, setCustomerEmailInput] = useState("");
+  const [emailFeedback, setEmailFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   // Print Slip Modal State
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
@@ -91,6 +97,51 @@ export default function OrdersPage() {
     fetchOrders();
   }, [fetchOrders]);
 
+  // Automatically open order if ref query param is provided
+  useEffect(() => {
+    if (refParam && refParam.trim()) {
+      const trimmedRef = refParam.trim();
+      setSearch(trimmedRef);
+      apiGet(`/admin/orders?search=${encodeURIComponent(trimmedRef)}`)
+        .then((res) => {
+          const list = res.data || [];
+          const match = list.find((o: any) => o.order_ref.toLowerCase() === trimmedRef.toLowerCase()) || list[0];
+          if (match) {
+            openDetail(match);
+          }
+        })
+        .catch((err) => console.error("Error opening order by ref param:", err));
+    }
+  }, [refParam]);
+
+  const handleSendTrackingEmail = async () => {
+    if (!selected) return;
+    const emailToSend = (customerEmailInput || selected.customer_email || "").trim();
+    if (!emailToSend) {
+      setEmailFeedback({ type: "error", message: "Please provide a valid customer email address." });
+      return;
+    }
+    setSendingEmail(true);
+    setEmailFeedback(null);
+    try {
+      const res = await apiPost(`/admin/orders/${selected.id}/send-tracking-email`, {
+        customer_email: emailToSend,
+      });
+      setSelected((prev: any) => ({
+        ...prev,
+        customer_email: emailToSend,
+        tracking_email_sent: true,
+        tracking_email_sent_at: res.data?.tracking_email_sent_at || new Date().toISOString(),
+      }));
+      setEmailFeedback({ type: "success", message: res.message || "Tracking email sent successfully!" });
+      await fetchOrders(true);
+    } catch (err: any) {
+      setEmailFeedback({ type: "error", message: err.message || "Failed to send tracking email." });
+    } finally {
+      setSendingEmail(false);
+    }
+  };
+
   // Live Auto Polling every 20 seconds
   useEffect(() => {
     if (!autoPoll) return;
@@ -103,11 +154,14 @@ export default function OrdersPage() {
   const openDetail = async (order: any) => {
     setSelected(order);
     setEditingNotes(order.admin_notes || "");
+    setCustomerEmailInput(order.customer_email || "");
+    setEmailFeedback(null);
     setDetailLoading(true);
     try {
       const json = await apiGet(`/admin/orders/${order.id}`);
       setSelected(json.data);
       setEditingNotes(json.data.admin_notes || "");
+      if (json.data.customer_email) setCustomerEmailInput(json.data.customer_email);
     } catch {
       // keep the list row data
     } finally {
@@ -513,6 +567,67 @@ export default function OrdersPage() {
               </button>
             </div>
 
+            {/* Live Order Tracking Email Action Box */}
+            <div className={`p-3.5 rounded-2xl border text-xs space-y-2.5 transition-all ${
+              selected.tracking_email_sent
+                ? "bg-emerald-50/70 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800"
+                : "bg-blue-50/70 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800"
+            }`}>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <i className={`fa-solid ${selected.tracking_email_sent ? "fa-circle-check text-emerald-600 dark:text-emerald-400" : "fa-paper-plane text-blue-600 dark:text-blue-400"}`}></i>
+                  <span className="font-bold text-slate-800 dark:text-slate-200">
+                    {selected.tracking_email_sent ? "Tracking Email Dispatched" : "Live Tracking Status Email"}
+                  </span>
+                </div>
+                {selected.tracking_email_sent_at && (
+                  <span className="text-[10px] text-slate-400">
+                    Sent {new Date(selected.tracking_email_sent_at).toLocaleTimeString("en-LK", { hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                )}
+              </div>
+
+              <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                {selected.customer_email
+                  ? `Customer Email: ${selected.customer_email}`
+                  : "No email registered for this customer. Enter an email below to send the live tracking link:"}
+              </p>
+
+              {emailFeedback && (
+                <div className={`p-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 ${
+                  emailFeedback.type === "success"
+                    ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800"
+                    : "bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300 border border-red-300 dark:border-red-800"
+                }`}>
+                  <i className={`fa-solid ${emailFeedback.type === "success" ? "fa-circle-check" : "fa-circle-exclamation"}`}></i>
+                  <span>{emailFeedback.message}</span>
+                </div>
+              )}
+
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="email"
+                  value={customerEmailInput}
+                  onChange={(e) => setCustomerEmailInput(e.target.value)}
+                  placeholder="customer@email.com"
+                  className="flex-1 text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-[#E36727]"
+                />
+                <button
+                  type="button"
+                  disabled={sendingEmail || !customerEmailInput.trim()}
+                  onClick={handleSendTrackingEmail}
+                  className={`py-2 px-3.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-xs shrink-0 ${
+                    selected.tracking_email_sent
+                      ? "bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700"
+                      : "bg-[#E36727] hover:bg-amber-600 text-white"
+                  } disabled:opacity-50`}
+                >
+                  <i className={`fa-solid ${sendingEmail ? "fa-circle-notch fa-spin" : "fa-envelope"}`}></i>
+                  <span>{sendingEmail ? "Sending..." : selected.tracking_email_sent ? "Resend Link" : "Send Tracking Link"}</span>
+                </button>
+              </div>
+            </div>
+
             {/* Customer & Fulfillment Info */}
             <div className="bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-4 space-y-2.5 text-xs border border-slate-200 dark:border-slate-700/60">
               <h3 className="font-bold text-slate-500 uppercase tracking-widest pb-1 border-b border-slate-200 dark:border-slate-700 text-[10px]">
@@ -532,6 +647,12 @@ export default function OrdersPage() {
                 >
                   {selected.customer_phone}
                 </a>
+              </div>
+              <div className="flex gap-2">
+                <i className="fa-solid fa-envelope text-slate-400 w-4 mt-0.5"></i>
+                <span className="text-slate-700 dark:text-slate-300">
+                  Email: <strong className="text-slate-900 dark:text-white">{selected.customer_email || "Not provided"}</strong>
+                </span>
               </div>
               <div className="flex gap-2">
                 <i className="fa-solid fa-tag text-slate-400 w-4 mt-0.5"></i>
@@ -802,5 +923,14 @@ export default function OrdersPage() {
         </div>
       )}
     </div>
+  );
+}
+
+
+export default function OrdersPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-xs text-slate-400">Loading orders...</div>}>
+      <OrdersContent />
+    </Suspense>
   );
 }
