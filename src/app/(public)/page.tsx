@@ -86,7 +86,7 @@ export default function Home() {
       {/* ========================================== */}
       {/* HERO SECTION WITH KEN BURNS BACKGROUND     */}
       {/* ========================================== */}
-      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden py-16 sm:py-12 bg-[#b59484]/30 dark:bg-[#0f0d0c]">
+      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden py-16 sm:py-12 bg-[#b59484] dark:bg-[#0f0d0c]">
         {/* Animated Hero Background Image */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img
