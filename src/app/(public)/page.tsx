@@ -86,7 +86,7 @@ export default function Home() {
       {/* ========================================== */}
       {/* HERO SECTION WITH KEN BURNS BACKGROUND     */}
       {/* ========================================== */}
-      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden py-16 sm:py-12 bg-[#b59484] dark:bg-[#0f0d0c]">
+      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden py-16 sm:py-12 bg-[#b59484]/20 dark:bg-[#0f0d0c]">
         {/* Animated Hero Background Image */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img
@@ -111,8 +111,8 @@ export default function Home() {
             <span className="gold-gradient-text font-semibold dark:font-normal">Sacred & Grand Occasions</span>
           </h1>
 
-          {/* Lead Description: Barlow | 400 | 16px–18px | 1.8em | normal */}
-          <p className="lead-desc mt-6 text-[16px] sm:text-[18px] leading-[1.8em] text-slate-600 dark:text-slate-300 max-w-3xl mx-auto font-normal font-sans">
+          {/* Lead Description: Barlow | 800 | 16px–18px | 1.8em | extrabold */}
+          <p className="lead-desc mt-6 text-[16px] sm:text-[18px] leading-[1.8em] text-slate-900 dark:text-slate-300 max-w-3xl mx-auto font-extrabold font-sans">
             FROM REVERENT ALMS-GIVING (DANA) & WEDDING RECEPTIONS TO FINE DINING, INSTANT TAKEAWAY, AND EXPRESS 6KM RADIUS DELIVERY ACROSS COLOMBO.
           </p>
 
@@ -128,8 +128,8 @@ export default function Home() {
                 <div className="section-tag inline-block text-[12px] leading-[15px] font-normal text-[#aa8453] uppercase tracking-[6px] bg-[#aa8453]/10 px-3 py-1 rounded-full font-condensed">
                   Grand & Sacred Events
                 </div>
-                {/* Section Heading (H2): Gilda Display | 400 | 30px–40px | 1.25em | 1px */}
-                <h2 className="section-heading font-serif font-normal text-[28px] sm:text-[34px] leading-[1.25em] tracking-[1px] text-slate-900 dark:text-white">
+                {/* Card Heading (H2): Gilda Display | 400 | 20px–24px | 1.25em | 1px */}
+                <h2 className="font-serif font-normal uppercase text-[28px] sm:text-[32px] leading-[1.25em] tracking-[1px] text-slate-900 dark:text-white whitespace-nowrap">
                   Catering Service
                 </h2>
                 {/* Body Paragraph: Barlow | 400 | 15px | 1.75em | normal */}
@@ -158,8 +158,8 @@ export default function Home() {
                 <div className="section-tag inline-block text-[12px] leading-[15px] font-normal text-[#aa8453] uppercase tracking-[6px] bg-[#aa8453]/10 px-3 py-1 rounded-full font-condensed">
                   Takeaway & Delivery
                 </div>
-                {/* Section Heading (H2): Gilda Display | 400 | 30px–40px | 1.25em | 1px */}
-                <h2 className="section-heading font-serif font-normal text-[28px] sm:text-[34px] leading-[1.25em] tracking-[1px] text-slate-900 dark:text-white">
+                {/* Card Heading (H2): Gilda Display | 400 | 20px–24px | 1.25em | 1px */}
+                <h2 className="font-serif font-normal uppercase text-[24px] sm:text-[26px] leading-[1.25em] tracking-[1px] text-slate-900 dark:text-white">
                   Takeaway & Delivery Service
                 </h2>
                 {/* Body Paragraph: Barlow | 400 | 15px | 1.75em | normal */}
@@ -270,7 +270,7 @@ export default function Home() {
               </span>
 
               {/* Section Heading (H2): Gilda Display | 400 | 30px–40px | 1.25em | 1px */}
-              <h2 className="section-heading font-serif font-normal text-[30px] sm:text-[40px] leading-[1.25em] tracking-[1px] text-slate-900 dark:text-white">
+              <h2 className="section-heading font-serif font-normal uppercase text-[30px] sm:text-[40px] leading-[1.25em] tracking-[1px] text-slate-900 dark:text-white">
                 Crafting Culinary Miracles for Over a Decade
               </h2>
 
@@ -314,7 +314,7 @@ export default function Home() {
               Choose Your Journey
             </span>
             {/* Section Heading (H2): Gilda Display | 400 | 30px–40px | 1.25em | 1px */}
-            <h2 className="section-heading font-serif font-normal text-[30px] sm:text-[40px] leading-[1.25em] tracking-[1px] text-slate-900 dark:text-white">
+            <h2 className="section-heading font-serif font-normal uppercase text-[30px] sm:text-[40px] leading-[1.25em] tracking-[1px] text-slate-900 dark:text-white">
               Portals & Culinary Offerings
             </h2>
             {/* Lead Description */}
@@ -330,7 +330,7 @@ export default function Home() {
                 <i className="fa-solid fa-calculator"></i>
               </div>
               {/* Card Heading (H3): Gilda Display | 400 | 18px–30px | 1.3em–1.4em | normal */}
-              <h3 className="card-heading font-serif font-normal text-[22px] sm:text-[26px] leading-[1.35em] text-slate-900 dark:text-white">
+              <h3 className="card-heading font-serif font-normal uppercase text-[22px] sm:text-[26px] leading-[1.35em] text-slate-900 dark:text-white">
                 Interactive Catering Estimator
               </h3>
               {/* Body Paragraph */}
@@ -352,7 +352,7 @@ export default function Home() {
                 <i className="fa-solid fa-basket-shopping"></i>
               </div>
               {/* Card Heading (H3): Gilda Display | 400 | 18px–30px */}
-              <h3 className="card-heading font-serif font-normal text-[22px] sm:text-[26px] leading-[1.35em] text-slate-900 dark:text-white">
+              <h3 className="card-heading font-serif font-normal uppercase text-[22px] sm:text-[26px] leading-[1.35em] text-slate-900 dark:text-white">
                 Browse Our Meals
               </h3>
               <p className="body-paragraph text-[15px] leading-[1.75em] text-slate-500 dark:text-slate-400 font-sans font-normal">
@@ -373,7 +373,7 @@ export default function Home() {
                 <i className="fa-solid fa-motorcycle"></i>
               </div>
               {/* Card Heading (H3): Gilda Display | 400 | 18px–30px */}
-              <h3 className="card-heading font-serif font-normal text-[22px] sm:text-[26px] leading-[1.35em] text-slate-900 dark:text-white">
+              <h3 className="card-heading font-serif font-normal uppercase text-[22px] sm:text-[26px] leading-[1.35em] text-slate-900 dark:text-white">
                 6km Radius Express Delivery
               </h3>
               <p className="body-paragraph text-[15px] leading-[1.75em] text-slate-500 dark:text-slate-400 font-sans font-normal">
@@ -404,7 +404,7 @@ export default function Home() {
                 Customers&apos; Feedbacks
               </span>
               {/* Section Heading (H2): Gilda Display | 400 | 30px–40px | 1.25em | 1px */}
-              <h2 className="section-heading font-serif font-normal text-[30px] sm:text-[40px] leading-[1.25em] tracking-[1px] text-slate-900 dark:text-white mt-3">
+              <h2 className="section-heading font-serif font-normal uppercase text-[30px] sm:text-[40px] leading-[1.25em] tracking-[1px] text-slate-900 dark:text-white mt-3">
                 Customers Words & Experience...
               </h2>
             </div>

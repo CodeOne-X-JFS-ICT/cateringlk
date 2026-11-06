@@ -179,7 +179,7 @@ export default function CheckoutPage() {
           <span className="text-[#E36727] text-xs font-extrabold uppercase tracking-widest bg-[#E36727]/10 px-3.5 py-1 rounded-full border border-[#E36727]/20 inline-block">
             Finalize Order
           </span>
-          <h1 className="font-serif text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">
+          <h1 className="font-serif text-3xl sm:text-4xl font-normal uppercase text-slate-900 dark:text-white">
             Review & Place Your Order
           </h1>
           <p className="text-xs text-slate-600 dark:text-slate-400">
@@ -206,7 +206,7 @@ export default function CheckoutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Customer Information Form (Left) */}
           <div className="lg:col-span-7 bg-[#FFFBF8] dark:bg-[#1a1614] border border-slate-200 dark:border-white/10 p-6 sm:p-8 rounded-3xl space-y-6 shadow-lg">
-            <h2 className="font-serif font-bold text-xl text-slate-900 dark:text-white pb-3 border-b border-slate-200 dark:border-white/10">
+            <h2 className="font-serif font-normal uppercase text-xl text-slate-900 dark:text-white pb-3 border-b border-slate-200 dark:border-white/10">
               Customer Information
             </h2>
 
@@ -226,11 +226,10 @@ export default function CheckoutPage() {
                         setErrorMsg(null);
                       }
                     }}
-                    className={`py-3 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                      orderType === "takeaway"
-                        ? "bg-white dark:bg-[#1a1614] text-[#E36727] shadow-sm border border-[#E36727]/30 ring-1 ring-[#E36727]/20"
-                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                    }`}
+                    className={`py-3 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer ${orderType === "takeaway"
+                      ? "bg-white dark:bg-[#1a1614] text-[#E36727] shadow-sm border border-[#E36727]/30 ring-1 ring-[#E36727]/20"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                      }`}
                   >
                     <i className="fa-solid fa-bag-shopping"></i>
                     <span>Takeaway Pick-up</span>
@@ -241,11 +240,10 @@ export default function CheckoutPage() {
                     onClick={() => {
                       setOrderType("delivery");
                     }}
-                    className={`py-3 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                      orderType === "delivery"
-                        ? "bg-white dark:bg-[#1a1614] text-[#E36727] shadow-sm border border-[#E36727]/30 ring-1 ring-[#E36727]/20"
-                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                    }`}
+                    className={`py-3 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer ${orderType === "delivery"
+                      ? "bg-white dark:bg-[#1a1614] text-[#E36727] shadow-sm border border-[#E36727]/30 ring-1 ring-[#E36727]/20"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                      }`}
                   >
                     <i className="fa-solid fa-motorcycle"></i>
                     <span>Doorstep Delivery (6km)</span>
@@ -399,11 +397,10 @@ export default function CheckoutPage() {
                   {paymentOptions.map((opt) => (
                     <label
                       key={opt.code}
-                      className={`flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${
-                        paymentMethod === opt.code
-                          ? "border-[#E36727] bg-[#E36727]/10 ring-1 ring-[#E36727]"
-                          : "border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#26201d] hover:border-slate-300"
-                      }`}
+                      className={`flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${paymentMethod === opt.code
+                        ? "border-[#E36727] bg-[#E36727]/10 ring-1 ring-[#E36727]"
+                        : "border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#26201d] hover:border-slate-300"
+                        }`}
                     >
                       <input
                         type="radio"
@@ -425,11 +422,10 @@ export default function CheckoutPage() {
               <button
                 type="submit"
                 disabled={cart.length === 0 || submitting || (orderType === "delivery" && isOutOfRadius)}
-                className={`butn-dark font-condensed w-full py-4 text-white font-medium text-[14px] uppercase tracking-[3px] leading-normal rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 ${
-                  cart.length === 0 || submitting || (orderType === "delivery" && isOutOfRadius)
-                    ? "bg-slate-400 dark:bg-slate-700 opacity-60 cursor-not-allowed pointer-events-none"
-                    : "bg-[#aa8453] hover:bg-[#987242] cursor-pointer"
-                }`}
+                className={`butn-dark font-condensed w-full py-4 text-white font-medium text-[14px] uppercase tracking-[3px] leading-normal rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 ${cart.length === 0 || submitting || (orderType === "delivery" && isOutOfRadius)
+                  ? "bg-slate-400 dark:bg-slate-700 opacity-60 cursor-not-allowed pointer-events-none"
+                  : "bg-[#aa8453] hover:bg-[#987242] cursor-pointer"
+                  }`}
               >
                 {submitting ? (
                   <>
@@ -448,7 +444,7 @@ export default function CheckoutPage() {
           {/* Order Summary Breakdown (Right) */}
           <div className="lg:col-span-5 bg-[#FFFBF8] dark:bg-[#1a1614] border border-amber-500/30 p-6 rounded-3xl space-y-5 shadow-lg portal-card-shadow">
             <div className="pb-3 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
-              <h3 className="font-serif font-bold text-lg text-slate-900 dark:text-white">
+              <h3 className="font-serif font-normal uppercase text-lg text-slate-900 dark:text-white">
                 Order Summary
               </h3>
               <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-[#E36727]/10 text-[#E36727] border border-[#E36727]/20">

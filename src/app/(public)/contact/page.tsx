@@ -192,7 +192,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="w-full transition-colors duration-300 font-sans bg-white dark:bg-[#0f0d0c] text-slate-800 dark:text-slate-100">
+    <div className="w-full transition-colors duration-300 font-sans bg-[#b59484]/20 dark:bg-[#0f0d0c] text-slate-800 dark:text-slate-100">
       {/* SECTION 1: HERO SECTION & DIRECT CONTACT DETAILS */}
       <section
         id="contact-hero"
@@ -203,7 +203,7 @@ export default function ContactPage() {
           <img
             src="https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=1920&q=80"
             alt="Ahas Gawwa Kitchen & Dining Background"
-            className="w-full h-full object-cover object-center animate-hero-kenburns opacity-50 dark:opacity-30 filter contrast-105"
+            className="w-full h-full object-cover object-center animate-hero-kenburns opacity-40 dark:opacity-30 filter contrast-105"
           />
           {/* Ambient Accent Overlay */}
           <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#E36727_1.5px,transparent_1.5px)] [background-size:24px_24px] pointer-events-none"></div>
@@ -233,10 +233,10 @@ export default function ContactPage() {
               <div className="text-xs font-bold text-amber-500 uppercase tracking-wider">
                 Our Physical Location
               </div>
-              <h3 className="font-serif font-bold text-lg text-slate-900 dark:text-white">
+              <h3 className="font-serif font-normal uppercase text-lg text-slate-900 dark:text-white">
                 Central Kitchen & Restaurant
               </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              <p className="text-xs font-bold text-slate-600 dark:text-slate-300 leading-relaxed">
                 No. 226, Arakawila
                 <br />
                 Handapangoda
@@ -258,7 +258,7 @@ export default function ContactPage() {
               <div className="text-xs font-bold text-amber-500 uppercase tracking-wider">
                 Direct E-mail Correspondence
               </div>
-              <h3 className="font-serif font-bold text-lg text-slate-900 dark:text-white">
+              <h3 className="font-serif font-normal uppercase text-lg text-slate-900 dark:text-white">
                 Email Addresses
               </h3>
               <div className="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 leading-relaxed">
@@ -289,7 +289,7 @@ export default function ContactPage() {
               <div className="text-xs font-bold text-amber-500 uppercase tracking-wider">
                 Direct Phone Lines
               </div>
-              <h3 className="font-serif font-bold text-lg text-slate-900 dark:text-white">
+              <h3 className="font-serif font-normal uppercase text-lg text-slate-900 dark:text-white">
                 Call Hotlines
               </h3>
               <div className="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 leading-relaxed">
@@ -335,10 +335,10 @@ export default function ContactPage() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           <div className="text-center max-w-3xl mx-auto space-y-2">
-            <span className="text-[#E36727] text-xs font-extrabold uppercase tracking-widest bg-[#E36727]/10 px-3.5 py-1 rounded-full border border-[#E36727]/20 inline-block">
+            <span className="text-[#E36727] text-xs font-normal uppercase tracking-widest bg-[#E36727]/10 px-3.5 py-1 rounded-full border border-[#E36727]/20 inline-block">
               Find Us
             </span>
-            <h2 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">
+            <h2 className="font-serif text-3xl sm:text-5xl font-normal uppercase text-slate-900 dark:text-white">
               Locate Our Kitchen & Restaurant
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
@@ -354,7 +354,7 @@ export default function ContactPage() {
                   <i className="fa-solid fa-clock"></i> Open 7 Days a Week
                 </div>
 
-                <h3 className="font-serif text-2xl font-bold text-slate-900 dark:text-white">
+                <h3 className="font-serif text-2xl font-normal uppercase text-slate-900 dark:text-white">
                   Operating Hours
                 </h3>
 
@@ -488,7 +488,7 @@ export default function ContactPage() {
             <span className="text-[#E36727] text-xs font-extrabold uppercase tracking-widest bg-[#E36727]/10 px-3.5 py-1 rounded-full border border-[#E36727]/20 inline-block">
               Direct Inquiries
             </span>
-            <h2 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">
+            <h2 className="font-serif text-3xl sm:text-5xl font-normal uppercase text-slate-900 dark:text-white">
               Send Direct Message & Inquiry
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
@@ -757,10 +757,10 @@ export default function ContactPage() {
                     {trackedInquiry.ref_code}
                   </span>
                   <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${trackedInquiry.status === "RESOLVED"
-                      ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
-                      : trackedInquiry.status === "IN_PROGRESS"
-                        ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
-                        : "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+                    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                    : trackedInquiry.status === "IN_PROGRESS"
+                      ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                      : "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
                     }`}>
                     {trackedInquiry.status.replace("_", " ")}
                   </span>

@@ -60,7 +60,7 @@ export default function InstantQuoteModal() {
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E36727]/10 text-[#E36727] text-xs font-bold border border-[#E36727]/20 font-condensed uppercase tracking-wider">
                 <i className="fa-solid fa-bolt text-amber-500"></i> Fast Quote Engine
               </div>
-              <h3 className="font-serif font-extrabold text-2xl text-slate-900 dark:text-white">
+              <h3 className="font-serif font-normal uppercase text-2xl text-slate-900 dark:text-white">
                 Submit Instant Catering Quote
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-400">

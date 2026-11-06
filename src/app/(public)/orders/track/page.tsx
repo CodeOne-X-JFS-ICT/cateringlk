@@ -109,7 +109,7 @@ function TrackOrderContent() {
           <span className="text-[#E36727] text-xs font-extrabold uppercase tracking-widest bg-[#E36727]/10 px-3.5 py-1 rounded-full border border-[#E36727]/20 inline-block font-condensed">
             Real-Time Tracking
           </span>
-          <h1 className="font-serif text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">
+          <h1 className="font-serif text-3xl sm:text-4xl font-normal uppercase text-slate-900 dark:text-white">
             Track Your Order
           </h1>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
@@ -193,22 +193,20 @@ function TrackOrderContent() {
                     return (
                       <div
                         key={step.key}
-                        className={`p-4 rounded-2xl border text-center transition-all ${
-                          isCurrent
-                            ? "bg-[#E36727]/10 border-[#E36727] ring-2 ring-[#E36727]/30 shadow-md"
-                            : isDone
+                        className={`p-4 rounded-2xl border text-center transition-all ${isCurrent
+                          ? "bg-[#E36727]/10 border-[#E36727] ring-2 ring-[#E36727]/30 shadow-md"
+                          : isDone
                             ? "bg-emerald-500/5 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
                             : "bg-slate-50 dark:bg-[#26201d] border-slate-200 dark:border-white/5 opacity-40"
-                        }`}
+                          }`}
                       >
                         <div
-                          className={`w-9 h-9 rounded-full flex items-center justify-center mx-auto mb-2 text-sm font-bold ${
-                            isCurrent
-                              ? "bg-[#E36727] text-white animate-pulse"
-                              : isDone
+                          className={`w-9 h-9 rounded-full flex items-center justify-center mx-auto mb-2 text-sm font-bold ${isCurrent
+                            ? "bg-[#E36727] text-white animate-pulse"
+                            : isDone
                               ? "bg-emerald-500 text-white"
                               : "bg-slate-200 dark:bg-slate-700 text-slate-400"
-                          }`}
+                            }`}
                         >
                           <i className={`fa-solid ${step.icon}`}></i>
                         </div>
@@ -225,7 +223,7 @@ function TrackOrderContent() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-200 dark:border-white/10">
               {/* Items List */}
               <div className="space-y-3">
-                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+                <h4 className="text-xs font-normal uppercase text-slate-500 uppercase tracking-widest">
                   Items Ordered
                 </h4>
                 <div className="space-y-2 bg-slate-50 dark:bg-[#26201d] p-4 rounded-2xl border border-slate-200 dark:border-white/5">

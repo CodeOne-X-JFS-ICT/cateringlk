@@ -380,7 +380,7 @@ export default function RestaurantPage() {
   return (
     <div className="w-full transition-colors duration-300 font-sans">
       {/* HERO SECTION */}
-      <section className="relative min-h-[75vh] sm:min-h-[85vh] flex items-center justify-center overflow-hidden py-16 sm:py-12 bg-[#b59484]/30 dark:bg-[#0f0d0c]">
+      <section className="relative min-h-[75vh] sm:min-h-[85vh] flex items-center justify-center overflow-hidden py-16 sm:py-12 bg-[#b59484]/20 dark:bg-[#0f0d0c]">
         {/* Animated Ken Burns Background */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img
@@ -487,7 +487,7 @@ export default function RestaurantPage() {
                     <span className="text-[#E36727] text-xs font-extrabold uppercase tracking-widest bg-[#E36727]/10 px-3.5 py-1 rounded-full border border-[#E36727]/20 inline-block">
                       Express Pick-up Counter
                     </span>
-                    <h2 className="font-serif text-3xl font-extrabold text-slate-900 dark:text-white">
+                    <h2 className="font-serif text-3xl font-normal uppercase text-slate-900 dark:text-white">
                       Takeaway Meals & Quick Pick-up
                     </h2>
                     <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
@@ -540,7 +540,7 @@ export default function RestaurantPage() {
                       <span className="text-[11px] font-extrabold uppercase tracking-wider text-amber-500">
                         Live Kitchen Catalog
                       </span>
-                      <h3 className="font-serif text-2xl font-bold text-slate-900 dark:text-white">
+                      <h3 className="font-serif text-2xl font-normal uppercase text-slate-900 dark:text-white">
                         Signature Meal Ranges
                       </h3>
                       <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -578,7 +578,7 @@ export default function RestaurantPage() {
                           <span className="text-[11px] font-extrabold uppercase tracking-wider text-amber-500">
                             Chef Specials
                           </span>
-                          <h3 className="font-serif text-2xl font-bold text-slate-900 dark:text-white">
+                          <h3 className="font-serif text-2xl font-normal uppercase text-slate-900 dark:text-white">
                             Popular Takeaway Favorites
                           </h3>
                         </div>
@@ -640,7 +640,7 @@ export default function RestaurantPage() {
 
                   {/* Takeaway Call-to-Action Box */}
                   <div className="p-8 rounded-3xl bg-gradient-to-r from-[#E36727] to-amber-600 text-white text-center space-y-4 portal-card-shadow">
-                    <h3 className="font-serif font-extrabold text-2xl sm:text-3xl">
+                    <h3 className="font-serif font-extrabold uppercase text-2xl sm:text-3xl">
                       Ready to Pick Up Your Favorite Meal?
                     </h3>
                     <p className="text-xs sm:text-sm text-white/90 max-w-xl mx-auto">

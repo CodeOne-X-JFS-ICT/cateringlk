@@ -381,7 +381,7 @@ export default function CateringPage() {
 
 
   return (
-    <div className="w-full transition-colors duration-300 font-sans bg-white dark:bg-[#0f0d0c] text-slate-800 dark:text-slate-100">
+    <div className="w-full transition-colors duration-300 font-sans bg-[#b59484]/20 dark:bg-[#0f0d0c] text-slate-800 dark:text-slate-100">
       {/*HERO SECTION */}
       <section
         id="hero"
@@ -392,7 +392,7 @@ export default function CateringPage() {
           <img
             src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1920&q=80"
             alt="Grand Catering Banquet"
-            className="w-full h-full object-cover object-center animate-hero-kenburns opacity-50 dark:opacity-30 filter contrast-105"
+            className="w-full h-full object-cover object-center animate-hero-kenburns opacity-40 dark:opacity-30 filter contrast-105"
           />
           {/* Ambient Accent Overlay */}
           <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#E36727_1.5px,transparent_1.5px)] [background-size:24px_24px] pointer-events-none"></div>
@@ -550,7 +550,7 @@ export default function CateringPage() {
             <span className="text-amber-500 text-xs font-extrabold tracking-widest uppercase bg-amber-500/10 px-3.5 py-1 rounded-full border border-amber-500/20 inline-block">
               Transparent Sri Lankan Pricing
             </span>
-            <h2 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">
+            <h2 className="font-serif text-3xl sm:text-5xl font-normal uppercase text-slate-900 dark:text-white">
               Catering Cost Estimator
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
@@ -719,7 +719,7 @@ export default function CateringPage() {
 
               {/* Live Summary Column (Right Sticky) */}
               <div className="lg:col-span-5 bg-[#FFFBF8] dark:bg-[#1a1614] border border-amber-500/40 rounded-3xl p-6 sm:p-8 shadow-xl sticky top-28 space-y-5 portal-card-shadow">
-                <div className="font-serif font-bold text-lg text-slate-900 dark:text-white pb-3 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
+                <div className="font-serif font-normal uppercase text-lg text-slate-900 dark:text-white pb-3 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
                   <span>Estimated Quote Summary</span>
                   <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/30">
                     Instant Estimate
@@ -899,10 +899,10 @@ export default function CateringPage() {
           <div className="mt-12 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-slate-900 via-[#1a1614] to-slate-900 border border-amber-500/40 text-white shadow-2xl relative overflow-hidden portal-card-shadow">
             <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
               <div className="space-y-2 text-center lg:text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-[11px] font-extrabold border border-amber-500/30">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-[11px] font-normal border border-amber-500/30">
                   <i className="fa-solid fa-headset text-amber-400"></i> Dedicated Catering Call Center Desk
                 </div>
-                <h3 className="font-serif font-extrabold text-2xl sm:text-3xl text-white">
+                <h3 className="font-serif font-bold text-2xl sm:text-3xl text-white">
                   Need Custom Menu Advice or Direct Payment Finalization?
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
@@ -947,7 +947,7 @@ export default function CateringPage() {
               <span className="text-[#E36727] text-xs font-extrabold uppercase tracking-widest bg-[#E36727]/10 px-3.5 py-1 rounded-full border border-[#E36727]/20 inline-block">
                 Authentic Menus Database
               </span>
-              <h2 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white mt-2">
+              <h2 className="font-serif text-3xl sm:text-5xl font-normal uppercase text-slate-900 dark:text-white mt-2">
                 Catering Packages & Set Menus
               </h2>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1">
@@ -1334,7 +1334,7 @@ export default function CateringPage() {
               <span className="text-[#E36727] text-xs font-extrabold uppercase tracking-widest bg-[#E36727]/10 px-3.5 py-1 rounded-full border border-[#E36727]/20 inline-block">
                 Top Value Offers
               </span>
-              <h2 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">
+              <h2 className="font-serif text-3xl sm:text-5xl font-normal uppercase text-slate-900 dark:text-white">
                 Seasonal Featured Packages
               </h2>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">

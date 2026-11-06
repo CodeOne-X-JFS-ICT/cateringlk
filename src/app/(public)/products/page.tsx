@@ -121,9 +121,8 @@ export default function ProductsPage() {
           <div className="flex items-center gap-3">
             <span className="w-10 h-10 rounded-2xl bg-[#E36727] text-white flex items-center justify-center text-lg shadow-md shrink-0">
               <i
-                className={`fa-solid ${
-                  orderType === "delivery" ? "fa-motorcycle" : "fa-bag-shopping"
-                }`}
+                className={`fa-solid ${orderType === "delivery" ? "fa-motorcycle" : "fa-bag-shopping"
+                  }`}
               ></i>
             </span>
             <div>
@@ -154,7 +153,7 @@ export default function ProductsPage() {
             <span className="text-[#E36727] text-xs font-extrabold uppercase tracking-widest bg-[#E36727]/10 px-3.5 py-1 rounded-full border border-[#E36727]/20 inline-block font-condensed">
               Catering by Ahas Gawwa
             </span>
-            <h1 className="font-serif text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mt-2">
+            <h1 className="font-serif text-3xl sm:text-4xl font-normal uppercase text-slate-900 dark:text-white mt-2">
               Takeaway & Delivery Menu
             </h1>
           </div>
@@ -180,11 +179,10 @@ export default function ProductsPage() {
             <button
               key={cat.key}
               onClick={() => setActiveCategory(cat.key)}
-              className={`px-5 py-2.5 rounded-2xl text-[13px] leading-[15px] font-normal shrink-0 transition-all cursor-pointer font-condensed uppercase tracking-[2.5px] ${
-                activeCategory === cat.key
+              className={`px-5 py-2.5 rounded-2xl text-[13px] leading-[15px] font-normal shrink-0 transition-all cursor-pointer font-condensed uppercase tracking-[2.5px] ${activeCategory === cat.key
                   ? "bg-[#aa8453] text-white shadow-md"
                   : "bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:text-[#aa8453]"
-              }`}
+                }`}
             >
               {cat.label}
             </button>
@@ -283,11 +281,10 @@ export default function ProductsPage() {
                                         [dish.key]: portionItem.id,
                                       }))
                                     }
-                                    className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer border ${
-                                      isSelected
+                                    className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer border ${isSelected
                                         ? "bg-[#E36727] text-white border-[#E36727] shadow-xs"
                                         : "bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300 border-slate-200 dark:border-white/10 hover:border-[#E36727]/50"
-                                    }`}
+                                      }`}
                                   >
                                     {portionItem.portion}
                                   </button>

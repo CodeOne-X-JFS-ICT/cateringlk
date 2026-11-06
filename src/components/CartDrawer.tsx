@@ -25,7 +25,7 @@ export default function CartDrawer() {
           <div className="flex justify-between items-center pb-4 border-b border-slate-200 dark:border-white/10">
             <div className="flex items-center gap-2">
               <i className="fa-solid fa-basket-shopping text-[#E36727] text-lg"></i>
-              <h3 className="font-serif font-bold text-xl text-slate-900 dark:text-white">
+              <h3 className="font-serif font-normal uppercase text-xl text-slate-900 dark:text-white">
                 Your Basket
               </h3>
             </div>
@@ -111,9 +111,8 @@ export default function CartDrawer() {
           <Link
             href="/checkout"
             onClick={() => setIsCartDrawerOpen(false)}
-            className={`butn-dark font-condensed w-full py-3.5 bg-[#aa8453] hover:bg-[#987242] text-white font-medium text-[14px] leading-normal uppercase tracking-[3px] rounded-2xl shadow-md transition-all cursor-pointer text-center block ${
-              cart.length === 0 ? "pointer-events-none opacity-50" : ""
-            }`}
+            className={`butn-dark font-condensed w-full py-3.5 bg-[#aa8453] hover:bg-[#987242] text-white font-medium text-[14px] leading-normal uppercase tracking-[3px] rounded-2xl shadow-md transition-all cursor-pointer text-center block ${cart.length === 0 ? "pointer-events-none opacity-50" : ""
+              }`}
           >
             Proceed to Checkout <i className="fa-solid fa-arrow-right ml-1"></i>
           </Link>
