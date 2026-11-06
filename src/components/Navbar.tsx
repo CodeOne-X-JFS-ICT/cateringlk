@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "./ThemeProvider";
 import { useOrder } from "@/context/OrderContext";
@@ -12,6 +13,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [logoError, setLogoError] = useState(false);
 
   const clickCountRef = useRef(0);
   const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -102,25 +104,31 @@ export default function Navbar() {
             onClick={handleLogoClick}
             className="flex items-center gap-3 group select-none cursor-pointer"
           >
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#aa8453] via-amber-600 to-[#987242] p-1 shadow-lg shadow-[#aa8453]/20 flex flex-col justify-center items-center text-center border border-[#aa8453]/40 group-hover:scale-105 transition-transform duration-300">
-              <span className="text-[7px] leading-tight font-serif uppercase tracking-widest text-amber-100 font-normal">
-                Catering
-              </span>
-              <span className="text-[6px] font-sans uppercase tracking-tighter text-amber-200 font-normal">
-                by
-              </span>
-              <span className="text-[7px] leading-tight font-serif uppercase tracking-widest text-white font-normal">
-                Ahas Gawwa
-              </span>
-            </div>
-            <div>
-              <div className="font-serif font-normal text-xl sm:text-2xl tracking-[1px] text-slate-900 dark:text-white flex items-center gap-1 group-hover:text-[#aa8453] transition-colors">
-                AHAS GAWWA
+            {!logoError ? (
+              <Image
+                src="/logo.png"
+                alt="Ahas Gawwa Logo"
+                width={2041}
+                height={771}
+                unoptimized
+                priority
+                onError={() => setLogoError(true)}
+                className="h-13 sm:h-15 md:h-16 w-auto object-contain rounded-xl shadow-sm group-hover:scale-105 transition-transform duration-300"
+              />
+            ) : (
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#aa8453] via-amber-600 to-[#987242] p-1 shadow-lg shadow-[#aa8453]/20 flex flex-col justify-center items-center text-center border border-[#aa8453]/40 group-hover:scale-105 transition-transform duration-300">
+                <span className="text-[7px] leading-tight font-serif uppercase tracking-widest text-amber-100 font-normal">
+                  Catering
+                </span>
+                <span className="text-[6px] font-sans uppercase tracking-tighter text-amber-200 font-normal">
+                  by
+                </span>
+                <span className="text-[7px] leading-tight font-serif uppercase tracking-widest text-white font-normal">
+                  Ahas Gawwa
+                </span>
               </div>
-              <div className="text-[12px] leading-[15px] uppercase tracking-[5px] text-[#aa8453] font-normal font-condensed -mt-0.5">
-                Takeaway & Delivery
-              </div>
-            </div>
+            )}
+
           </Link>
 
           {/* Desktop Nav Items: Barlow Condensed | 400 | 15px | 24px | 2px–3px */}

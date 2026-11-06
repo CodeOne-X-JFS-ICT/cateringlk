@@ -380,13 +380,13 @@ export default function RestaurantPage() {
   return (
     <div className="w-full transition-colors duration-300 font-sans">
       {/* HERO SECTION */}
-      <section className="relative min-h-[75vh] sm:min-h-[85vh] flex items-center justify-center overflow-hidden py-16 sm:py-10 bg-white dark:bg-[#0f0d0c]">
+      <section className="relative min-h-[75vh] sm:min-h-[85vh] flex items-center justify-center overflow-hidden py-16 sm:py-12 bg-[#b59484]/30 dark:bg-[#0f0d0c]">
         {/* Animated Ken Burns Background */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img
             src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1920&q=80"
             alt="Dining & Restaurant Experience"
-            className="w-full h-full object-cover object-center animate-hero-kenburns opacity-50 dark:opacity-30 filter contrast-105"
+            className="w-full h-full object-cover object-center animate-hero-kenburns opacity-40 dark:opacity-30 filter contrast-105"
           />
           {/* Ambient Particle Grid Overlay */}
           <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#E36727_1.5px,transparent_1.5px)] [background-size:24px_24px] pointer-events-none"></div>
@@ -415,8 +415,8 @@ export default function RestaurantPage() {
                 type="button"
                 onClick={() => setActiveTab("takeaway")}
                 className={`py-3 px-3 sm:px-4 rounded-2xl font-medium text-[14px] flex flex-col sm:flex-row items-center justify-center gap-2 transition-all cursor-pointer font-condensed uppercase tracking-[3px] ${activeTab === "takeaway"
-                    ? "bg-[#aa8453] text-white shadow-md"
-                    : "bg-[#FBEAD9] dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:text-[#aa8453]"
+                  ? "bg-[#aa8453] text-white shadow-md"
+                  : "bg-[#FBEAD9] dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:text-[#aa8453]"
                   }`}
               >
                 <i
@@ -430,8 +430,8 @@ export default function RestaurantPage() {
                 type="button"
                 onClick={() => setActiveTab("delivery")}
                 className={`py-3 px-3 sm:px-4 rounded-2xl font-medium text-[14px] flex flex-col sm:flex-row items-center justify-center gap-2 transition-all cursor-pointer font-condensed uppercase tracking-[3px] ${activeTab === "delivery"
-                    ? "bg-[#aa8453] text-white shadow-md"
-                    : "bg-[#FBEAD9] dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:text-[#aa8453]"
+                  ? "bg-[#aa8453] text-white shadow-md"
+                  : "bg-[#FBEAD9] dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:text-[#aa8453]"
                   }`}
               >
                 <i
@@ -773,8 +773,8 @@ export default function RestaurantPage() {
                         disabled={!isLocationVerified}
                         onClick={startDeliveryOrder}
                         className={`w-full py-3.5 font-extrabold text-xs uppercase tracking-wider rounded-2xl transition-all shadow-md ${isLocationVerified
-                            ? "bg-[#E36727] hover:bg-amber-600 text-white cursor-pointer shadow-lg transform hover:scale-[1.01]"
-                            : "bg-slate-400 text-white opacity-60 cursor-not-allowed"
+                          ? "bg-[#E36727] hover:bg-amber-600 text-white cursor-pointer shadow-lg transform hover:scale-[1.01]"
+                          : "bg-slate-400 text-white opacity-60 cursor-not-allowed"
                           }`}
                       >
                         {isLocationVerified

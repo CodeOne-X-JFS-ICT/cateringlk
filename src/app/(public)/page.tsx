@@ -86,13 +86,13 @@ export default function Home() {
       {/* ========================================== */}
       {/* HERO SECTION WITH KEN BURNS BACKGROUND     */}
       {/* ========================================== */}
-      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden py-16 sm:py-12 bg-white dark:bg-[#0f0d0c]">
+      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden py-16 sm:py-12 bg-[#b59484]/30 dark:bg-[#0f0d0c]">
         {/* Animated Hero Background Image */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img
             src="https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=1920&q=80"
             alt="Catering Feast by Ahas Gawwa"
-            className="w-full h-full object-cover object-center animate-hero-kenburns opacity-50 dark:opacity-30 filter contrast-105"
+            className="w-full h-full object-cover object-center animate-hero-kenburns opacity-40 dark:opacity-30 filter contrast-105"
           />
 
           {/* Ambient Particle Grid Overlay */}
@@ -108,7 +108,7 @@ export default function Home() {
           {/* Hero Title (H1): Gilda Display | 400 | 30px–45px | 1.25em | 10px */}
           <h1 className="hero-title font-serif font-normal text-[30px] sm:text-[45px] leading-[1.25em] tracking-[10px] text-slate-900 dark:text-white max-w-5xl mx-auto uppercase">
             Authentic Culinary Heritage for{" "}
-            <span className="gold-gradient-text">Sacred & Grand Occasions</span>
+            <span className="gold-gradient-text font-semibold dark:font-normal">Sacred & Grand Occasions</span>
           </h1>
 
           {/* Lead Description: Barlow | 400 | 16px–18px | 1.8em | normal */}

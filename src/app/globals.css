@@ -288,12 +288,22 @@ html.dark ::-webkit-scrollbar-thumb:hover {
   background: #aa8453;
 }
 
-/* Gold Gradient Text */
+/* Gold Gradient Text - High contrast highlighted in Light Theme */
 .gold-gradient-text {
+  background: linear-gradient(135deg, #964710 0%, #c97722 50%, #7a350a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.7));
+}
+
+/* Gold Gradient Text - Luminous in Dark Theme */
+.dark .gold-gradient-text {
   background: linear-gradient(135deg, #aa8453 0%, #d4b584 50%, #aa8453 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  filter: none;
 }
 
 /* Card Glow Shadow */
