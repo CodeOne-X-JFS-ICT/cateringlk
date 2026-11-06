@@ -68,7 +68,7 @@ function OrdersContent() {
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
 
   // Auto-refresh control
-  const [autoPoll, setAutoPoll] = useState(true);
+  const [autoPoll, _setAutoPoll] = useState(true);
 
   const LIMIT = 15;
 
@@ -96,6 +96,24 @@ function OrdersContent() {
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
+
+  const openDetail = async (order: any) => {
+    setSelected(order);
+    setEditingNotes(order.admin_notes || "");
+    setCustomerEmailInput(order.customer_email || "");
+    setEmailFeedback(null);
+    setDetailLoading(true);
+    try {
+      const json = await apiGet(`/admin/orders/${order.id}`);
+      setSelected(json.data);
+      setEditingNotes(json.data.admin_notes || "");
+      if (json.data.customer_email) setCustomerEmailInput(json.data.customer_email);
+    } catch {
+      // keep the list row data
+    } finally {
+      setDetailLoading(false);
+    }
+  };
 
   // Automatically open order if ref query param is provided
   useEffect(() => {
@@ -150,24 +168,6 @@ function OrdersContent() {
     }, 20000);
     return () => clearInterval(interval);
   }, [autoPoll, fetchOrders]);
-
-  const openDetail = async (order: any) => {
-    setSelected(order);
-    setEditingNotes(order.admin_notes || "");
-    setCustomerEmailInput(order.customer_email || "");
-    setEmailFeedback(null);
-    setDetailLoading(true);
-    try {
-      const json = await apiGet(`/admin/orders/${order.id}`);
-      setSelected(json.data);
-      setEditingNotes(json.data.admin_notes || "");
-      if (json.data.customer_email) setCustomerEmailInput(json.data.customer_email);
-    } catch {
-      // keep the list row data
-    } finally {
-      setDetailLoading(false);
-    }
-  };
 
   const advanceStatus = async (orderId: number, newStatus: string) => {
     setUpdating(true);

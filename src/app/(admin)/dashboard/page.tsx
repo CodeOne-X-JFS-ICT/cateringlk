@@ -77,7 +77,7 @@ export default function DashboardPage() {
             Welcome back, Admin
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mt-1 text-xs sm:text-sm">
-            Here's what's happening with your restaurant today.
+            Here&apos;s what&apos;s happening with your restaurant today.
           </p>
         </div>
         <div className="flex flex-wrap sm:flex-nowrap gap-2.5 sm:gap-3 w-full sm:w-auto">

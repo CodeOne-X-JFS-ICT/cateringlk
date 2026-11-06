@@ -57,7 +57,7 @@ export default function InstantQuoteModal() {
           <>
             {/* Modal Header */}
             <div className="space-y-1">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E36727]/10 text-[#E36727] text-xs font-bold border border-[#E36727]/20">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E36727]/10 text-[#E36727] text-xs font-bold border border-[#E36727]/20 font-condensed uppercase tracking-wider">
                 <i className="fa-solid fa-bolt text-amber-500"></i> Fast Quote Engine
               </div>
               <h3 className="font-serif font-extrabold text-2xl text-slate-900 dark:text-white">
@@ -187,7 +187,7 @@ export default function InstantQuoteModal() {
 
               <button
                 type="submit"
-                className="w-full py-3.5 bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-xl transition-all cursor-pointer transform hover:scale-[1.01] active:scale-95 flex items-center justify-center gap-2"
+                className="butn-dark w-full py-3.5 bg-[#aa8453] hover:bg-[#987242] text-white font-medium text-[14px] leading-normal uppercase tracking-[3px] rounded-2xl shadow-xl transition-all cursor-pointer transform hover:scale-[1.01] active:scale-95 flex items-center justify-center gap-2 font-condensed"
               >
                 <i className="fa-solid fa-paper-plane"></i>
                 <span>Submit Instant Quote Request</span>

@@ -29,7 +29,7 @@ function TrackOrderContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [order, setOrder] = useState<any | null>(null);
-  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [autoRefresh, _setAutoRefresh] = useState(true);
 
   const fetchStatus = useCallback(async (refToSearch: string) => {
     const trimmed = refToSearch.trim();
@@ -106,7 +106,7 @@ function TrackOrderContent() {
 
         {/* Title & Tracker Search Box */}
         <div className="text-center max-w-xl mx-auto space-y-3">
-          <span className="text-[#E36727] text-xs font-extrabold uppercase tracking-widest bg-[#E36727]/10 px-3.5 py-1 rounded-full border border-[#E36727]/20 inline-block">
+          <span className="text-[#E36727] text-xs font-extrabold uppercase tracking-widest bg-[#E36727]/10 px-3.5 py-1 rounded-full border border-[#E36727]/20 inline-block font-condensed">
             Real-Time Tracking
           </span>
           <h1 className="font-serif text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">
@@ -128,7 +128,7 @@ function TrackOrderContent() {
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-3 bg-[#E36727] hover:bg-amber-600 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shrink-0 disabled:opacity-50"
+              className="butn-dark font-condensed px-6 py-3 bg-[#aa8453] hover:bg-[#987242] text-white font-medium text-[14px] leading-normal uppercase tracking-[3px] rounded-xl transition-all cursor-pointer shrink-0 disabled:opacity-50"
             >
               {loading ? "Searching..." : "Track"}
             </button>

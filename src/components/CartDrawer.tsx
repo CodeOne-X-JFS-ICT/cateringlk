@@ -37,7 +37,7 @@ export default function CartDrawer() {
             </button>
           </div>
 
-          <div className="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#E36727]/10 text-[#E36727] text-[11px] font-bold border border-[#E36727]/20">
+          <div className="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#E36727]/10 text-[#E36727] text-[11px] font-bold border border-[#E36727]/20 font-condensed uppercase tracking-wider">
             <span>
               {orderType === "delivery"
                 ? `🛵 Delivery (${verifiedLocation})`
@@ -111,7 +111,7 @@ export default function CartDrawer() {
           <Link
             href="/checkout"
             onClick={() => setIsCartDrawerOpen(false)}
-            className={`w-full py-3.5 bg-[#E36727] hover:bg-amber-600 text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-md transition-all cursor-pointer text-center block ${
+            className={`butn-dark font-condensed w-full py-3.5 bg-[#aa8453] hover:bg-[#987242] text-white font-medium text-[14px] leading-normal uppercase tracking-[3px] rounded-2xl shadow-md transition-all cursor-pointer text-center block ${
               cart.length === 0 ? "pointer-events-none opacity-50" : ""
             }`}
           >

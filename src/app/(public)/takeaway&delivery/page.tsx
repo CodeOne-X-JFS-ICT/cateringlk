@@ -41,7 +41,7 @@ export default function RestaurantPage() {
     setIsLocationVerified,
     deliveryCoords,
     setDeliveryCoords,
-    distanceKm,
+    distanceKm: _distanceKm,
     setDistanceKm,
     setDeliveryZoneId,
     setDeliveryFee,
@@ -351,7 +351,7 @@ export default function RestaurantPage() {
           );
           const revJson = await revRes.json();
           if (revJson.display_name) cleanAddr = revJson.display_name;
-        } catch {}
+        } catch { }
 
         await handleMapLocationSelect(cleanAddr, lat, lng, "", true, dist);
       },
@@ -393,19 +393,19 @@ export default function RestaurantPage() {
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-4">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-500 text-xs sm:text-sm font-extrabold mb-6 shadow-sm">
-            <i className="fa-solid fa-utensils"></i> Handapangoda Dining & Express Delivery Hub
+          <div className="hero-tagline inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#aa8453]/30 bg-[#aa8453]/10 text-[#aa8453] text-[12px] leading-[15px] tracking-[6px] font-normal font-condensed uppercase mb-6 shadow-sm">
+            <i className="fa-solid fa-utensils text-[#aa8453]"></i> Handapangoda Dining & Express Delivery Hub
           </div>
 
-          <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.15] max-w-4xl mx-auto">
+          <h1 className="hero-title font-serif font-normal text-[30px] sm:text-[45px] leading-[1.25em] tracking-[10px] text-slate-900 dark:text-white max-w-4xl mx-auto uppercase">
             Savor Authentic Sri Lankan & International{" "}
             <span className="gold-gradient-text">
               Flavors Fresh From Our Kitchen
             </span>
           </h1>
 
-          <p className="mt-4 text-sm sm:text-xl text-slate-900 dark:text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
-            Choose your order preference below: Arrange quick takeaway pick-up or verify your 6km radius for express hot delivery.
+          <p className="lead-desc mt-6 text-[16px] sm:text-[18px] leading-[1.8em] text-slate-900 dark:text-slate-300 max-w-2xl mx-auto font-normal font-sans">
+            CHOOSE YOUR ORDER PREFERENCE BELOW: ARRANGE QUICK TAKEAWAY PICK-UP OR VERIFY YOUR 6KM RADIUS FOR EXPRESS HOT DELIVERY.
           </p>
 
           {/* Order Mode Switcher Tabs (Takeaway, Delivery 6km) */}
@@ -414,16 +414,14 @@ export default function RestaurantPage() {
               <button
                 type="button"
                 onClick={() => setActiveTab("takeaway")}
-                className={`py-3 px-3 sm:px-4 rounded-2xl font-extrabold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-2 transition-all cursor-pointer ${
-                  activeTab === "takeaway"
-                    ? "bg-[#E36727] text-white shadow-md"
-                    : "bg-[#FBEAD9] dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:text-[#E36727]"
-                }`}
+                className={`py-3 px-3 sm:px-4 rounded-2xl font-medium text-[14px] flex flex-col sm:flex-row items-center justify-center gap-2 transition-all cursor-pointer font-condensed uppercase tracking-[3px] ${activeTab === "takeaway"
+                    ? "bg-[#aa8453] text-white shadow-md"
+                    : "bg-[#FBEAD9] dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:text-[#aa8453]"
+                  }`}
               >
                 <i
-                  className={`fa-solid fa-bag-shopping ${
-                    activeTab === "takeaway" ? "text-white" : "text-amber-500"
-                  }`}
+                  className={`fa-solid fa-bag-shopping ${activeTab === "takeaway" ? "text-white" : "text-amber-500"
+                    }`}
                 ></i>
                 <span>Takeaway Pick-up</span>
               </button>
@@ -431,16 +429,14 @@ export default function RestaurantPage() {
               <button
                 type="button"
                 onClick={() => setActiveTab("delivery")}
-                className={`py-3 px-3 sm:px-4 rounded-2xl font-extrabold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-2 transition-all cursor-pointer ${
-                  activeTab === "delivery"
-                    ? "bg-[#E36727] text-white shadow-md"
-                    : "bg-[#FBEAD9] dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:text-[#E36727]"
-                }`}
+                className={`py-3 px-3 sm:px-4 rounded-2xl font-medium text-[14px] flex flex-col sm:flex-row items-center justify-center gap-2 transition-all cursor-pointer font-condensed uppercase tracking-[3px] ${activeTab === "delivery"
+                    ? "bg-[#aa8453] text-white shadow-md"
+                    : "bg-[#FBEAD9] dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:text-[#aa8453]"
+                  }`}
               >
                 <i
-                  className={`fa-solid fa-motorcycle ${
-                    activeTab === "delivery" ? "text-white" : "text-amber-500"
-                  }`}
+                  className={`fa-solid fa-motorcycle ${activeTab === "delivery" ? "text-white" : "text-amber-500"
+                    }`}
                 ></i>
                 <span>Delivery (6km)</span>
               </button>
@@ -776,11 +772,10 @@ export default function RestaurantPage() {
                         type="button"
                         disabled={!isLocationVerified}
                         onClick={startDeliveryOrder}
-                        className={`w-full py-3.5 font-extrabold text-xs uppercase tracking-wider rounded-2xl transition-all shadow-md ${
-                          isLocationVerified
+                        className={`w-full py-3.5 font-extrabold text-xs uppercase tracking-wider rounded-2xl transition-all shadow-md ${isLocationVerified
                             ? "bg-[#E36727] hover:bg-amber-600 text-white cursor-pointer shadow-lg transform hover:scale-[1.01]"
                             : "bg-slate-400 text-white opacity-60 cursor-not-allowed"
-                        }`}
+                          }`}
                       >
                         {isLocationVerified
                           ? `Proceed to Order for Delivery (${verifiedLocation})`

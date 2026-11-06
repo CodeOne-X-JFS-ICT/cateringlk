@@ -42,7 +42,7 @@ function AdminLoginForm() {
       } else {
         setError(json.message || "Invalid credentials.");
       }
-    } catch (err) {
+    } catch (_err) {
       setError("Failed to connect to the server. Is the backend running?");
     } finally {
       setLoading(false);

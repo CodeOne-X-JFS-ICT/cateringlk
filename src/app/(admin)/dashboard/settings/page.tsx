@@ -131,7 +131,7 @@ export default function SettingsPage() {
             Site Settings
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-            Manage your restaurant's global settings and business information.
+            Manage your restaurant&apos;s global settings and business information.
           </p>
         </div>
         <button

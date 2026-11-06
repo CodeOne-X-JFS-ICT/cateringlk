@@ -37,7 +37,7 @@ export default function ContactPage() {
   const [noticeTitle, setNoticeTitle] = useState("");
   const [noticeDesc, setNoticeDesc] = useState("");
 
-  const showNotice = (title: string, desc: string) => {
+  const _showNotice = (title: string, desc: string) => {
     setNoticeTitle(title);
     setNoticeDesc(desc);
     setIsNoticeOpen(true);
@@ -211,16 +211,16 @@ export default function ContactPage() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-2">
           {/* Pill Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-500 text-xs sm:text-sm font-extrabold mb-6 shadow-sm">
+          <div className="hero-tagline inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#aa8453]/30 bg-[#aa8453]/10 text-[#aa8453] text-[12px] leading-[15px] tracking-[6px] font-normal font-condensed uppercase mb-6 shadow-sm">
             <i className="fa-solid fa-headset"></i> We&apos;re Here to Assist You 24/7
           </div>
 
-          <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.12] max-w-4xl mx-auto">
+          <h1 className="hero-title font-serif font-normal text-[30px] sm:text-[45px] leading-[1.25em] tracking-[10px] text-slate-900 dark:text-white max-w-4xl mx-auto uppercase">
             Get in Touch with <span className="gold-gradient-text">Ahas Gawwa</span>
           </h1>
 
-          <p className="mt-4 text-base sm:text-xl text-slate-900 dark:text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
-            Have a question regarding restaurant reservations, takeaway orders, or custom catering packages for your special event? Connect with our master culinary team directly.
+          <p className="lead-desc mt-6 text-[16px] sm:text-[18px] leading-[1.8em] text-slate-900 dark:text-slate-300 max-w-2xl mx-auto font-normal font-sans">
+            HAVE A QUESTION REGARDING RESTAURANT RESERVATIONS, TAKEAWAY ORDERS, OR CUSTOM CATERING PACKAGES FOR YOUR SPECIAL EVENT? CONNECT WITH OUR MASTER CULINARY TEAM DIRECTLY.
           </p>
 
           {/* Section 1 Primary Contact Cards: Address, Email, Phone */}
@@ -691,7 +691,7 @@ export default function ContactPage() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full sm:w-2/3 py-3.5 rounded-xl bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white font-extrabold uppercase tracking-wider text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 transform hover:scale-[1.01] active:scale-95 disabled:opacity-60"
+                    className="butn-dark font-condensed w-full sm:w-2/3 py-3.5 rounded-xl bg-[#aa8453] hover:bg-[#987242] text-white font-medium uppercase tracking-[3px] text-[14px] leading-normal shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 transform hover:scale-[1.01] active:scale-95 disabled:opacity-60"
                   >
                     {submitting ? (
                       <>
@@ -708,7 +708,7 @@ export default function ContactPage() {
                   <button
                     type="button"
                     onClick={sendWhatsAppDirectInquiry}
-                    className="w-full sm:w-1/3 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold uppercase tracking-wider text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+                    className="butn-dark font-condensed w-full sm:w-1/3 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium uppercase tracking-[3px] text-[14px] leading-normal shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
                   >
                     <i className="fa-brands fa-whatsapp text-sm"></i> WhatsApp Us
                   </button>
@@ -756,13 +756,12 @@ export default function ContactPage() {
                   <span className="font-mono text-xs font-extrabold text-slate-900 dark:text-white">
                     {trackedInquiry.ref_code}
                   </span>
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                    trackedInquiry.status === "RESOLVED"
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${trackedInquiry.status === "RESOLVED"
                       ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
                       : trackedInquiry.status === "IN_PROGRESS"
-                      ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
-                      : "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
-                  }`}>
+                        ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                        : "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+                    }`}>
                     {trackedInquiry.status.replace("_", " ")}
                   </span>
                 </div>

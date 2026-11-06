@@ -57,7 +57,7 @@ export default function CateringPage() {
   const [paxCount, setPaxCount] = useState(100);
 
   // Menu Tab State
-  const [activeMenuTab, setActiveMenuTab] = useState<MenuTabKey>("srilankan");
+  const [_activeMenuTab, _setActiveMenuTab] = useState<MenuTabKey>("srilankan");
 
   // Dynamic Catering Packages & Addons State (Fetched from Backend DB)
   const [packages, setPackages] = useState<CateringPackageData[]>([]);
@@ -264,7 +264,7 @@ export default function CateringPage() {
   const advanceAmount = Math.round(grandTotal * 0.3);
   const balanceAmount = grandTotal - advanceAmount;
 
-  const openPaymentGateway = (type: "advance" | "full") => {
+  const _openPaymentGateway = (type: "advance" | "full") => {
     setPaymentType(type);
     setIsGatewayModalOpen(true);
   };
@@ -370,7 +370,7 @@ export default function CateringPage() {
       setBookingPhone("");
       setBookingPackage("");
       setBookingSuburb("");
-    } catch (err: any) {
+    } catch (_err: any) {
       setIsBookingModalOpen(false);
       showAlertNotice(
         "Quote Request Received",
@@ -399,19 +399,18 @@ export default function CateringPage() {
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-4">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-500 text-xs sm:text-sm font-extrabold mb-6 shadow-sm">
+          <div className="hero-tagline inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#aa8453]/30 bg-[#aa8453]/10 text-[#aa8453] text-[12px] leading-[15px] tracking-[6px] font-normal font-condensed uppercase mb-6 shadow-sm">
             <i className="fa-solid fa-crown"></i> Sacred Alms-Giving & Grand
             Banquet Catering
           </div>
 
-          <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.12] max-w-5xl mx-auto">
+          <h1 className="hero-title font-serif font-normal text-[30px] sm:text-[45px] leading-[1.25em] tracking-[10px] text-slate-900 dark:text-white max-w-5xl mx-auto uppercase">
             Authentic Culinary Excellence for{" "}
             <span className="gold-gradient-text">Sacred & Grand Occasions</span>
           </h1>
 
-          <p className="mt-4 text-base sm:text-xl text-slate-900 dark:text-slate-300 max-w-3xl mx-auto font-normal leading-relaxed">
-            Compute itemized quotes, select specialized functions, and explore
-            Sri Lankan & international menus tailored for your guests.
+          <p className="lead-desc mt-6 text-[16px] sm:text-[18px] leading-[1.8em] text-slate-900 dark:text-slate-300 max-w-3xl mx-auto font-normal font-sans">
+            COMPUTE ITEMIZED QUOTES, SELECT SPECIALIZED FUNCTIONS, AND EXPLORE SRI LANKAN & INTERNATIONAL MENUS TAILORED FOR YOUR GUESTS.
           </p>
 
           {/* Quick Hero Selector Bar */}
@@ -496,7 +495,7 @@ export default function CateringPage() {
               {/* 4. CTA Button */}
               <button
                 onClick={scrollToCalculator}
-                className="w-full bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl p-3.5 flex items-center justify-center gap-2 shadow-md shadow-#FBEAD9 transition-all transform hover:scale-[1.02] active:scale-95 cursor-pointer"
+                className="butn-dark font-condensed w-full bg-[#aa8453] hover:bg-[#987242] text-white font-medium text-[14px] leading-normal uppercase tracking-[3px] rounded-2xl p-3.5 flex items-center justify-center gap-2 shadow-md transition-all transform hover:scale-[1.02] active:scale-95 cursor-pointer"
               >
                 <span>Calculate Cost</span>
                 <i className="fa-solid fa-arrow-right text-xs"></i>
@@ -514,26 +513,26 @@ export default function CateringPage() {
           {/* Stats Grid */}
           <div className="mt-12 grid grid-cols-2 md:grid-cols-3 gap-4 max-w-4xl mx-auto pt-8 border-t border-slate-200 dark:border-white/10">
             <div className="p-3 text-center">
-              <div className="font-serif text-3xl font-extrabold text-black dark:text-[#E36727]">
+              <div className="featured-numeral font-serif font-normal text-3xl sm:text-4xl text-[#ef8a2e]">
                 3+
               </div>
-              <div className="text-[11px] text-slate-700 dark:text-slate-400 uppercase font-bold mt-1">
+              <div className="section-tag text-[12px] leading-[15px] text-slate-700 dark:text-slate-400 uppercase font-normal tracking-[6px] mt-2 font-condensed">
                 Years Catering Heritage
               </div>
             </div>
             <div className="p-3 text-center">
-              <div className="font-serif text-3xl font-extrabold text-black dark:text-[#E36727]">
+              <div className="featured-numeral font-serif font-normal text-3xl sm:text-4xl text-[#ef8a2e]">
                 4.9 ★
               </div>
-              <div className="text-[11px] text-slate-700 dark:text-slate-400 uppercase font-bold mt-1">
+              <div className="section-tag text-[12px] leading-[15px] text-slate-700 dark:text-slate-400 uppercase font-normal tracking-[6px] mt-2 font-condensed">
                 70+ Google Reviews
               </div>
             </div>
             <div className="p-3 text-center">
-              <div className="font-serif text-3xl font-extrabold text-emerald-700 dark:text-emerald-500">
+              <div className="featured-numeral font-serif font-normal text-3xl sm:text-4xl text-emerald-500">
                 100%
               </div>
-              <div className="text-[11px] text-slate-700 dark:text-slate-400 uppercase font-bold mt-1">
+              <div className="section-tag text-[12px] leading-[15px] text-slate-700 dark:text-slate-400 uppercase font-normal tracking-[6px] mt-2 font-condensed">
                 PHI Hygiene Standards
               </div>
             </div>

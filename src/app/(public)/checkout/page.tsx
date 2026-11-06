@@ -42,6 +42,10 @@ export default function CheckoutPage() {
   const paymentOptions =
     orderType === "takeaway" ? TAKEAWAY_PAYMENT_OPTIONS : DELIVERY_PAYMENT_OPTIONS;
 
+
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
   const [paymentMethod, setPaymentMethod] = useState(
     orderType === "takeaway" ? "Cash on Collection" : "Cash on Delivery"
   );
@@ -64,10 +68,8 @@ export default function CheckoutPage() {
           : "Cash on Delivery"
       );
     }
-  }, [orderType]);
+  }, [orderType, errorMsg]);
 
-  const [submitting, setSubmitting] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Receipt Modal State
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
@@ -423,10 +425,10 @@ export default function CheckoutPage() {
               <button
                 type="submit"
                 disabled={cart.length === 0 || submitting || (orderType === "delivery" && isOutOfRadius)}
-                className={`w-full py-4 text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 ${
+                className={`butn-dark font-condensed w-full py-4 text-white font-medium text-[14px] uppercase tracking-[3px] leading-normal rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 ${
                   cart.length === 0 || submitting || (orderType === "delivery" && isOutOfRadius)
                     ? "bg-slate-400 dark:bg-slate-700 opacity-60 cursor-not-allowed pointer-events-none"
-                    : "bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] cursor-pointer"
+                    : "bg-[#aa8453] hover:bg-[#987242] cursor-pointer"
                 }`}
               >
                 {submitting ? (

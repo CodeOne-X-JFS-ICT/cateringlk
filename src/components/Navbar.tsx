@@ -51,12 +51,11 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2 text-center sm:text-left">
           {/* Left Side: Certification Badge + Tagline */}
           <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 bg-amber-500/20 text-amber-200 px-2.5 py-0.5 rounded-full font-semibold text-[11px] border border-amber-500/30">
-              <i className="fa-solid fa-certificate text-[10px]"></i> PHI & ISO Standard
+            <span className="inline-flex items-center gap-1.5 bg-[#aa8453]/20 text-amber-200 px-2.5 py-0.5 rounded-full text-[12px] leading-[15px] border border-[#aa8453]/40 font-condensed uppercase tracking-[2px]">
+              <i className="fa-solid fa-certificate text-[10px] text-[#aa8453]"></i> PHI & ISO Standard
             </span>
-            <span className="hidden md:inline text-amber-200/90 text-xs">
-              🇱🇰 Catering & Fine Dining by Ahas Gawwa | Colombo & Western
-              Province
+            <span className="hidden md:inline text-amber-200/90 text-[13px] font-sans">
+              🇱🇰 Catering & Fine Dining by Ahas Gawwa | Colombo & Western Province
             </span>
           </div>
 
@@ -66,7 +65,8 @@ export default function Navbar() {
               href="tel:+94742013332"
               className="hover:text-white transition-colors flex items-center gap-1.5 font-medium"
             >
-              <i className="fa-solid fa-phone text-amber-400"></i> +94 74 201 3332
+              <i className="fa-solid fa-phone text-[#aa8453]"></i>
+              <span className="text-[#aa8453] font-normal tracking-[1px]">+94 74 201 3332</span>
             </a>
             <span className="text-amber-700/60">|</span>
 
@@ -74,22 +74,18 @@ export default function Navbar() {
             <button
               onClick={toggleTheme}
               type="button"
-              className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/20 hover:bg-black/30 text-amber-200 border border-amber-400/30 transition-all cursor-pointer shadow-xs active:scale-95"
+              className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/20 hover:bg-black/30 text-amber-200 border border-amber-400/30 transition-all cursor-pointer shadow-xs active:scale-95 font-condensed text-[12px] uppercase tracking-[2px]"
               aria-label="Toggle Light / Dark Theme"
             >
               {theme === "dark" ? (
                 <>
                   <i className="fa-solid fa-sun text-amber-400"></i>
-                  <span className="font-semibold text-[11px] uppercase tracking-wider">
-                    LIGHT THEME
-                  </span>
+                  <span>LIGHT THEME</span>
                 </>
               ) : (
                 <>
                   <i className="fa-solid fa-moon text-amber-300"></i>
-                  <span className="font-semibold text-[11px] uppercase tracking-wider">
-                    DARK THEME
-                  </span>
+                  <span>DARK THEME</span>
                 </>
               )}
             </button>
@@ -106,29 +102,29 @@ export default function Navbar() {
             onClick={handleLogoClick}
             className="flex items-center gap-3 group select-none cursor-pointer"
           >
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#E36727] via-amber-600 to-amber-700 p-1 shadow-lg shadow-[#E36727]/20 flex flex-col justify-center items-center text-center border border-amber-400/40 group-hover:scale-105 transition-transform duration-300">
-              <span className="text-[7px] leading-tight font-serif uppercase tracking-widest text-amber-100 font-extrabold">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#aa8453] via-amber-600 to-[#987242] p-1 shadow-lg shadow-[#aa8453]/20 flex flex-col justify-center items-center text-center border border-[#aa8453]/40 group-hover:scale-105 transition-transform duration-300">
+              <span className="text-[7px] leading-tight font-serif uppercase tracking-widest text-amber-100 font-normal">
                 Catering
               </span>
-              <span className="text-[6px] font-sans uppercase tracking-tighter text-amber-200 font-semibold">
+              <span className="text-[6px] font-sans uppercase tracking-tighter text-amber-200 font-normal">
                 by
               </span>
-              <span className="text-[7px] leading-tight font-serif uppercase tracking-widest text-white font-black">
+              <span className="text-[7px] leading-tight font-serif uppercase tracking-widest text-white font-normal">
                 Ahas Gawwa
               </span>
             </div>
             <div>
-              <div className="font-serif text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white flex items-center gap-1 group-hover:text-[#E36727] transition-colors">
+              <div className="font-serif font-normal text-xl sm:text-2xl tracking-[1px] text-slate-900 dark:text-white flex items-center gap-1 group-hover:text-[#aa8453] transition-colors">
                 AHAS GAWWA
               </div>
-              <div className="text-[10px] uppercase tracking-widest text-[#E36727] font-bold -mt-1">
-                Catering & Restaurant
+              <div className="text-[12px] leading-[15px] uppercase tracking-[5px] text-[#aa8453] font-normal font-condensed -mt-0.5">
+                Takeaway & Delivery
               </div>
             </div>
           </Link>
 
-          {/* Desktop Nav Items */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold">
+          {/* Desktop Nav Items: Barlow Condensed | 400 | 15px | 24px | 2px–3px */}
+          <nav className="hidden md:flex items-center gap-8 text-slate-500 dark:text-slate-300">
             {navLinks.map((link, index) => {
               const isActive =
                 pathname === link.href ||
@@ -137,13 +133,13 @@ export default function Navbar() {
               return (
                 <React.Fragment key={link.name}>
                   {index === 2 && (
-                    <div className="w-2 h-2 rounded-full bg-[#E36727] hidden lg:block opacity-60"></div>
+                    <div className="w-2 h-2 rounded-full bg-[#aa8453] hidden lg:block opacity-60"></div>
                   )}
                   <Link
                     href={link.href}
-                    className={`transition-colors duration-200 tracking-wide ${isActive
-                        ? "text-[#E36727] font-bold"
-                        : "text-slate-700 dark:text-slate-300 hover:text-[#E36727] dark:hover:text-[#E36727]"
+                    className={`transition-colors duration-200 text-[15px] leading-[24px] tracking-[2.5px] font-normal font-condensed uppercase ${isActive
+                      ? "text-[#aa8453]"
+                      : "text-slate-700 dark:text-slate-300 hover:text-[#aa8453] dark:hover:text-[#aa8453]"
                       }`}
                   >
                     {link.name}
@@ -158,21 +154,22 @@ export default function Navbar() {
             <button
               onClick={toggleCartDrawer}
               type="button"
-              className="relative p-2.5 rounded-xl bg-[#E36727]/10 border border-[#E36727]/30 text-[#E36727] hover:bg-[#E36727] hover:text-white transition-all cursor-pointer shadow-xs active:scale-95"
+              className="relative p-2.5 rounded-xl bg-[#aa8453]/10 border border-[#aa8453]/30 text-[#aa8453] hover:bg-[#aa8453] hover:text-white transition-all cursor-pointer shadow-xs active:scale-95"
               aria-label="View Shopping Cart"
             >
               <i className="fa-solid fa-basket-shopping text-base"></i>
               {cartTotalCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-[#E36727] text-white text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-[#0f0d0c] shadow-xs">
+                <span className="absolute -top-1.5 -right-1.5 bg-[#aa8453] text-white text-[10px] font-normal w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-[#0f0d0c] shadow-xs">
                   {cartTotalCount}
                 </span>
               )}
             </button>
 
+            {/* CTA Button: Barlow Condensed | 400 / 500 | 13px–15px | normal | 3px–4px */}
             <button
               type="button"
               onClick={openInstantQuoteModal}
-              className="hidden sm:block px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#E36727] to-amber-600 hover:from-amber-500 hover:to-[#E36727] text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-[#E36727]/30 transition-all transform hover:scale-105 active:scale-95 cursor-pointer"
+              className="butn-dark hidden sm:block px-5 py-2.5 rounded-xl bg-[#aa8453] hover:bg-[#987242] text-white font-medium text-[14px] leading-normal uppercase tracking-[3px] shadow-md hover:shadow-[#aa8453]/30 transition-all transform hover:scale-105 active:scale-95 cursor-pointer font-condensed"
             >
               Instant Quote
             </button>
@@ -204,9 +201,9 @@ export default function Navbar() {
                   key={link.name}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`block w-full text-left font-semibold py-2 transition-colors ${isActive
-                      ? "text-[#E36727] font-bold"
-                      : "text-slate-800 dark:text-slate-200 hover:text-[#E36727]"
+                  className={`block w-full text-left py-2 transition-colors text-[15px] leading-[24px] tracking-[2.5px] font-normal font-condensed uppercase ${isActive
+                    ? "text-[#aa8453]"
+                    : "text-slate-800 dark:text-slate-200 hover:text-[#aa8453]"
                     }`}
                 >
                   {link.name}
@@ -221,7 +218,7 @@ export default function Navbar() {
                   setMobileMenuOpen(false);
                   openInstantQuoteModal();
                 }}
-                className="w-full py-3 rounded-xl bg-[#E36727] text-white font-bold text-center text-sm shadow-md cursor-pointer hover:bg-amber-600 transition-all"
+                className="butn-dark w-full py-3 rounded-xl bg-[#aa8453] hover:bg-[#987242] text-white font-medium text-[14px] leading-normal uppercase tracking-[3px] text-center shadow-md cursor-pointer transition-all font-condensed"
               >
                 Instant Quote
               </button>

@@ -1,12 +1,86 @@
 @import "tailwindcss";
 
 /* Enable class-based dark mode in Tailwind v4 */
-@variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-serif: "Gilda Display", serif;
+  --font-sans: "Barlow", sans-serif;
+  --font-condensed: "Barlow Condensed", sans-serif;
+  --color-gold: #aa8453;
+  --color-gold-hover: #987242;
+}
 
 @layer base {
   :root {
     --background: #0f0d0c;
     --foreground: #f8fafc;
+    --gold: #aa8453;
+    --gold-hover: #987242;
+    --font-serif: "Gilda Display", serif;
+    --font-sans: "Barlow", sans-serif;
+    --font-condensed: "Barlow Condensed", sans-serif;
+  }
+
+  body {
+    font-family: var(--font-sans, "Barlow", sans-serif);
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 1.75em;
+    letter-spacing: normal;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Hero Title (H1): Gilda Display, 400, 30px-45px, 1.25em, normal default (10px applied on .hero-title) */
+  h1 {
+    font-family: var(--font-serif, "Gilda Display", serif);
+    font-weight: 400;
+    font-size: clamp(28px, 3.5vw, 42px);
+    line-height: 1.25em;
+    letter-spacing: normal;
+  }
+
+  /* Section Headings (H2): Gilda Display, 400, 30px-40px, 1.25em, 1px */
+  h2 {
+    font-family: var(--font-serif, "Gilda Display", serif);
+    font-weight: 400;
+    font-size: clamp(30px, 3.5vw, 40px);
+    line-height: 1.25em;
+    letter-spacing: 1px;
+  }
+
+  /* Card Headings (H3–H5): Gilda Display, 400, 18px-30px, 1.3em-1.4em, normal */
+  h3 {
+    font-family: var(--font-serif, "Gilda Display", serif);
+    font-weight: 400;
+    font-size: clamp(22px, 2.5vw, 30px);
+    line-height: 1.35em;
+    letter-spacing: normal;
+  }
+
+  h4 {
+    font-family: var(--font-serif, "Gilda Display", serif);
+    font-weight: 400;
+    font-size: clamp(20px, 2vw, 24px);
+    line-height: 1.35em;
+    letter-spacing: normal;
+  }
+
+  h5 {
+    font-family: var(--font-serif, "Gilda Display", serif);
+    font-weight: 400;
+    font-size: clamp(18px, 1.8vw, 20px);
+    line-height: 1.4em;
+    letter-spacing: normal;
+  }
+
+  /* Body Paragraphs: Barlow, 400, 15px, 1.75em, normal */
+  p {
+    font-family: var(--font-sans, "Barlow", sans-serif);
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 1.75em;
+    letter-spacing: normal;
   }
 }
 
@@ -24,9 +98,164 @@ html.light {
   color: #0f172a;
 }
 
-body {
-  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
-  transition: background-color 0.3s ease, color 0.3s ease;
+/* ============================================================ */
+/* TYPOGRAPHY SPECIFICATION UTILITIES                           */
+/* ============================================================ */
+
+/* 1. Hero Title (H1): Gilda Display | 400 | 30px–45px | 1.25em | 10px */
+.hero-title,
+h1.hero-title {
+  font-family: var(--font-serif, "Gilda Display", serif) !important;
+  font-weight: 400 !important;
+  font-size: clamp(30px, 4vw, 45px) !important;
+  line-height: 1.25em !important;
+  letter-spacing: 10px !important;
+}
+
+/* 2. Hero Tagline / Subtitle: Barlow Condensed | 400 | 12px | 15px | 6px | uppercase */
+.hero-tagline,
+.hero-subtitle {
+  font-family: var(--font-condensed, "Barlow Condensed", sans-serif) !important;
+  font-weight: 400 !important;
+  font-size: 12px !important;
+  line-height: 15px !important;
+  letter-spacing: 6px !important;
+  text-transform: uppercase !important;
+}
+
+/* 3. Section Headings (H2): Gilda Display | 400 | 30px–40px | 1.25em | 1px */
+.section-heading,
+h2.section-heading {
+  font-family: var(--font-serif, "Gilda Display", serif) !important;
+  font-weight: 400 !important;
+  font-size: clamp(30px, 3.5vw, 40px) !important;
+  line-height: 1.25em !important;
+  letter-spacing: 1px !important;
+}
+
+/* 4. Card Headings (H3–H5): Gilda Display | 400 | 18px–30px | 1.3em–1.4em | normal */
+.card-heading,
+h3.card-heading {
+  font-family: var(--font-serif, "Gilda Display", serif) !important;
+  font-weight: 400 !important;
+  font-size: clamp(18px, 2.5vw, 30px) !important;
+  line-height: 1.35em !important;
+  letter-spacing: normal !important;
+}
+
+/* 5. Section Subtitles / Tags: Barlow Condensed | 400 | 12px–15px | 15px | 6px–10px | #aa8453 */
+.section-subtitle,
+.section-tag,
+.category-tag,
+.badge-tag {
+  font-family: var(--font-condensed, "Barlow Condensed", sans-serif) !important;
+  font-weight: 400 !important;
+  font-size: 13px !important;
+  line-height: 15px !important;
+  letter-spacing: 6px !important;
+  text-transform: uppercase !important;
+  color: #aa8453;
+}
+
+/* 6. Main Navigation Links: Barlow Condensed | 400 | 15px | 24px | 2px–3px | uppercase */
+header nav a,
+.main-nav a,
+.nav-link {
+  font-family: var(--font-condensed, "Barlow Condensed", sans-serif) !important;
+  font-weight: 400 !important;
+  font-size: 15px !important;
+  line-height: 24px !important;
+  letter-spacing: 2.5px !important;
+  text-transform: uppercase !important;
+}
+
+header nav a.active,
+.main-nav a.active,
+.nav-link.active {
+  color: #aa8453 !important;
+}
+
+/* 7. CTA Buttons (.butn-dark): Barlow Condensed | 400 / 500 | 13px–15px | normal | 3px–4px | uppercase */
+.butn-dark,
+.cta-button {
+  font-family: var(--font-condensed, "Barlow Condensed", sans-serif) !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  line-height: normal !important;
+  letter-spacing: 3px !important;
+  text-transform: uppercase !important;
+  background-color: #aa8453;
+  color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.butn-dark:hover,
+.cta-button:hover {
+  background-color: #987242;
+}
+
+/* 8. Body Paragraphs: Barlow | 400 | 15px | 1.75em | normal */
+.body-paragraph {
+  font-family: var(--font-sans, "Barlow", sans-serif) !important;
+  font-weight: 400 !important;
+  font-size: 15px !important;
+  line-height: 1.75em !important;
+  letter-spacing: normal !important;
+}
+
+/* 9. Lead Descriptions: Barlow | 300 / 400 | 16px–18px | 1.8em | normal */
+.lead-desc,
+.lead-description,
+.lead {
+  font-family: var(--font-sans, "Barlow", sans-serif) !important;
+  font-weight: 400 !important;
+  font-size: 17px !important;
+  line-height: 1.8em !important;
+  letter-spacing: normal !important;
+}
+
+/* 10. Footer & Copyright: Barlow | 400 | 13px–14px | 1.8em | normal */
+footer,
+footer p,
+.footer-text,
+.copyright {
+  font-family: var(--font-sans, "Barlow", sans-serif) !important;
+  font-weight: 400 !important;
+  font-size: 13px !important;
+  line-height: 1.8em !important;
+  letter-spacing: normal !important;
+}
+
+/* Featured Numerals: Gilda Display | 400 */
+.featured-numeral {
+  font-family: var(--font-serif, "Gilda Display", serif) !important;
+  font-weight: 400 !important;
+}
+
+/* Font family utility classes */
+.font-serif {
+  font-family: var(--font-serif, "Gilda Display", serif) !important;
+}
+
+.font-sans {
+  font-family: var(--font-sans, "Barlow", sans-serif) !important;
+}
+
+.font-condensed {
+  font-family: var(--font-condensed, "Barlow Condensed", sans-serif) !important;
+}
+
+/* Gold Brand Accent Helpers */
+.text-gold {
+  color: #aa8453 !important;
+}
+
+.bg-gold {
+  background-color: #aa8453 !important;
+}
+
+.border-gold {
+  border-color: #aa8453 !important;
 }
 
 /* Custom Scrollbar */
@@ -45,7 +274,7 @@ html.dark ::-webkit-scrollbar-thumb {
 }
 .dark ::-webkit-scrollbar-thumb:hover,
 html.dark ::-webkit-scrollbar-thumb:hover {
-  background: #e36727;
+  background: #aa8453;
 }
 
 ::-webkit-scrollbar-track {
@@ -56,19 +285,20 @@ html.dark ::-webkit-scrollbar-thumb:hover {
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #e36727;
+  background: #aa8453;
 }
 
 /* Gold Gradient Text */
 .gold-gradient-text {
-  background: linear-gradient(135deg, #e36727 0%, #f59e0b 50%, #d4af37 100%);
+  background: linear-gradient(135deg, #aa8453 0%, #d4b584 50%, #aa8453 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 /* Card Glow Shadow */
 .portal-card-shadow {
-  box-shadow: 0 12px 30px -10px rgba(227, 103, 39, 0.25);
+  box-shadow: 0 12px 30px -10px rgba(170, 132, 83, 0.25);
 }
 
 /* Ken Burns Animation */

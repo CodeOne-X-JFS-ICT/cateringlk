@@ -151,7 +151,7 @@ export default function ProductsPage() {
         {/* Page Headline & Search */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <span className="text-[#E36727] text-xs font-extrabold uppercase tracking-widest bg-[#E36727]/10 px-3.5 py-1 rounded-full border border-[#E36727]/20 inline-block">
+            <span className="text-[#E36727] text-xs font-extrabold uppercase tracking-widest bg-[#E36727]/10 px-3.5 py-1 rounded-full border border-[#E36727]/20 inline-block font-condensed">
               Catering by Ahas Gawwa
             </span>
             <h1 className="font-serif text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mt-2">
@@ -180,10 +180,10 @@ export default function ProductsPage() {
             <button
               key={cat.key}
               onClick={() => setActiveCategory(cat.key)}
-              className={`px-5 py-2.5 rounded-2xl text-xs font-bold shrink-0 transition-all cursor-pointer ${
+              className={`px-5 py-2.5 rounded-2xl text-[13px] leading-[15px] font-normal shrink-0 transition-all cursor-pointer font-condensed uppercase tracking-[2.5px] ${
                 activeCategory === cat.key
-                  ? "bg-[#E36727] text-white shadow-md"
-                  : "bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:text-[#E36727]"
+                  ? "bg-[#aa8453] text-white shadow-md"
+                  : "bg-slate-100 dark:bg-[#26201d] text-slate-700 dark:text-slate-300 hover:text-[#aa8453]"
               }`}
             >
               {cat.label}
@@ -212,7 +212,7 @@ export default function ProductsPage() {
               <button
                 type="button"
                 onClick={fetchProducts}
-                className="px-6 py-3 bg-[#E36727] hover:bg-amber-600 text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-lg transition-all cursor-pointer transform hover:scale-105 active:scale-95"
+                className="butn-dark font-condensed px-6 py-3 bg-[#aa8453] hover:bg-[#987242] text-white font-medium text-[14px] leading-normal uppercase tracking-[3px] rounded-2xl shadow-lg transition-all cursor-pointer transform hover:scale-105 active:scale-95"
               >
                 <i className="fa-solid fa-arrows-rotate mr-2"></i> Try Again
               </button>

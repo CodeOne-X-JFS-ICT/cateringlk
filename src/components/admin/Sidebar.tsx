@@ -21,7 +21,7 @@ export default function Sidebar() {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         setUserRole(payload.role || "ADMIN");
-      } catch (e) {
+      } catch (_e) {
         setUserRole("ADMIN"); // fallback
       }
     }
